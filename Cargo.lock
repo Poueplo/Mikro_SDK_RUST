@@ -60,6 +60,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_gpio"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio_port",
+ "mcu",
+]
+
+[[package]]
 name = "hal_ll_gpio_port"
 version = "0.1.0"
 dependencies = [
@@ -76,6 +84,7 @@ version = "0.1.1"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
+ "hal_ll_gpio",
  "hal_ll_gpio_port",
  "mcu",
  "panic-halt",

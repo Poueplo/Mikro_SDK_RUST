@@ -25,6 +25,7 @@ panic-halt = "1.0.0"    # Panic handler
 
 mcu = { path = "core/mcu"}
 hal_ll_gpio_port = { path = "hal_ll/gpio/hal_ll_gpio_port" }
+hal_ll_gpio = { path = "hal_ll/gpio/hal_ll_gpio" }
 
 
 [features]

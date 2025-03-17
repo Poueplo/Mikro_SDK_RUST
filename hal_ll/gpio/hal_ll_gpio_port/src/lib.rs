@@ -1,4 +1,7 @@
 #![no_std]
+#![allow(non_camel_case_types)]
+#![allow(non_upper_case_globals)]
+#![allow(unused)]
 
 //to change place at some point
 //==========================================================//
@@ -10,17 +13,62 @@ pub const GPIO_PIN_MASK_ALL: u16 = 0xFFFF;
 pub const HAL_LL_NIBBLE_HIGH_32BIT : u32 = 0xFFFF_0000;
 pub const HAL_LL_NIBBLE_LOW_32BIT : u32 = 0xFFFF;
 
+pub const GPIO_OSPEEDER_OSPEEDR0 : u32 = 0x03;
+pub const GPIO_MODER_MODER0 : u32 = 0x03;
+pub const GPIO_OTYPER_OT_0 : u32 = 0x01;
+pub const GPIO_PUPDR_PUPDR0 : u32 = 0x03;
+
+
+pub const GPIO_CFG_MODE_INPUT : u32 = 0x2;
 pub const GPIO_CFG_MODE_OUTPUT : u32 = 0x4;
 pub const GPIO_CFG_OTYPE_PP : u32 = 0x10;
+pub const GPIO_CFG_PULL_NO : u32 = 0x40;
 pub const GPIO_CFG_SPEED_MAX : u32 = 0x80000;
 
-pub const  GPIO_CFG_DIGITAL_OUTPUT : u32 = ( GPIO_CFG_MODE_OUTPUT | GPIO_CFG_SPEED_MAX | GPIO_CFG_OTYPE_PP );
-
+pub const GPIO_CFG_DIGITAL_OUTPUT : u32 = GPIO_CFG_MODE_OUTPUT | GPIO_CFG_SPEED_MAX | GPIO_CFG_OTYPE_PP;
+pub const GPIO_CFG_DIGITAL_INPUT : u32 = GPIO_CFG_MODE_INPUT | GPIO_CFG_PULL_NO;
 
 //==========================================================//
 
 pub const RESET_PINS_OFFSET: u8 = 16;
 
+pub type hal_ll_gpio_base_t = mcu::handle_t;
+
+pub struct hal_ll_gpio_t
+{
+    pub base: hal_ll_gpio_base_t,
+    pub mask: mcu::hal_ll_gpio_mask_t
+}
+
+impl Default for hal_ll_gpio_port_t {
+    fn default() -> Self {
+        Self { base: 0, mask: 0}
+    }
+}
+
+#[derive(PartialEq)]
+pub enum hal_ll_gpio_direction_t
+{
+    HAL_LL_GPIO_DIGITAL_INPUT = 0,
+    HAL_LL_GPIO_DIGITAL_OUTPUT = 1
+}
+
+pub type hal_ll_gpio_port_t = hal_ll_gpio_t;
+
+const _hal_ll_gpio_port_base: [u32; 11 ] =
+[
+    mcu::GPIOA_BASE_ADDR,
+    mcu::GPIOB_BASE_ADDR,
+    mcu::GPIOC_BASE_ADDR,
+    mcu::GPIOD_BASE_ADDR,
+    mcu::GPIOE_BASE_ADDR,
+    mcu::GPIOF_BASE_ADDR,
+    mcu::GPIOG_BASE_ADDR,
+    mcu::GPIOH_BASE_ADDR,
+    mcu::GPIOI_BASE_ADDR,
+    mcu::GPIOJ_BASE_ADDR,
+    mcu::GPIOK_BASE_ADDR
+];
 
 #[repr(C)]
 pub struct hal_ll_gpio_base_handle_t 
@@ -39,6 +87,15 @@ pub struct hal_ll_gpio_base_handle_t
 
 const RCC_GPIOCLOCK: u32 = mcu::RCC_AHB1ENR;
 
+pub fn hal_ll_gpio_port_base( name: mcu::hal_ll_port_name_t ) -> u32
+{
+    return _hal_ll_gpio_port_base[ name as usize ];
+}
+
+pub fn hal_ll_gpio_digital_input(port: u32, pin_mask: u16) 
+{
+    hal_ll_gpio_config(port, pin_mask, GPIO_CFG_DIGITAL_INPUT);
+}
 
 pub fn hal_ll_gpio_digital_output(port: u32, pin_mask: u16) 
 {
@@ -67,18 +124,15 @@ fn hal_ll_gpio_clock_enable(port: u32) {
     }
 }
 
-//TODO : optimize per MCU
-//only conf output treated
+//TODO : optimize per MCU, extra config tunnings
+//only treated conf digital I/O any mask
 fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32) 
 {
-
-    let mut pin_pos     : u32   = 0;
     let mut pos         : u32   = 0;
     let mut current_pin : u32   = 0;
 
     let mut mode        : u32   = 0;
     let mut speed       : u32   = 0;
-
     let mut otype       : u32   = 0;
     let mut pull        : u32   = 0;
 
@@ -93,24 +147,31 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
         if config == GPIO_CFG_DIGITAL_OUTPUT 
         {
             unsafe { (*port_ptr).moder |= 0x0000_5555; }
-            unsafe { (*port_ptr).otyper &= 0xFFFFFF00; }
+            unsafe { (*port_ptr).otyper &= 0xFFFF_FF00; }
             unsafe { (*port_ptr).ospeedr |= HAL_LL_NIBBLE_LOW_32BIT; }
             return;
         }
 
-        // if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_INPUT 
-        // {
-        //     unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-        //     return;
-        // }
+        if config == GPIO_CFG_DIGITAL_INPUT 
+        {
+            unsafe { (*port_ptr).moder &= HAL_LL_NIBBLE_HIGH_32BIT; }
+            return;
+        }
+
     } else if pin_mask == GPIO_PIN_MASK_HIGH as u16
     {
         unsafe { (*port_ptr).moder &= HAL_LL_NIBBLE_LOW_32BIT; }
         if config == GPIO_CFG_DIGITAL_OUTPUT 
         {
             unsafe { (*port_ptr).moder |= 0x5555_0000; }
-            unsafe { (*port_ptr).otyper &= 0xFFFF00FF; }
+            unsafe { (*port_ptr).otyper &= 0xFFFF_00FF; }
             unsafe { (*port_ptr).ospeedr |= HAL_LL_NIBBLE_HIGH_32BIT; }
+            return;
+        }
+
+        if config == GPIO_CFG_DIGITAL_INPUT 
+        {
+            unsafe { (*port_ptr).moder &= HAL_LL_NIBBLE_LOW_32BIT; }
             return;
         }
 
@@ -125,207 +186,51 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
             unsafe { (*port_ptr).ospeedr = HAL_LL_NIBBLE_HIGH_32BIT; }
             return;
         }
-        /*if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_INPUT 
-        {
-            unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-            unsafe { *(port_ptr.crh as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-            return;
-        }*/
-    }
 
-//TODO 
-/*
-    if pin_mask == hal_ll_gpio_constants::GPIO_PIN_MASK_LOW as u16 
-    {
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_OUTPUT 
+        if config == GPIO_CFG_DIGITAL_INPUT 
         {
-            unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_OUTPUT;}
-            return;
-        }
-
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_INPUT 
-        {
-            unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-            return;
-        }
-    } 
-    else if pin_mask == hal_ll_gpio_constants::GPIO_PIN_MASK_HIGH as u16 
-    {
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_OUTPUT 
-        {
-            unsafe { *(port_ptr.crh as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_OUTPUT; }
-            return;
-        }
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_INPUT 
-        {
-            unsafe { *(port_ptr.crh as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
+            unsafe { (*port_ptr).moder = 0; }
             return;
         }
     }
 
-    if pin_mask == hal_ll_gpio_constants::GPIO_PIN_MASK_ALL as u16
+    if config & GPIO_CFG_MODE_OUTPUT != 0
     {
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_OUTPUT 
-        {
-            unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_OUTPUT; }
-            unsafe { *(port_ptr.crh as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_OUTPUT; }
-            return;
-        }
-        if config == hal_ll_gpio_constants::GPIO_CFG_DIGITAL_INPUT 
-        {
-            unsafe { *(port_ptr.crl as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-            unsafe { *(port_ptr.crh as *mut u32) = hal_ll_gpio_constants::GPIO_SET_ALL_INPUT; }
-            return;
-        }
+        mode = 1;
     }
-
-    if config & (hal_ll_gpio_constants::GPIO_CFG_MODE_ANALOG) != 0 
+    else
     {
         mode = 0;
-    } 
-    else if config & hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT != 0 
-    {
-        if config & (hal_ll_gpio_constants::GPIO_CFG_PULL_DOWN | hal_ll_gpio_constants::GPIO_CFG_PULL_UP) != 0 
-        {
-            mode = 0x8;
-        } 
-        else 
-        {
-            mode = 0x4;
-        }
-    } 
-    else if config & hal_ll_gpio_constants::GPIO_CFG_MODE_OUTPUT != 0 
-    {
-        if config & hal_ll_gpio_constants::GPIO_CFG_OTYPE_OD != 0 
-        {
-            mode = 0x4;
-        } 
-        else 
-        {
-            mode = 0;
-        }
-    } 
-    else if config & hal_ll_gpio_constants::GPIO_CFG_MODE_ALT_FUNCTION != 0 
-    {
-        if config & hal_ll_gpio_constants::GPIO_CFG_OTYPE_OD != 0 
-        {
-            mode = 0xC;
-        } 
-        else 
-        {
-            mode = 0x8;
-        }
     }
 
-    if config & (hal_ll_gpio_constants::GPIO_CFG_SPEED_MAX | hal_ll_gpio_constants::GPIO_CFG_SPEED_50MHZ) != 0 
-    {
-        speed = 3;
-    } 
-    else if config & hal_ll_gpio_constants::GPIO_CFG_SPEED_2MHZ != 0 
-    {
-        speed = 2;
-    } 
-    else if config & hal_ll_gpio_constants::GPIO_CFG_SPEED_10MHZ != 0 
-    {
-        speed = 1;
-    }
+    for pin_pos in 0x00 .. 0x10 {
+        pos = 0x01 << pin_pos;
+        current_pin = (pin_mask) as u32 & pos;
 
-    if config & (hal_ll_gpio_constants::GPIO_CFG_MODE_OUTPUT | hal_ll_gpio_constants::GPIO_CFG_MODE_ALT_FUNCTION) != 0 
-    {
-        /* Output mode */
-        mode |= speed;
-    }
-
-    if (pin_mask & 0xFF) != 0 
-    {
-        tmpreg = unsafe { *(port_ptr.crl as *mut u32) }; // CRL register
-
-        for pin_pos in 0..8 
+        if current_pin == pos
         {
-            pos = 1 << pin_pos;
+            unsafe{
+                (*port_ptr).moder &= !( GPIO_MODER_MODER0 << ( pin_pos * 2 ) );
+                (*port_ptr).moder |=  ( mode ) << ( pin_pos * 2 );
+            }
 
-            /* Get the port pins position */
-            current_pin = pin_mask as u32 & pos;
-
-            if current_pin == pos 
+            if config & ( GPIO_CFG_MODE_OUTPUT /*| GPIO_CFG_MODE_ALT_FUNCTION*/) != 0
             {
-                pos = pin_pos << 2;
-
-                /* Clear the corresponding low control register bits */
-                tmp_pinmask = 0x0F << pos;
-                tmpreg &= !tmp_pinmask;
-
-                /* Write the mode configuration in the corresponding bits */
-                tmpreg |= mode << pos;
-
-                /* Reset the corresponding ODR bit */
-                if (config & (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_DOWN)) == 
-                                (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_DOWN) 
-                {
-                    unsafe { *(port_ptr.brr as *mut u32) = 1 << pin_pos }; // write to BRR register
-                }
-                
-                /* Set the corresponding ODR bit */
-                if (config & (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_UP)) == 
-                                    (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_UP) 
-                {
-                    unsafe { *(port_ptr.bsrr as *mut u32) = 1 << pin_pos };
+                unsafe {                
+                    (*port_ptr).ospeedr &= !( GPIO_OSPEEDER_OSPEEDR0 << ( pin_pos * 2 ) );
+                    (*port_ptr).ospeedr |=  speed  << ( pin_pos * 2 );
+                    
+                    (*port_ptr).otyper &= !( GPIO_OTYPER_OT_0 << ( pin_pos ) as u16 ) ;
+                    (*port_ptr).otyper |= otype << pin_pos;
                 }
             }
-        }
-        unsafe { *(port_ptr.crl as *mut u32) = tmpreg; } // write to CRL register
-    }
 
-
-
-
-    /*---------------------------- GPIO CRH Configuration ------------------------*/
-    
-    /* Configure the eight high port pins */
-    use hal_ll_target::hal_ll_bit_control;
-
-    if pin_mask > hal_ll_bit_control::HAL_LL_NIBBLE_LOW_16BIT 
-    {
-
-        unsafe { tmpreg = port_ptr.crh; } // GPIOx->CRH;
-        
-        for pin_pos in 0..8 
-        {
-            pos = 1 << (pin_pos + 8);
-
-            /* Get the port pins position */
-            current_pin = pin_mask as u32 & pos;
-
-            if current_pin == pos 
-            {
-                pos = pin_pos << 2;
-
-            /* Clear the corresponding high control register bits */
-                tmp_pinmask = 0x0F << pos;
-                tmpreg &= !tmp_pinmask;
-
-            
-            /* Write the mode configuration in the corresponding bits */
-                tmpreg |= mode << pos;
-
-
-            /* Reset the corresponding ODR bit */
-                if (config & (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_DOWN)) == 
-                        (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_DOWN) 
-                {
-                    unsafe { *(port_ptr.brr as *mut u32) = 1 << (pin_pos + 8); }
-                }
-
-            /* Set the corresponding ODR bit */
-                if (config & (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_UP)) == 
-                        (hal_ll_gpio_constants::GPIO_CFG_MODE_INPUT | hal_ll_gpio_constants::GPIO_CFG_PULL_UP) 
-                {
-                    unsafe { *(port_ptr.bsrr as *mut u32) = 1 << (pin_pos + 8); }
-                }
+            unsafe{
+                (*port_ptr).pupdr &= !( GPIO_PUPDR_PUPDR0 << ( pin_pos * 2 ) );
+                (*port_ptr).pupdr |=  pull  << ( pin_pos * 2 );
             }
+
         }
 
-        unsafe { *(port_ptr.crh as *mut u32) = tmpreg; }
-    } */
-
+    }
 }
