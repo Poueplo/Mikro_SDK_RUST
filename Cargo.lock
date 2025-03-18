@@ -50,6 +50,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_digital_in"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_gpio",
+]
+
+[[package]]
+name = "drv_digital_out"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_gpio",
+]
+
+[[package]]
+name = "drv_name"
+version = "0.1.0"
+dependencies = [
+ "hal_gpio",
+ "hal_target",
+]
+
+[[package]]
+name = "drv_port"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_gpio",
+]
+
+[[package]]
 name = "embedded-hal"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -57,6 +89,16 @@ checksum = "35949884794ad573cf46071e41c9b60efb0cb311e3ca01f7af807af1debc66ff"
 dependencies = [
  "nb 0.1.3",
  "void",
+]
+
+[[package]]
+name = "hal_gpio"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "hal_ll_gpio_port",
+ "hal_target",
+ "mcu",
 ]
 
 [[package]]
@@ -75,6 +117,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_target"
+version = "0.1.0"
+dependencies = [
+ "mcu",
+]
+
+[[package]]
 name = "mcu"
 version = "0.1.1"
 
@@ -84,8 +133,10 @@ version = "0.1.1"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
- "hal_ll_gpio",
- "hal_ll_gpio_port",
+ "drv_digital_in",
+ "drv_digital_out",
+ "drv_name",
+ "drv_port",
  "mcu",
  "panic-halt",
 ]

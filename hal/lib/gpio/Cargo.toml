@@ -1,0 +1,22 @@
+[package]
+name = "hal_gpio"
+version = "0.1.0"
+edition = "2024"
+author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
+
+
+[profile.release]
+opt-level = 'z' 
+lto = true
+
+
+[profile.dev]
+opt-level = 0 
+lto = false  
+
+
+[dependencies]
+mcu = { path = "../../../core/mcu" }
+hal_ll_gpio = { path = "../../../hal_ll/gpio/hal_ll_gpio" }
+hal_ll_gpio_port = { path = "../../../hal_ll/gpio/hal_ll_gpio_port" }
+hal_target = { path = "../../interface"}

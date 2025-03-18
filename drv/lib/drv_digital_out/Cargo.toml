@@ -1,0 +1,20 @@
+[package]
+name = "drv_digital_out"
+version = "0.1.0"
+edition = "2024"
+author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
+
+
+[profile.release]
+opt-level = 'z' 
+lto = true
+
+
+[profile.dev]
+opt-level = 0 
+lto = false  
+
+
+[dependencies]
+drv_name = {path = "../drv_name"}
+hal_gpio = {path = "../../../hal/lib/gpio"}

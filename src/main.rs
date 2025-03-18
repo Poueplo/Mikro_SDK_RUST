@@ -10,38 +10,82 @@ use cortex_m_rt::entry; // The runtime
 #[allow(unused_imports)]
 use panic_halt;
 
-const port_out: mcu::hal_ll_port_name_t = mcu::PORT_D;
-const port_out1: mcu::hal_ll_port_name_t = mcu::PORT_E;
-const port_out2: mcu::hal_ll_port_name_t = mcu::PORT_F;
-const port_out3: mcu::hal_ll_port_name_t = mcu::PORT_G;
-const port_in: mcu::hal_ll_port_name_t = mcu::PORT_B;
+use drv_port::*;
+use drv_digital_in::*;
+use drv_digital_out::*;
+use drv_name::*;
+use mcu::*;
 
-
-
+const port_out: port_name_t = GPIO_PORT_D;
+const pin_in_1: pin_name_t = GPIO_B0;
+const pin_in_2: pin_name_t = GPIO_B1;
+const pin_in_3: pin_name_t = GPIO_B2;
+const pin_in_4: pin_name_t = GPIO_B4;
+const pin_out_1: pin_name_t = GPIO_C0;
+const pin_out_2: pin_name_t = GPIO_C2;
+const pin_out_3: pin_name_t = GPIO_C3;
 
 #[entry]
 fn main() -> ! {
-    let mut output:hal_ll_gpio_port::hal_ll_gpio_t = hal_ll_gpio_port::hal_ll_gpio_t::default();
-    let mut output1:hal_ll_gpio_port::hal_ll_gpio_t = hal_ll_gpio_port::hal_ll_gpio_t::default();
-    let mut output2:hal_ll_gpio_port::hal_ll_gpio_t = hal_ll_gpio_port::hal_ll_gpio_t::default();
-    let mut output3:hal_ll_gpio_port::hal_ll_gpio_t = hal_ll_gpio_port::hal_ll_gpio_t::default();
-    let mut input:hal_ll_gpio_port::hal_ll_gpio_t = hal_ll_gpio_port::hal_ll_gpio_t::default();
+    let mut output1: port_t = port_t::default();
 
-    let mut value : mcu::hal_ll_port_size_t;
+    let mut output2: digital_out_t = digital_out_t::default();
+    let mut output3: digital_out_t = digital_out_t::default();
+    let mut output4: digital_out_t = digital_out_t::default();
 
-    hal_ll_gpio::hal_ll_gpio_configure_port(&mut output as *mut _, port_out, 0x5555, hal_ll_gpio_port::hal_ll_gpio_direction_t::HAL_LL_GPIO_DIGITAL_OUTPUT);
-    hal_ll_gpio::hal_ll_gpio_configure_port(&mut output1 as *mut _, port_out1, hal_ll_gpio_port::GPIO_PIN_MASK_LOW, hal_ll_gpio_port::hal_ll_gpio_direction_t::HAL_LL_GPIO_DIGITAL_OUTPUT);
-    hal_ll_gpio::hal_ll_gpio_configure_port(&mut output2 as *mut _, port_out2, hal_ll_gpio_port::GPIO_PIN_MASK_HIGH, hal_ll_gpio_port::hal_ll_gpio_direction_t::HAL_LL_GPIO_DIGITAL_OUTPUT);
-    hal_ll_gpio::hal_ll_gpio_configure_port(&mut output3 as *mut _, port_out3, hal_ll_gpio_port::GPIO_PIN_MASK_ALL, hal_ll_gpio_port::hal_ll_gpio_direction_t::HAL_LL_GPIO_DIGITAL_OUTPUT);
-    hal_ll_gpio::hal_ll_gpio_write_port_output(&mut output as *mut _, 0xFFFF);
-    hal_ll_gpio::hal_ll_gpio_write_port_output(&mut output1 as *mut _, 0xFFFF);
-    hal_ll_gpio::hal_ll_gpio_write_port_output(&mut output2 as *mut _, 0xFFFF);
-    hal_ll_gpio::hal_ll_gpio_write_port_output(&mut output3 as *mut _, 0xFFFF);
+    let mut input1: digital_in_t = digital_in_t::default();
+    let mut input2: digital_in_t = digital_in_t::default();
+    let mut input3: digital_in_t = digital_in_t::default();
+    let mut input4: digital_in_t = digital_in_t::default();
 
-    hal_ll_gpio::hal_ll_gpio_configure_port(&mut input as *mut _, port_in, hal_ll_gpio_port::GPIO_PIN_MASK_ALL, hal_ll_gpio_port::hal_ll_gpio_direction_t::HAL_LL_GPIO_DIGITAL_INPUT);
+    let mut value0 : port_size_t;
+    let mut value1 : u8 = 0;
+    let mut value2 : u8 = 0;
+    let mut value3 : u8 = 0;
+    let mut value4 : u8 = 0;
 
-    value = hal_ll_gpio::hal_ll_gpio_read_port_ouput(&mut output as *mut _);
-    value = hal_ll_gpio::hal_ll_gpio_read_port_input(&mut input as *mut _);
+    port_init(&mut output1 , port_out, 0x5555, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
     
-    loop {}
+    digital_in_init(&mut input1, pin_in_1);
+    digital_in_init(&mut input2, pin_in_2);
+    digital_in_init(&mut input3, pin_in_3);
+    digital_in_init(&mut input4, pin_in_4);
+    
+    digital_out_init(&mut output2, pin_out_1);
+    digital_out_init(&mut output3, pin_out_2);
+    digital_out_init(&mut output4, pin_out_3);
+
+    port_write(&mut output1, 0xFFFF);
+
+    value0 = port_read_output(&mut output1).ok().unwrap();
+    
+    loop {
+        value1 = digital_in_read(&mut input1).ok().unwrap();
+        value2 = digital_in_read(&mut input2).ok().unwrap();
+        value3 = digital_in_read(&mut input3).ok().unwrap();
+        value4 = digital_in_read(&mut input4).ok().unwrap();
+
+        if value1 == 1 {
+            port_write(&mut output1, 0xFFFF);
+        } else {
+            port_write(&mut output1, 0x0000);
+        }
+
+        if value2 == 1 {
+            digital_out_high(&mut output2);
+        } else {
+            digital_out_low(&mut output2);
+        }
+
+        if value3 == 1 {
+            digital_out_toggle(&mut output3);
+        }
+
+        if value4 == 1 {
+            digital_out_write(&mut output4, 0xFF);
+        } else {
+            digital_out_write(&mut output4, 0x00);
+        }
+
+    }
 }

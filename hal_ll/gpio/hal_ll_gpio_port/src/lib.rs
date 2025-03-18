@@ -5,7 +5,7 @@
 
 //to change place at some point
 //==========================================================//
-pub extern crate mcu;
+use mcu::*;
 
 pub const GPIO_PIN_MASK_LOW: u16 = 0x00FF;
 pub const GPIO_PIN_MASK_HIGH: u16 = 0xFF00;
@@ -18,12 +18,25 @@ pub const GPIO_MODER_MODER0 : u32 = 0x03;
 pub const GPIO_OTYPER_OT_0 : u32 = 0x01;
 pub const GPIO_PUPDR_PUPDR0 : u32 = 0x03;
 
-
+pub const GPIO_CFG_MODE_ANALOG : u32 = 0x1;
 pub const GPIO_CFG_MODE_INPUT : u32 = 0x2;
 pub const GPIO_CFG_MODE_OUTPUT : u32 = 0x4;
+pub const GPIO_CFG_MODE_ALT_FUNCTION : u32 = 0x8;
 pub const GPIO_CFG_OTYPE_PP : u32 = 0x10;
+pub const GPIO_CFG_OTYPE_OD : u32 = 0x20;
 pub const GPIO_CFG_PULL_NO : u32 = 0x40;
+pub const GPIO_CFG_PULL_UP : u32 = 0x80;
+pub const GPIO_CFG_PULL_DOWN : u32 = 0x100;
+
+//TODO adapt per CPU
+pub const GPIO_CFG_SPEED_LOW : u32 = 0x0;
+pub const GPIO_CFG_SPEED_MEDIUM : u32 = 0x200;
+pub const GPIO_CFG_SPEED_HIGH : u32 = 0x400;
+pub const GPIO_CFG_SPEED_VERY_HIGH : u32 = 0x800;
+
 pub const GPIO_CFG_SPEED_MAX : u32 = 0x80000;
+
+
 
 pub const GPIO_CFG_DIGITAL_OUTPUT : u32 = GPIO_CFG_MODE_OUTPUT | GPIO_CFG_SPEED_MAX | GPIO_CFG_OTYPE_PP;
 pub const GPIO_CFG_DIGITAL_INPUT : u32 = GPIO_CFG_MODE_INPUT | GPIO_CFG_PULL_NO;
@@ -32,12 +45,12 @@ pub const GPIO_CFG_DIGITAL_INPUT : u32 = GPIO_CFG_MODE_INPUT | GPIO_CFG_PULL_NO;
 
 pub const RESET_PINS_OFFSET: u8 = 16;
 
-pub type hal_ll_gpio_base_t = mcu::handle_t;
+pub type hal_ll_gpio_base_t = handle_t;
 
 pub struct hal_ll_gpio_t
 {
     pub base: hal_ll_gpio_base_t,
-    pub mask: mcu::hal_ll_gpio_mask_t
+    pub mask: hal_ll_gpio_mask_t
 }
 
 impl Default for hal_ll_gpio_port_t {
@@ -53,21 +66,22 @@ pub enum hal_ll_gpio_direction_t
     HAL_LL_GPIO_DIGITAL_OUTPUT = 1
 }
 
+pub type hal_ll_gpio_pin_t = hal_ll_gpio_t;
 pub type hal_ll_gpio_port_t = hal_ll_gpio_t;
 
 const _hal_ll_gpio_port_base: [u32; 11 ] =
 [
-    mcu::GPIOA_BASE_ADDR,
-    mcu::GPIOB_BASE_ADDR,
-    mcu::GPIOC_BASE_ADDR,
-    mcu::GPIOD_BASE_ADDR,
-    mcu::GPIOE_BASE_ADDR,
-    mcu::GPIOF_BASE_ADDR,
-    mcu::GPIOG_BASE_ADDR,
-    mcu::GPIOH_BASE_ADDR,
-    mcu::GPIOI_BASE_ADDR,
-    mcu::GPIOJ_BASE_ADDR,
-    mcu::GPIOK_BASE_ADDR
+    GPIOA_BASE_ADDR,
+    GPIOB_BASE_ADDR,
+    GPIOC_BASE_ADDR,
+    GPIOD_BASE_ADDR,
+    GPIOE_BASE_ADDR,
+    GPIOF_BASE_ADDR,
+    GPIOG_BASE_ADDR,
+    GPIOH_BASE_ADDR,
+    GPIOI_BASE_ADDR,
+    GPIOJ_BASE_ADDR,
+    GPIOK_BASE_ADDR
 ];
 
 #[repr(C)]
@@ -85,11 +99,26 @@ pub struct hal_ll_gpio_base_handle_t
     pub afrh:    u32,
 }
 
-const RCC_GPIOCLOCK: u32 = mcu::RCC_AHB1ENR;
+const RCC_GPIOCLOCK: u32 = RCC_AHB1ENR;
 
-pub fn hal_ll_gpio_port_base( name: mcu::hal_ll_port_name_t ) -> u32
+fn hal_ll_gpio_pin_index(name: hal_ll_pin_name_t) -> u8
 {
-    return _hal_ll_gpio_port_base[ name as usize ];
+    name % PORT_SIZE
+}
+
+pub fn hal_ll_gpio_port_index(name: hal_ll_pin_name_t) -> u8
+{
+    name / PORT_SIZE
+}
+
+pub fn hal_ll_gpio_pin_mask(name: hal_ll_pin_name_t) -> u16
+{
+    0x01 << hal_ll_gpio_pin_index( name )
+}
+
+pub fn hal_ll_gpio_port_base( name: hal_ll_port_name_t ) -> u32
+{
+    _hal_ll_gpio_port_base[ name as usize ]
 }
 
 pub fn hal_ll_gpio_digital_input(port: u32, pin_mask: u16) 
@@ -110,13 +139,13 @@ fn hal_ll_gpio_clock_enable(port: u32) {
     {
 
         match port & 0xFFFFFC00 {
-            mcu::GPIOA_BASE_ADDR => {pos = 0x1;},
-            mcu::GPIOB_BASE_ADDR => {pos = 0x2;},
-            mcu::GPIOC_BASE_ADDR => {pos = 0x4;},
-            mcu::GPIOD_BASE_ADDR => {pos = 0x8;},
-            mcu::GPIOE_BASE_ADDR => {pos = 0x10;},
-            mcu::GPIOF_BASE_ADDR => {pos = 0x20;},
-            mcu::GPIOG_BASE_ADDR => {pos = 0x40;},
+            GPIOA_BASE_ADDR => {pos = 0x1;},
+            GPIOB_BASE_ADDR => {pos = 0x2;},
+            GPIOC_BASE_ADDR => {pos = 0x4;},
+            GPIOD_BASE_ADDR => {pos = 0x8;},
+            GPIOE_BASE_ADDR => {pos = 0x10;},
+            GPIOF_BASE_ADDR => {pos = 0x20;},
+            GPIOG_BASE_ADDR => {pos = 0x40;},
             _ => {}
         }
 
@@ -146,9 +175,11 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
         unsafe { (*port_ptr).moder &= HAL_LL_NIBBLE_HIGH_32BIT; }
         if config == GPIO_CFG_DIGITAL_OUTPUT 
         {
-            unsafe { (*port_ptr).moder |= 0x0000_5555; }
-            unsafe { (*port_ptr).otyper &= 0xFFFF_FF00; }
-            unsafe { (*port_ptr).ospeedr |= HAL_LL_NIBBLE_LOW_32BIT; }
+            unsafe {
+                (*port_ptr).moder |= 0x0000_5555;
+                (*port_ptr).otyper &= 0xFFFF_FF00;
+                (*port_ptr).ospeedr |= HAL_LL_NIBBLE_LOW_32BIT;
+            }
             return;
         }
 
@@ -163,9 +194,11 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
         unsafe { (*port_ptr).moder &= HAL_LL_NIBBLE_LOW_32BIT; }
         if config == GPIO_CFG_DIGITAL_OUTPUT 
         {
-            unsafe { (*port_ptr).moder |= 0x5555_0000; }
-            unsafe { (*port_ptr).otyper &= 0xFFFF_00FF; }
-            unsafe { (*port_ptr).ospeedr |= HAL_LL_NIBBLE_HIGH_32BIT; }
+            unsafe {
+                (*port_ptr).moder |= 0x5555_0000;
+                (*port_ptr).otyper &= 0xFFFF_00FF;
+                (*port_ptr).ospeedr |= HAL_LL_NIBBLE_HIGH_32BIT; 
+            }
             return;
         }
 
@@ -181,9 +214,11 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
     {
         if config == GPIO_CFG_DIGITAL_OUTPUT 
         {
-            unsafe { (*port_ptr).moder = 0x5555_5555; }
-            unsafe { (*port_ptr).otyper = 0; }
-            unsafe { (*port_ptr).ospeedr = HAL_LL_NIBBLE_HIGH_32BIT; }
+            unsafe {
+                (*port_ptr).moder = 0x5555_5555;
+                (*port_ptr).otyper = 0;
+                (*port_ptr).ospeedr = HAL_LL_NIBBLE_HIGH_32BIT;
+            }
             return;
         }
 
@@ -194,13 +229,40 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
         }
     }
 
-    if config & GPIO_CFG_MODE_OUTPUT != 0
-    {
+
+    if config & GPIO_CFG_MODE_ANALOG != 0 {
+        mode = 3;
+    } else if config & GPIO_CFG_MODE_ALT_FUNCTION != 0 {
+        mode = 2;
+    } else if config & GPIO_CFG_MODE_OUTPUT != 0 {
         mode = 1;
-    }
-    else
-    {
+    } else {
         mode = 0;
+    }
+
+    //TODO adapt per cpu
+    if config & (GPIO_CFG_SPEED_VERY_HIGH | GPIO_CFG_SPEED_MAX) != 0 {
+        speed = 3;
+    } else if config & GPIO_CFG_SPEED_HIGH != 0 {
+        speed = 2;
+    } else if config & GPIO_CFG_SPEED_MEDIUM != 0 {
+        speed = 1;
+    } else {
+        speed = 0;
+    }
+
+    if config & GPIO_CFG_OTYPE_OD != 0 {
+        otype = 1;
+    } else {
+        otype = 0;
+    }
+
+    if config & GPIO_CFG_PULL_DOWN != 0 {
+        pull = 2;
+    } else if config & GPIO_CFG_PULL_UP != 0 {
+        pull = 1;
+    } else {
+        pull = 0;
     }
 
     for pin_pos in 0x00 .. 0x10 {
@@ -214,7 +276,7 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
                 (*port_ptr).moder |=  ( mode ) << ( pin_pos * 2 );
             }
 
-            if config & ( GPIO_CFG_MODE_OUTPUT /*| GPIO_CFG_MODE_ALT_FUNCTION*/) != 0
+            if config & ( GPIO_CFG_MODE_OUTPUT | GPIO_CFG_MODE_ALT_FUNCTION) != 0
             {
                 unsafe {                
                     (*port_ptr).ospeedr &= !( GPIO_OSPEEDER_OSPEEDR0 << ( pin_pos * 2 ) );
