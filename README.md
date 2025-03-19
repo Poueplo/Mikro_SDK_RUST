@@ -32,7 +32,7 @@ You must have a ST-Link V2, Firmware version 2.26 or higher
 
 ### Compiling and Flashing  
 
-Run the following command to flash your MCU:  
+Run the following command to build and flash your MCU:  
 
 ```sh
 cargo-flash --chip STM32F429ZI --connect-under-reset
