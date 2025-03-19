@@ -47,10 +47,10 @@ This project is configured to target the thumbv7m-none-eabi architecture by defa
 ### Prerequisites
 
 - **OpenOCD-xpack**
- - [OpenOCD-xpack download](https://sourceforge.net/projects/openocd-xpack/)
+  - [OpenOCD-xpack download](https://sourceforge.net/projects/openocd-xpack/)
 
 - **arm-none-eabi**
- - [arm-none-eabi download](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
+  - [arm-none-eabi download](https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads)
 
 ### Setting Up  
 
