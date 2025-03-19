@@ -1,5 +1,5 @@
 [package]
-name = "hal_ll_gpio_port"
+name = "hal_ll_gpio_constants"
 version = "0.1.0"
 edition = "2024"
 author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
@@ -16,7 +16,5 @@ lto = false
 
 
 [dependencies]
-hal_ll_gpio_constants = {path = "../hal_ll_gpio_constants"}
-hal_ll_target = {path = "../../hal_ll_target"}
 
 [features]

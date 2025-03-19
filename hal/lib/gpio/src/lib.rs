@@ -1,10 +1,9 @@
 #![no_std]
 #![allow(non_camel_case_types)]
 
-use hal_ll_gpio_port::{hal_ll_gpio_direction_t,hal_ll_gpio_port_t,hal_ll_gpio_pin_t};
 use hal_ll_gpio::*;
 use hal_target::*;
-use mcu::hal_ll_port_size_t;
+use hal_target::pin_names::*;
 
 #[derive(PartialEq)]
 pub enum hal_gpio_direction_t
@@ -13,8 +12,8 @@ pub enum hal_gpio_direction_t
     HAL_GPIO_DIGITAL_OUTPUT = 1
 }
 
-pub type hal_gpio_base_t = mcu::handle_t;
-pub type hal_gpio_mask_t = mcu::hal_ll_gpio_mask_t;
+pub type hal_gpio_base_t = handle_t;
+pub type hal_gpio_mask_t = hal_ll_gpio_mask_t;
 
 pub struct hal_gpio_t
 {

@@ -16,7 +16,5 @@ lto = false
 
 
 [dependencies]
-mcu = { path = "../../../core/mcu" }
 hal_ll_gpio = { path = "../../../hal_ll/gpio/hal_ll_gpio" }
-hal_ll_gpio_port = { path = "../../../hal_ll/gpio/hal_ll_gpio_port" }
 hal_target = { path = "../../interface"}

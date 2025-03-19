@@ -96,9 +96,7 @@ name = "hal_gpio"
 version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
- "hal_ll_gpio_port",
  "hal_target",
- "mcu",
 ]
 
 [[package]]
@@ -106,21 +104,44 @@ name = "hal_ll_gpio"
 version = "0.1.0"
 dependencies = [
  "hal_ll_gpio_port",
- "mcu",
 ]
+
+[[package]]
+name = "hal_ll_gpio_constants"
+version = "0.1.0"
 
 [[package]]
 name = "hal_ll_gpio_port"
 version = "0.1.0"
 dependencies = [
+ "hal_ll_gpio_constants",
+ "hal_ll_target",
+]
+
+[[package]]
+name = "hal_ll_pin_names"
+version = "0.1.1"
+dependencies = [
+ "hal_ll_target_names",
  "mcu",
 ]
+
+[[package]]
+name = "hal_ll_target"
+version = "0.1.1"
+dependencies = [
+ "hal_ll_pin_names",
+]
+
+[[package]]
+name = "hal_ll_target_names"
+version = "0.1.1"
 
 [[package]]
 name = "hal_target"
 version = "0.1.0"
 dependencies = [
- "mcu",
+ "hal_ll_target",
 ]
 
 [[package]]
@@ -137,7 +158,6 @@ dependencies = [
  "drv_digital_out",
  "drv_name",
  "drv_port",
- "mcu",
  "panic-halt",
 ]
 

@@ -14,7 +14,6 @@ use drv_port::*;
 use drv_digital_in::*;
 use drv_digital_out::*;
 use drv_name::*;
-use mcu::*;
 
 const port_out: port_name_t = GPIO_PORT_D;
 const pin_in_1: pin_name_t = GPIO_B0;
