@@ -66,7 +66,7 @@ pub fn hal_ll_gpio_write_pin_output(pin: *mut hal_ll_gpio_pin_t, value: u8)
 
 pub fn hal_ll_gpio_toggle_pin_output(pin: *mut hal_ll_gpio_pin_t)
 {
-    let mut value;
+    let value: u8;
     if hal_ll_gpio_read_pin_output(pin) == 0x00 {
         value = 0x01;
     } else {

@@ -30,7 +30,6 @@ impl Default for port_t {
 }
 
 
-//TODO add error detection
 pub fn port_init(port: &mut port_t, name: port_name_t, mask: port_size_t, direction: gpio_direction_t) -> Result<()>
 {
     if (direction != gpio_direction_t::GPIO_DIGITAL_INPUT) && (direction != gpio_direction_t::GPIO_DIGITAL_OUTPUT) {
