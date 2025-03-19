@@ -16,4 +16,4 @@ lto = false
 
 
 [dependencies]
-mcu = { path = "../../core/mcu" }
+hal_ll_target = {path = "../../hal_ll/hal_ll_target"}

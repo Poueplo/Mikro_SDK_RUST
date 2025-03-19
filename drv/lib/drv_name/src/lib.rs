@@ -4,6 +4,7 @@
 use hal_gpio::hal_gpio_direction_t;
 use hal_target::{hal_port_name_t, hal_port_size_t,hal_pin_name_t};
 pub use hal_target::{HAL_PORT_NC,HAL_PIN_NC};
+pub use hal_target::pin_names::*;
 
 #[derive(PartialEq)]
 pub enum gpio_direction_t

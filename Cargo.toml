@@ -23,7 +23,6 @@ cortex-m = "0.7.7"      # Access to the generic ARM peripherals
 cortex-m-rt = "0.7.5"  # Startup code for the ARM Core
 panic-halt = "1.0.0"    # Panic handler
 
-mcu = { path = "core/mcu"}
 drv_name = {path = "drv/lib/drv_name"}
 drv_port = {path= "drv/lib/drv_port"}
 drv_digital_in = {path= "drv/lib/drv_digital_in"}
