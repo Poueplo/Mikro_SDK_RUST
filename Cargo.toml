@@ -24,8 +24,9 @@ cortex-m-rt = "0.7.5"  # Startup code for the ARM Core
 panic-halt = "1.0.0"    # Panic handler
 
 drv_name = {path = "drv/lib/drv_name"}
-drv_port = {path= "drv/lib/drv_port"}
-drv_digital_in = {path= "drv/lib/drv_digital_in"}
-drv_digital_out = {path= "drv/lib/drv_digital_out"}
+drv_port = {path = "drv/lib/drv_port"}
+drv_digital_in = {path = "drv/lib/drv_digital_in"}
+drv_digital_out = {path = "drv/lib/drv_digital_out"}
+delays = {path = "core/delays"}
 
 [features]

@@ -62,4 +62,4 @@ pub const RCC_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x3800;
 //present in hal_ll_rcc.h
 pub const RCC_AHB1ENR:   u32 = RCC_BASE_ADDR + 0x0030;
 
-pub const PORT_SIZE : u8 = 16;
+pub const PORT_SIZE: u8 = 16;
