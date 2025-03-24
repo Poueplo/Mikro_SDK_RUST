@@ -12,10 +12,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bit_control"
+version = "0.1.1"
+
+[[package]]
 name = "bitfield"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46afbd2983a5d5a7bd740ccb198caf5b82f45c40c09c0eed36052d91cb92e719"
+
+[[package]]
+name = "common_header"
+version = "0.1.1"
 
 [[package]]
 name = "cortex-m"
@@ -48,10 +56,6 @@ dependencies = [
  "quote",
  "syn",
 ]
-
-[[package]]
-name = "delays"
-version = "0.1.1"
 
 [[package]]
 name = "drv_digital_in"
@@ -104,6 +108,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_adc"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_target",
+]
+
+[[package]]
 name = "hal_ll_gpio"
 version = "0.1.0"
 dependencies = [
@@ -134,6 +145,7 @@ dependencies = [
 name = "hal_ll_target"
 version = "0.1.1"
 dependencies = [
+ "bit_control",
  "hal_ll_pin_names",
 ]
 
@@ -158,12 +170,13 @@ version = "0.1.1"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
- "delays",
  "drv_digital_in",
  "drv_digital_out",
  "drv_name",
  "drv_port",
+ "hal_ll_adc",
  "panic-halt",
+ "system",
 ]
 
 [[package]]
@@ -238,6 +251,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "system"
+version = "0.1.0"
+dependencies = [
+ "common_header",
+ "mcu",
 ]
 
 [[package]]

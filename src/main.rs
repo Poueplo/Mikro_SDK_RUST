@@ -53,7 +53,7 @@ use drv_port::*;
 use drv_digital_in::*;
 use drv_digital_out::*;
 use drv_name::*;
-use delays::*;
+use system::*;
 
 const port_out: port_name_t = GPIO_PORT_D;
 const pin_in_1: pin_name_t = GPIO_B0;
@@ -66,6 +66,9 @@ const pin_out_3: pin_name_t = GPIO_C3;
 
 #[entry]
 fn main() -> ! {
+
+    system_init();
+
     let mut output1: port_t = port_t::default();
 
     let mut output2: digital_out_t = digital_out_t::default();
@@ -118,7 +121,7 @@ fn main() -> ! {
 
         if value3 == 1 {
             digital_out_toggle(&mut output3);
-            Delay_10ms();
+            delay_100ms();
         }
 
         if value4 == 1 {

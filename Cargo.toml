@@ -27,6 +27,8 @@ drv_name = {path = "drv/lib/drv_name"}
 drv_port = {path = "drv/lib/drv_port"}
 drv_digital_in = {path = "drv/lib/drv_digital_in"}
 drv_digital_out = {path = "drv/lib/drv_digital_out"}
-delays = {path = "core/delays"}
+system = {path = "core/system"}
+
+hal_ll_adc = {path = "hal_ll/adc/hal_ll_adc"}
 
 [features]
