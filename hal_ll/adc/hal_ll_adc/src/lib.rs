@@ -39,6 +39,8 @@
 
 #![no_std]
 #![allow(non_camel_case_types)]
+#![allow(non_upper_case_globals)]
+#![allow(unreachable_patterns)]
 
 use core::ptr;
 
@@ -327,7 +329,7 @@ pub fn hal_ll_adc_set_vref_value(handle: &mut hal_ll_adc_handle_register_t, vref
     hal_ll_adc_hw_specifics_map_local.vref_value = vref_value;
 }
 
-pub fn hal_ll_adc_read(handle: &mut hal_ll_adc_handle_register_t) -> Result<(u16)> {
+pub fn hal_ll_adc_read(handle: &mut hal_ll_adc_handle_register_t) -> Result<u16> {
     let hal_handle : &mut hal_ll_adc_handle_register_t = handle;
     let hal_ll_adc_hw_specifics_map_local: &mut hal_ll_adc_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
