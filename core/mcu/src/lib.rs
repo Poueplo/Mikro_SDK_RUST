@@ -41,6 +41,7 @@
 #![allow(non_upper_case_globals)]
 //for STM32F429ZI
 pub const APB1_BASE_ADDR: u32 = 0x4000_0000;
+pub const APB2_BASE_ADDR: u32 = 0x4001_0000;
 pub const AHB1_BASE_ADDR: u32 = 0x4002_0000;
 
 //present in hal_ll_gpio_port
@@ -57,6 +58,18 @@ pub const GPIOJ_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x2400;
 pub const GPIOK_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x2800;
 
 pub const PORT_SIZE: u8 = 16;
+
+pub const ADC_MODULE_1: u8 = 1;
+pub const ADC_MODULE_2: u8 = 2;
+pub const ADC_MODULE_3: u8 = 3;
+
+pub const ADC_MODULE_COUNT: u8 = 3;
+
+//present in hal_ll_adc_pin_map
+pub const ADC_BASE_ADDR: u32 = APB2_BASE_ADDR + 0x2000;
+pub const ADC1_BASE_ADDR: u32 = ADC_BASE_ADDR;
+pub const ADC2_BASE_ADDR: u32 = ADC_BASE_ADDR + 0x100;
+pub const ADC3_BASE_ADDR: u32 = ADC_BASE_ADDR + 0x200;
 
 //present in core_header.h
 pub const ADDRESS_RCC_CR         : u32 = 0x40023800;
@@ -86,6 +99,7 @@ pub const RCC_CIR         : u32 = RCC_BASE_ADDR + 0x0C;
 pub const RCC_AHB1ENR     : u32 = RCC_BASE_ADDR + 0x30;
 //
 pub const RCC_APB1ENR     : u32 = RCC_BASE_ADDR + 0x40;
+pub const RCC_APB2ENR     : u32 = RCC_BASE_ADDR + 0x44;
 
 // =========== PWR REGISTERS =========== 
 

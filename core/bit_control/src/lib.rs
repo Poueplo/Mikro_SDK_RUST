@@ -52,19 +52,19 @@ pub const HAL_LL_NIBBLE_HIGH_16BIT: u16 = 0xFF00;
 pub const HAL_LL_NIBBLE_HIGH_32BIT: u32 = 0xFFFF0000;
 
 /// Clears one bit in a register
-pub fn clear_reg_bit(reg: &mut u32, bit: u32) 
+pub fn clear_reg_bit(reg: u32, bit: u32) 
 {
-    *reg &= !(1 << bit);
+    unsafe{*(reg as *mut u32) &= !(1 << bit);}
 }
 
 /// Sets one bit in a register
-pub fn set_reg_bit(reg: &mut u32, bit: u32)
+pub fn set_reg_bit(reg: u32, bit: u32)
 {
-    *reg |= 1 << bit;
+    unsafe{*(reg as *mut u32) |= 1 << bit;}
 }
 
 /// Returns value of one bit in a register
 pub fn check_reg_bit(reg: u32, bit: u32) -> u32 
 {
-    reg & (1 << bit)
+    unsafe{*(reg as *mut u32) & (1 << bit)}
 }

@@ -42,6 +42,10 @@
 pub use hal_ll_target_names::*;
 pub use mcu::*;
 
+pub const HAL_LL_PIN_NC : hal_ll_pin_name_t = 0xFF;
+pub const HAL_LL_PORT_NC : hal_ll_pin_name_t = 0xFF;
+pub const HAL_LL_MODULE_ERROR: u32 = 0xFFFF_FFFF;
+
 pub const GPIO_A0: hal_ll_pin_name_t = 0x00;
 pub const GPIO_A1: hal_ll_pin_name_t = 0x01;
 pub const GPIO_A2: hal_ll_pin_name_t = 0x02;

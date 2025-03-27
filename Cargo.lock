@@ -111,7 +111,17 @@ dependencies = [
 name = "hal_ll_adc"
 version = "0.1.0"
 dependencies = [
+ "hal_ll_adc_pin_map",
+ "hal_ll_gpio_port",
  "hal_ll_target",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_adc_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
 ]
 
 [[package]]

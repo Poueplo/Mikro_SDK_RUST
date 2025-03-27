@@ -54,20 +54,40 @@ use drv_digital_in::*;
 use drv_digital_out::*;
 use drv_name::*;
 use system::*;
+use hal_ll_adc::*;
 
-const port_out: port_name_t = GPIO_PORT_D;
+const port_out: port_name_t = GPIO_PORT_E;
 const pin_in_1: pin_name_t = GPIO_B0;
 const pin_in_2: pin_name_t = GPIO_B1;
 const pin_in_3: pin_name_t = GPIO_B2;
-const pin_in_4: pin_name_t = GPIO_B4;
-const pin_out_1: pin_name_t = GPIO_C0;
-const pin_out_2: pin_name_t = GPIO_C2;
-const pin_out_3: pin_name_t = GPIO_C3;
+const pin_in_4: pin_name_t = GPIO_B5;
+const pin_out_1: pin_name_t = GPIO_D0;
+const pin_out_2: pin_name_t = GPIO_D2;
+const pin_out_3: pin_name_t = GPIO_D3;
 
 #[entry]
 fn main() -> ! {
 
     system_init();
+
+    let mut hal_module_id: u8 = 0;
+    let mut read_value: u16 = 0;
+    let mut adc1: hal_ll_adc_handle_register_t = hal_ll_adc_handle_register_t::default();
+    let mut adc2: hal_ll_adc_handle_register_t = hal_ll_adc_handle_register_t::default();
+    let mut adc3: hal_ll_adc_handle_register_t = hal_ll_adc_handle_register_t::default();
+    adc1 = hal_ll_adc_register_handle(GPIO_A3, HAL_LL_ADC_VREF_DEFAULT, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_6_BIT, &mut hal_module_id ).unwrap();
+    adc2 = hal_ll_adc_register_handle(GPIO_C0, HAL_LL_ADC_VREF_DEFAULT, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_8_BIT, &mut hal_module_id ).unwrap();
+    adc3 = hal_ll_adc_register_handle(GPIO_C2, HAL_LL_ADC_VREF_DEFAULT, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_10_BIT, &mut hal_module_id ).unwrap();
+    
+    hal_ll_adc_set_resolution(&mut adc1, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_8_BIT);
+    hal_ll_adc_set_resolution(&mut adc1, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_16_BIT); //should return error
+    hal_ll_adc_set_resolution(&mut adc1, hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_10_BIT);
+    hal_ll_adc_set_vref_value(&mut adc1, 3.3);
+    hal_ll_adc_set_vref_value(&mut adc1, 0.0);
+    hal_ll_adc_close(&mut adc2);
+    
+    hal_ll_module_configure_adc(&mut adc1);
+
 
     let mut output1: port_t = port_t::default();
 
@@ -86,7 +106,7 @@ fn main() -> ! {
     let mut value3 : u8 = 0;
     let mut value4 : u8 = 0;
 
-    port_init(&mut output1 , port_out, 0x5555, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+    port_init(&mut output1 , port_out, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
     
     digital_in_init(&mut input1, pin_in_1);
     digital_in_init(&mut input2, pin_in_2);
@@ -106,9 +126,11 @@ fn main() -> ! {
         value2 = digital_in_read(&mut input2).ok().unwrap();
         value3 = digital_in_read(&mut input3).ok().unwrap();
         value4 = digital_in_read(&mut input4).ok().unwrap();
+        read_value = hal_ll_adc_read(&mut adc1).ok().unwrap();
+
 
         if value1 == 1 {
-            port_write(&mut output1, 0xFFFF);
+            port_write(&mut output1, read_value);
         } else {
             port_write(&mut output1, 0x0000);
         }
