@@ -42,8 +42,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unreachable_patterns)]
 
-use core::ptr;
-
 use hal_ll_target::*;
 use hal_ll_gpio_port::{hal_ll_gpio_analog_input,hal_ll_gpio_port_base,hal_ll_gpio_port_index,hal_ll_gpio_pin_mask};
 use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef};
@@ -140,38 +138,36 @@ struct hal_ll_adc_pin_id
     pub pin_an : [u8; ADC_MODULE_COUNT as usize],
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_adc_resolution_t
 {
-    HAL_LL_ADC_RESOLUTION_NOT_SET = 0,
-    HAL_LL_ADC_RESOLUTION_6_BIT,     /* 6  bit resolution */
-    HAL_LL_ADC_RESOLUTION_8_BIT,     /* 8  bit resolution */
-    HAL_LL_ADC_RESOLUTION_10_BIT,    /* 10 bit resolution */
-    HAL_LL_ADC_RESOLUTION_12_BIT,    /* 12 bit resolution */
-    HAL_LL_ADC_RESOLUTION_14_BIT,    /* 14 bit resolution */
-    HAL_LL_ADC_RESOLUTION_16_BIT,    /* 16 bit resolution */
+    ADC_RESOLUTION_NOT_SET,
+    ADC_RESOLUTION_6_BIT,     /* 6  bit resolution */
+    ADC_RESOLUTION_8_BIT,     /* 8  bit resolution */
+    ADC_RESOLUTION_10_BIT,    /* 10 bit resolution */
+    ADC_RESOLUTION_12_BIT,    /* 12 bit resolution */
 }
 
-pub const HAL_LL_ADC_RESOLUTION_DEFAULT: hal_ll_adc_resolution_t = hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_12_BIT;
+pub const ADC_RESOLUTION_DEFAULT: hal_ll_adc_resolution_t = hal_ll_adc_resolution_t::ADC_RESOLUTION_12_BIT;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_adc_voltage_reference_t {
-    HAL_LL_ADC_VREF_EXTERNAL = 0,
+    ADC_VREF_EXTERNAL = 0,
 }
 
-pub const HAL_LL_ADC_VREF_DEFAULT: hal_ll_adc_voltage_reference_t = hal_ll_adc_voltage_reference_t::HAL_LL_ADC_VREF_EXTERNAL;
+pub const ADC_VREF_DEFAULT: hal_ll_adc_voltage_reference_t = hal_ll_adc_voltage_reference_t::ADC_VREF_EXTERNAL;
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct hal_ll_adc_handle_register_t
 {
-    pub hal_ll_adc_handle : handle_t,
+    pub adc_handle : handle_t,
     pub init_ll_state : bool
 }
 
 impl Default for hal_ll_adc_handle_register_t {
     fn default() -> Self {
         Self {
-            hal_ll_adc_handle : 0,
+            adc_handle : 0,
             init_ll_state : false
         }
     }
@@ -191,22 +187,22 @@ pub struct hal_ll_adc_hw_specifics_map_t {
 
 impl Default for hal_ll_adc_hw_specifics_map_t {
     fn default() -> Self {
-        Self { base: 0, module_index: 0, pin: 0, vref_input: HAL_LL_ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
+        Self { base: 0, module_index: 0, pin: 0, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
     }
 }
 
 static mut hal_ll_module_state: [hal_ll_adc_handle_register_t; ADC_MODULE_COUNT as usize]  = [ 
     hal_ll_adc_handle_register_t{
-        hal_ll_adc_handle : 0, 
+        adc_handle : 0, 
         init_ll_state : false
         };
     ADC_MODULE_COUNT as usize];
 
 static mut hal_ll_adc_hw_specifics_map:[hal_ll_adc_hw_specifics_map_t; (ADC_MODULE_COUNT+1) as usize] = [
-    hal_ll_adc_hw_specifics_map_t{base: ADC1_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_1), pin: HAL_LL_PIN_NC, vref_input: HAL_LL_ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_10BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
-    hal_ll_adc_hw_specifics_map_t{base: ADC2_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_2), pin: HAL_LL_PIN_NC, vref_input: HAL_LL_ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
-    hal_ll_adc_hw_specifics_map_t{base: ADC3_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_3), pin: HAL_LL_PIN_NC, vref_input: HAL_LL_ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
-    hal_ll_adc_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pin: HAL_LL_PIN_NC, vref_input: HAL_LL_ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
+    hal_ll_adc_hw_specifics_map_t{base: ADC1_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_1), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_10BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    hal_ll_adc_hw_specifics_map_t{base: ADC2_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_2), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    hal_ll_adc_hw_specifics_map_t{base: ADC3_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_3), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    hal_ll_adc_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
 ];
 
 static mut hal_ll_module_error : usize = 0;
@@ -225,20 +221,20 @@ pub fn hal_ll_adc_register_handle(pin: hal_ll_pin_name_t, vref_input: hal_ll_adc
 
     unsafe{
         match resolution {
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_6_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_6_BIT => 
                 hal_ll_adc_hw_specifics_map[pin_check_result as usize].resolution = HAL_LL_ADC_6BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_8_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_8_BIT => 
                 hal_ll_adc_hw_specifics_map[pin_check_result as usize].resolution = HAL_LL_ADC_8BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_10_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_10_BIT => 
                 hal_ll_adc_hw_specifics_map[pin_check_result as usize].resolution = HAL_LL_ADC_10BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_12_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_12_BIT => 
                 hal_ll_adc_hw_specifics_map[pin_check_result as usize].resolution = HAL_LL_ADC_12BIT_RES,
             _ => return Err(HAL_LL_ADC_ERROR::HAL_LL_ADC_UNSUPPORTED_RESOLUTION)
         }
     }
 
     match vref_input {
-        hal_ll_adc_voltage_reference_t::HAL_LL_ADC_VREF_EXTERNAL => (),
+        hal_ll_adc_voltage_reference_t::ADC_VREF_EXTERNAL => (),
         _ => return Err(HAL_LL_ADC_ERROR::HAL_LL_ADC_UNSUPPORTED_VREF)
     }
 
@@ -250,7 +246,7 @@ pub fn hal_ll_adc_register_handle(pin: hal_ll_pin_name_t, vref_input: hal_ll_adc
 
     *hal_module_id = pin_check_result;
 
-    hal_ll_module_state[pin_check_result as usize].hal_ll_adc_handle = hal_ll_adc_hw_specifics_map[pin_check_result as usize].base;
+    hal_ll_module_state[pin_check_result as usize].adc_handle = hal_ll_adc_hw_specifics_map[pin_check_result as usize].base;
     
     Ok(hal_ll_module_state[pin_check_result as usize])
     }
@@ -265,7 +261,7 @@ pub fn hal_ll_module_configure_adc (handle: &mut hal_ll_adc_handle_register_t) {
 
     hal_ll_adc_init(hal_ll_adc_hw_specifics_map_local);
     unsafe{
-        hal_ll_module_state[pin_check_result as usize].hal_ll_adc_handle = hal_ll_adc_hw_specifics_map[pin_check_result as usize].base;
+        hal_ll_module_state[pin_check_result as usize].adc_handle = hal_ll_adc_hw_specifics_map[pin_check_result as usize].base;
         hal_ll_module_state[pin_check_result as usize].init_ll_state = true;
     }
     hal_handle.init_ll_state = true;
@@ -280,13 +276,13 @@ pub fn hal_ll_adc_set_resolution(handle: &mut hal_ll_adc_handle_register_t, reso
     unsafe{
         hal_ll_module_state[pin_check_result as usize].init_ll_state = false;
         match resolution {
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_6_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_6_BIT => 
                 hal_ll_adc_hw_specifics_map_local.resolution = HAL_LL_ADC_6BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_8_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_8_BIT => 
                 hal_ll_adc_hw_specifics_map_local.resolution = HAL_LL_ADC_8BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_10_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_10_BIT => 
                 hal_ll_adc_hw_specifics_map_local.resolution = HAL_LL_ADC_10BIT_RES,
-            hal_ll_adc_resolution_t::HAL_LL_ADC_RESOLUTION_12_BIT => 
+            hal_ll_adc_resolution_t::ADC_RESOLUTION_12_BIT => 
                 hal_ll_adc_hw_specifics_map_local.resolution = HAL_LL_ADC_12BIT_RES,
             _ => return Err(HAL_LL_ADC_ERROR::HAL_LL_ADC_UNSUPPORTED_RESOLUTION)
         }
@@ -309,7 +305,7 @@ pub fn hal_ll_adc_set_vref_input(handle: &mut hal_ll_adc_handle_register_t, vref
         hal_ll_module_state[pin_check_result as usize].init_ll_state = false;
         
         match vref_input {
-            hal_ll_adc_voltage_reference_t::HAL_LL_ADC_VREF_EXTERNAL => (),
+            hal_ll_adc_voltage_reference_t::ADC_VREF_EXTERNAL => (),
             _ => return Err(HAL_LL_ADC_ERROR::HAL_LL_ADC_UNSUPPORTED_VREF)
         }
 
@@ -362,10 +358,11 @@ pub fn hal_ll_adc_close(handle: &mut hal_ll_adc_handle_register_t) {
 
     if hal_ll_adc_hw_specifics_map_local.base != HAL_LL_MODULE_ERROR  {
 
-        hal_ll_adc_hw_specifics_map_local.vref_input = HAL_LL_ADC_VREF_DEFAULT;
+        hal_ll_adc_hw_specifics_map_local.vref_input = ADC_VREF_DEFAULT;
         hal_ll_adc_hw_specifics_map_local.vref_value = 0.0;
         hal_ll_adc_hw_specifics_map_local.resolution = HAL_LL_ADC_12BIT_RES;
         hal_ll_adc_hw_specifics_map_local.pin = HAL_LL_PIN_NC;
+        hal_ll_adc_hw_specifics_map_local.channel = hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC;
 
         unsafe{
             hal_ll_module_state[pin_check_result as usize] = hal_ll_adc_handle_register_t::default();
@@ -404,7 +401,7 @@ fn hal_ll_adc_check_pins(pin: hal_ll_pin_name_t, index: &mut hal_ll_adc_pin_id) 
             index.pin_an[hal_ll_module_id as usize] = pin_index;
 
             // Check if module is taken
-            if  hal_ll_adc_handle_register_t::default().hal_ll_adc_handle == unsafe{hal_ll_module_state[hal_ll_module_id as usize].hal_ll_adc_handle}  {               
+            if  hal_ll_adc_handle_register_t::default().adc_handle == unsafe{hal_ll_module_state[hal_ll_module_id as usize].adc_handle}  {               
                 return hal_ll_module_id;
             } else {
                 index_counter = index_counter + 1;
@@ -431,13 +428,13 @@ fn hal_ll_adc_map_pin(module_index: u8, index: &mut hal_ll_adc_pin_id) {
 
 fn hal_ll_get_specifics<'a>( handle: hal_ll_adc_handle_register_t ) -> &'a mut hal_ll_adc_hw_specifics_map_t{
     unsafe{
-        let mut hal_ll_module_count : usize = ptr::read(ptr::addr_of!(hal_ll_module_state)).len();
+        let mut hal_ll_module_count : usize = ADC_MODULE_COUNT as usize;
         hal_ll_module_error = hal_ll_module_count;
 
     while hal_ll_module_count > 0 {
         hal_ll_module_count -= 1;
 
-        let base = handle.hal_ll_adc_handle;
+        let base = handle.adc_handle;
 
         if base == hal_ll_adc_hw_specifics_map[hal_ll_module_count].base {
             return &mut hal_ll_adc_hw_specifics_map[hal_ll_module_count];

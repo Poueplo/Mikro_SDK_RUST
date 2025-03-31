@@ -29,6 +29,6 @@ drv_digital_in = {path = "drv/lib/drv_digital_in"}
 drv_digital_out = {path = "drv/lib/drv_digital_out"}
 system = {path = "core/system"}
 
-hal_ll_adc = {path = "hal_ll/adc/hal_ll_adc"}
+hal_adc = {path = "hal/lib/adc"}
 
 [features]

@@ -100,6 +100,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_adc"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_adc",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_gpio"
 version = "0.1.0"
 dependencies = [
@@ -184,7 +192,7 @@ dependencies = [
  "drv_digital_out",
  "drv_name",
  "drv_port",
- "hal_ll_adc",
+ "hal_adc",
  "panic-halt",
  "system",
 ]
