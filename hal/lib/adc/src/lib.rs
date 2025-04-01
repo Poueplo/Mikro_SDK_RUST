@@ -53,14 +53,14 @@ pub use hal_ll_adc::{ADC_RESOLUTION_DEFAULT, ADC_VREF_DEFAULT};
 
 #[derive(Debug)]
 pub enum HAL_ADC_ERROR {
-    HAL_ADC_ERROR,
+    ADC_ERROR,
     ACQUIRE_FAIL
 }
 
 impl fmt::Display for HAL_ADC_ERROR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::HAL_ADC_ERROR => write!(f, "HAL_ADC_ERROR occurred"),
+            Self::ADC_ERROR => write!(f, "ADC_ERROR occurred"),
             Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),
         }
     }
@@ -164,7 +164,7 @@ pub fn hal_adc_set_resolution(handle: &mut hal_adc_t, config: hal_adc_config_t) 
     let hal_handle: &mut hal_adc_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 
     match hal_ll_adc_set_resolution(hal_handle , config.resolution) {
@@ -172,7 +172,7 @@ pub fn hal_adc_set_resolution(handle: &mut hal_adc_t, config: hal_adc_config_t) 
             hal_obj.handle = *hal_handle;
             Ok(())
         },
-        Err(_) => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        Err(_) => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 }
 
@@ -181,7 +181,7 @@ pub fn hal_adc_set_vref_input(handle: &mut hal_adc_t, config: hal_adc_config_t) 
     let hal_handle: &mut hal_adc_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 
     match hal_ll_adc_set_vref_input(hal_handle , config.vref_input) {
@@ -189,7 +189,7 @@ pub fn hal_adc_set_vref_input(handle: &mut hal_adc_t, config: hal_adc_config_t) 
             hal_obj.handle = *hal_handle;
             Ok(())
         },
-        Err(_) => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        Err(_) => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 }
 
@@ -198,7 +198,7 @@ pub fn hal_adc_set_vref_value(handle: &mut hal_adc_t, config: hal_adc_config_t) 
     let hal_handle: &mut hal_adc_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 
     hal_ll_adc_set_vref_value(hal_handle , config.vref_value);
@@ -211,7 +211,7 @@ pub fn hal_adc_read(handle: &mut hal_adc_t) -> Result<u16> {
     let hal_handle: &mut hal_adc_handle_register_t; 
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 
     if !hal_handle.init_ll_state {
@@ -221,8 +221,40 @@ pub fn hal_adc_read(handle: &mut hal_adc_t) -> Result<u16> {
     
     match hal_ll_adc_read(hal_handle) {
         Ok(r) => Ok(r),
-        Err(_) => Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        Err(_) => Err(HAL_ADC_ERROR::ADC_ERROR),
     }
+}
+
+pub fn hal_adc_read_voltage(handle: &mut hal_adc_t) -> Result<f32> {
+    let read_value: u16;
+    let local_resolution: u16;
+    
+    let hal_obj: &mut hal_adc_t = handle;
+    let hal_handle: &mut hal_adc_handle_register_t; 
+    match hal_is_handle_register( hal_obj ){
+        Some(h) => hal_handle = h ,
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
+    }
+
+    if !hal_handle.init_ll_state {
+        hal_ll_module_configure_adc(hal_handle);
+        hal_obj.handle = *hal_handle;
+    }
+    
+    match hal_ll_adc_read(hal_handle) {
+        Ok(r) => read_value = r,
+        Err(_) => return Err(HAL_ADC_ERROR::ADC_ERROR),
+    }
+
+    match hal_obj.config.resolution {
+        hal_ll_adc_resolution_t::ADC_RESOLUTION_6_BIT => local_resolution = HAL_LL_ADC_RESOLUTION_MASK::ADC_6BIT_MASK_VAL as u16,
+        hal_ll_adc_resolution_t::ADC_RESOLUTION_8_BIT => local_resolution = HAL_LL_ADC_RESOLUTION_MASK::ADC_8BIT_MASK_VAL as u16,
+        hal_ll_adc_resolution_t::ADC_RESOLUTION_10_BIT => local_resolution = HAL_LL_ADC_RESOLUTION_MASK::ADC_10BIT_MASK_VAL as u16,
+        hal_ll_adc_resolution_t::ADC_RESOLUTION_12_BIT => local_resolution = HAL_LL_ADC_RESOLUTION_MASK::ADC_12BIT_MASK_VAL as u16,
+        _ => return Err(HAL_ADC_ERROR::ADC_ERROR),
+    }
+
+    return Ok((read_value as f32 *  hal_obj.config.vref_value ) / local_resolution as f32)
 }
 
 pub fn hal_adc_close( handle: &mut hal_adc_t) -> Result<()> {
@@ -230,7 +262,7 @@ pub fn hal_adc_close( handle: &mut hal_adc_t) -> Result<()> {
     let hal_handle: &mut hal_adc_handle_register_t; 
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_ADC_ERROR::HAL_ADC_ERROR),
+        None => return Err(HAL_ADC_ERROR::ADC_ERROR),
     }
 
     if (hal_handle.adc_handle != 0) & (hal_handle.adc_handle != 0xFFFF_FFFF)
@@ -244,5 +276,5 @@ pub fn hal_adc_close( handle: &mut hal_adc_t) -> Result<()> {
         return Ok(())
     }
 
-    Err(HAL_ADC_ERROR::HAL_ADC_ERROR)
+    Err(HAL_ADC_ERROR::ADC_ERROR)
 }

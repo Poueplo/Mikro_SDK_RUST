@@ -58,6 +58,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_analog_in"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_adc",
+]
+
+[[package]]
 name = "drv_digital_in"
 version = "0.1.0"
 dependencies = [
@@ -188,11 +196,11 @@ version = "0.1.1"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
+ "drv_analog_in",
  "drv_digital_in",
  "drv_digital_out",
  "drv_name",
  "drv_port",
- "hal_adc",
  "panic-halt",
  "system",
 ]

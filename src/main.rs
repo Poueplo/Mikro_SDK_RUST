@@ -39,22 +39,17 @@
 
 #![no_std]
 #![no_main]
-//#![allow(unused)]
 #![allow(non_upper_case_globals)]
-
-
+#![allow(unused_imports)]
 
 use cortex_m_rt::entry; // The runtime
-
-use hal_adc::hal_adc_t;
-#[allow(unused_imports)]
 use panic_halt;
 
 use drv_port::*;
 use drv_digital_in::*;
+use drv_analog_in::*;
 use drv_name::*;
 use system::*;
-use hal_adc::*;
 
 const port_out: port_name_t = GPIO_PORT_E;
 const pin_in_1: pin_name_t = GPIO_B0;
@@ -65,23 +60,24 @@ fn main() -> ! {
     system_init();
 
     let mut read_value: u16 = 0;
-    let mut adc1: hal_adc_t = hal_adc_t::default();
-    let mut adc2: hal_adc_t = hal_adc_t::default();
-    let config_1: hal_adc_config_t =  hal_adc_config_t{ pin: GPIO_A3, resolution: hal_adc_resolution_t::ADC_RESOLUTION_10_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 3.3 };
-    let config_2: hal_adc_config_t =  hal_adc_config_t{ pin: GPIO_A3, resolution: hal_adc_resolution_t::ADC_RESOLUTION_8_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    let mut read_voltage: f32 = 0.0;
+    let mut adc1: analog_in_t = analog_in_t::default();
+    let mut adc2: analog_in_t = analog_in_t::default();
+    let config_1: analog_in_config_t =  analog_in_config_t{ pin: GPIO_A3, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    let config_2: analog_in_config_t =  analog_in_config_t{ pin: GPIO_C0, resolution: analog_in_resolution_t::ADC_RESOLUTION_6_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 3.3 };
 
-    adc1.config = hal_adc_config_t{ pin: GPIO_A3, resolution: hal_adc_resolution_t::ADC_RESOLUTION_6_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
-    adc2.config = hal_adc_config_t{ pin: GPIO_C0, resolution: ADC_RESOLUTION_DEFAULT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    let drv_config: analog_in_t = analog_in_t::default();
 
-    hal_adc_open(&mut adc1, true);
-    hal_adc_open(&mut adc2, true);
-    hal_adc_set_resolution(&mut adc2, config_1);
-    hal_adc_close(&mut adc2);
+    adc1.config = analog_in_config_t{ pin: GPIO_A3, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    adc2.config = analog_in_config_t{ pin: GPIO_C0, resolution: ADC_RESOLUTION_DEFAULT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
 
-    hal_adc_set_resolution(&mut adc1, config_1);
-    hal_adc_set_resolution(&mut adc1, config_2);
-    hal_adc_set_vref_value(&mut adc1, config_1);
-    hal_adc_set_vref_value(&mut adc1, config_2);
+    analog_in_open(&mut adc1, config_1);
+    analog_in_open(&mut adc2, config_2);
+    analog_in_set_resolution(&mut adc2, config_1.resolution);
+    analog_in_close(&mut adc2);
+
+    analog_in_set_resolution(&mut adc1, config_2.resolution);
+    analog_in_set_vref_value(&mut adc1, 25.0);
 
 
     let mut output1: port_t = port_t::default();
@@ -96,8 +92,8 @@ fn main() -> ! {
     
     loop {
         value1 = digital_in_read(&mut input1).ok().unwrap();
-        read_value = hal_adc_read(&mut adc1).ok().unwrap();
-
+        read_value = analog_in_read(&mut adc1).ok().unwrap();
+        read_voltage = analog_in_read_voltage(&mut adc1).ok().unwrap();
 
         if value1 == 1 {
             port_write(&mut output1, read_value);

@@ -87,6 +87,14 @@ pub const HAL_LL_ADC_6BIT_RES: u32 = 0x0300_0000;
 
 pub const HAL_LL_RESOLUTION_MASK: u32 = 0xFCFFFFFF;
 
+#[repr(u16)]
+pub enum HAL_LL_ADC_RESOLUTION_MASK {
+    ADC_6BIT_MASK_VAL = 0x003F,
+    ADC_8BIT_MASK_VAL = 0x00FF,
+    ADC_10BIT_MASK_VAL = 0x03FF,
+    ADC_12BIT_MASK_VAL = 0x0FFF,
+}
+
 #[derive(Debug)]
 pub enum HAL_LL_ADC_ERROR {
     HAL_LL_ADC_WRONG_PIN,
