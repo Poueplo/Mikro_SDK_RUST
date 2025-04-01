@@ -43,4 +43,9 @@ pub mod pin_names {
     pub use hal_ll_pin_names::*;
 }
 
+pub mod bit_control {
+    pub use bit_control::*;
+}
+
 pub use pin_names::*;
+pub use bit_control::*;

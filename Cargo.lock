@@ -12,10 +12,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "bit_control"
+version = "0.1.1"
+
+[[package]]
 name = "bitfield"
 version = "0.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "46afbd2983a5d5a7bd740ccb198caf5b82f45c40c09c0eed36052d91cb92e719"
+
+[[package]]
+name = "common_header"
+version = "0.1.1"
 
 [[package]]
 name = "cortex-m"
@@ -47,6 +55,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "drv_analog_in"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_adc",
 ]
 
 [[package]]
@@ -92,11 +108,36 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_adc"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_adc",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_gpio"
 version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
  "hal_target",
+]
+
+[[package]]
+name = "hal_ll_adc"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_adc_pin_map",
+ "hal_ll_gpio_port",
+ "hal_ll_target",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_adc_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -130,6 +171,7 @@ dependencies = [
 name = "hal_ll_target"
 version = "0.1.1"
 dependencies = [
+ "bit_control",
  "hal_ll_pin_names",
 ]
 
@@ -154,11 +196,13 @@ version = "0.1.1"
 dependencies = [
  "cortex-m",
  "cortex-m-rt",
+ "drv_analog_in",
  "drv_digital_in",
  "drv_digital_out",
  "drv_name",
  "drv_port",
  "panic-halt",
+ "system",
 ]
 
 [[package]]
@@ -233,6 +277,14 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
+]
+
+[[package]]
+name = "system"
+version = "0.1.0"
+dependencies = [
+ "common_header",
+ "mcu",
 ]
 
 [[package]]

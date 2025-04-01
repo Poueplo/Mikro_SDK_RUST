@@ -39,35 +39,32 @@
 
 #![no_std]
 
-pub const GPIO_PIN_MASK_LOW: u16 = 0x00FF;
-pub const GPIO_PIN_MASK_HIGH: u16 = 0xFF00;
-pub const GPIO_PIN_MASK_ALL: u16 = 0xFFFF;
+/* Low nibble macros */
 
-pub const GPIO_OSPEEDER_OSPEEDR0 : u32 = 0x03;
-pub const GPIO_MODER_MODER0 : u32 = 0x03;
-pub const GPIO_OTYPER_OT_0 : u32 = 0x01;
-pub const GPIO_PUPDR_PUPDR0 : u32 = 0x03;
+pub const HAL_LL_NIBBLE_LOW_8BIT: u8 = 0xF;
+pub const HAL_LL_NIBBLE_LOW_16BIT: u16 = 0xFF;
+pub const HAL_LL_NIBBLE_LOW_32BIT: u32 = 0xFFFF;
 
-pub const GPIO_CFG_MODE_ANALOG : u32 = 0x1;
-pub const GPIO_CFG_MODE_INPUT : u32 = 0x2;
-pub const GPIO_CFG_MODE_OUTPUT : u32 = 0x4;
-pub const GPIO_CFG_MODE_ALT_FUNCTION : u32 = 0x8;
-pub const GPIO_CFG_OTYPE_PP : u32 = 0x10;
-pub const GPIO_CFG_OTYPE_OD : u32 = 0x20;
-pub const GPIO_CFG_PULL_NO : u32 = 0x40;
-pub const GPIO_CFG_PULL_UP : u32 = 0x80;
-pub const GPIO_CFG_PULL_DOWN : u32 = 0x100;
+/* High nibble macros */
 
-//TODO adapt per CPU
-pub const GPIO_CFG_SPEED_LOW : u32 = 0x0;
-pub const GPIO_CFG_SPEED_MEDIUM : u32 = 0x200;
-pub const GPIO_CFG_SPEED_HIGH : u32 = 0x400;
-pub const GPIO_CFG_SPEED_VERY_HIGH : u32 = 0x800;
+pub const HAL_LL_NIBBLE_HIGH_8BIT: u8 = 0xF0;
+pub const HAL_LL_NIBBLE_HIGH_16BIT: u16 = 0xFF00;
+pub const HAL_LL_NIBBLE_HIGH_32BIT: u32 = 0xFFFF0000;
 
-pub const GPIO_CFG_SPEED_MAX : u32 = 0x80000;
+/// Clears one bit in a register
+pub fn clear_reg_bit(reg: u32, bit: u32) 
+{
+    unsafe{*(reg as *mut u32) &= !(1 << bit);}
+}
 
+/// Sets one bit in a register
+pub fn set_reg_bit(reg: u32, bit: u32)
+{
+    unsafe{*(reg as *mut u32) |= 1 << bit;}
+}
 
-
-pub const GPIO_CFG_DIGITAL_OUTPUT : u32 = GPIO_CFG_MODE_OUTPUT | GPIO_CFG_SPEED_MAX | GPIO_CFG_OTYPE_PP;
-pub const GPIO_CFG_DIGITAL_INPUT : u32 = GPIO_CFG_MODE_INPUT | GPIO_CFG_PULL_NO;
-pub const GPIO_CFG_ANALOG_INPUT : u32 = GPIO_CFG_MODE_ANALOG | GPIO_CFG_PULL_NO;
+/// Returns value of one bit in a register
+pub fn check_reg_bit(reg: u32, bit: u32) -> u32 
+{
+    unsafe{*(reg as *mut u32) & (1 << bit)}
+}

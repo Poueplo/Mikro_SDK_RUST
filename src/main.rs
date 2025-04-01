@@ -39,90 +39,66 @@
 
 #![no_std]
 #![no_main]
-#![allow(unused)]
 #![allow(non_upper_case_globals)]
-
-use core::default;
+#![allow(unused_imports)]
 
 use cortex_m_rt::entry; // The runtime
-
-#[allow(unused_imports)]
 use panic_halt;
 
 use drv_port::*;
 use drv_digital_in::*;
-use drv_digital_out::*;
+use drv_analog_in::*;
 use drv_name::*;
+use system::*;
 
-const port_out: port_name_t = GPIO_PORT_D;
+const port_out: port_name_t = GPIO_PORT_E;
 const pin_in_1: pin_name_t = GPIO_B0;
-const pin_in_2: pin_name_t = GPIO_B1;
-const pin_in_3: pin_name_t = GPIO_B2;
-const pin_in_4: pin_name_t = GPIO_B4;
-const pin_out_1: pin_name_t = GPIO_C0;
-const pin_out_2: pin_name_t = GPIO_C2;
-const pin_out_3: pin_name_t = GPIO_C3;
 
 #[entry]
 fn main() -> ! {
+
+    system_init();
+
+    let mut read_value: u16 = 0;
+    let mut read_voltage: f32 = 0.0;
+    let mut adc1: analog_in_t = analog_in_t::default();
+    let mut adc2: analog_in_t = analog_in_t::default();
+    let config_1: analog_in_config_t =  analog_in_config_t{ pin: GPIO_A3, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    let config_2: analog_in_config_t =  analog_in_config_t{ pin: GPIO_C0, resolution: analog_in_resolution_t::ADC_RESOLUTION_6_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 3.3 };
+
+    let drv_config: analog_in_t = analog_in_t::default();
+
+    adc1.config = analog_in_config_t{ pin: GPIO_A3, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+    adc2.config = analog_in_config_t{ pin: GPIO_C0, resolution: ADC_RESOLUTION_DEFAULT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+
+    analog_in_open(&mut adc1, config_1);
+    analog_in_open(&mut adc2, config_2);
+    analog_in_set_resolution(&mut adc2, config_1.resolution);
+    analog_in_close(&mut adc2);
+
+    analog_in_set_resolution(&mut adc1, config_2.resolution);
+    analog_in_set_vref_value(&mut adc1, 25.0);
+
+
     let mut output1: port_t = port_t::default();
 
-    let mut output2: digital_out_t = digital_out_t::default();
-    let mut output3: digital_out_t = digital_out_t::default();
-    let mut output4: digital_out_t = digital_out_t::default();
-
     let mut input1: digital_in_t = digital_in_t::default();
-    let mut input2: digital_in_t = digital_in_t::default();
-    let mut input3: digital_in_t = digital_in_t::default();
-    let mut input4: digital_in_t = digital_in_t::default();
 
-    let mut value0 : port_size_t;
     let mut value1 : u8 = 0;
-    let mut value2 : u8 = 0;
-    let mut value3 : u8 = 0;
-    let mut value4 : u8 = 0;
 
-    port_init(&mut output1 , port_out, 0x5555, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+    port_init(&mut output1 , port_out, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
     
     digital_in_init(&mut input1, pin_in_1);
-    digital_in_init(&mut input2, pin_in_2);
-    digital_in_init(&mut input3, pin_in_3);
-    digital_in_init(&mut input4, pin_in_4);
-    
-    digital_out_init(&mut output2, pin_out_1);
-    digital_out_init(&mut output3, pin_out_2);
-    digital_out_init(&mut output4, pin_out_3);
-
-    port_write(&mut output1, 0xFFFF);
-
-    value0 = port_read_output(&mut output1).ok().unwrap();
     
     loop {
         value1 = digital_in_read(&mut input1).ok().unwrap();
-        value2 = digital_in_read(&mut input2).ok().unwrap();
-        value3 = digital_in_read(&mut input3).ok().unwrap();
-        value4 = digital_in_read(&mut input4).ok().unwrap();
+        read_value = analog_in_read(&mut adc1).ok().unwrap();
+        read_voltage = analog_in_read_voltage(&mut adc1).ok().unwrap();
 
         if value1 == 1 {
-            port_write(&mut output1, 0xFFFF);
+            port_write(&mut output1, read_value);
         } else {
             port_write(&mut output1, 0x0000);
-        }
-
-        if value2 == 1 {
-            digital_out_high(&mut output2);
-        } else {
-            digital_out_low(&mut output2);
-        }
-
-        if value3 == 1 {
-            digital_out_toggle(&mut output3);
-        }
-
-        if value4 == 1 {
-            digital_out_write(&mut output4, 0xFF);
-        } else {
-            digital_out_write(&mut output4, 0x00);
         }
 
     }

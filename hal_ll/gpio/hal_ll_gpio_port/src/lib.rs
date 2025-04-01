@@ -48,10 +48,6 @@ pub use hal_ll_target::pin_names;
 use hal_ll_target::*;
 use hal_ll_gpio_constants::*;
 
-//move to hal_ll_bit_control
-pub const HAL_LL_NIBBLE_HIGH_32BIT : u32 = 0xFFFF_0000;
-pub const HAL_LL_NIBBLE_LOW_32BIT : u32 = 0xFFFF;
-
 //==========================================================//
 
 pub const RESET_PINS_OFFSET: u8 = 16;
@@ -130,6 +126,11 @@ pub fn hal_ll_gpio_pin_mask(name: hal_ll_pin_name_t) -> u16
 pub fn hal_ll_gpio_port_base( name: hal_ll_port_name_t ) -> u32
 {
     _hal_ll_gpio_port_base[ name as usize ]
+}
+
+pub fn hal_ll_gpio_analog_input(port: u32, pin_mask: u16)
+{
+    hal_ll_gpio_config(port, pin_mask, GPIO_CFG_ANALOG_INPUT);
 }
 
 pub fn hal_ll_gpio_digital_input(port: u32, pin_mask: u16) 

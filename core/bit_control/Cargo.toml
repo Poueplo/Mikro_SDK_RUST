@@ -1,5 +1,5 @@
 [package]
-name = "hal_ll_target"
+name = "bit_control"
 version = "0.1.1"
 edition = "2024"
 author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
@@ -16,7 +16,5 @@ lto = false
 
 
 [dependencies]
-hal_ll_pin_names = {path = "../hal_ll_pin_names"}
-bit_control = {path = "../../core/bit_control"}
 
 [features]
