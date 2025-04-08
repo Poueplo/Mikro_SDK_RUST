@@ -30,4 +30,6 @@ drv_digital_out = {path = "drv/lib/drv_digital_out"}
 drv_analog_in = {path = "drv/lib/drv_analog_in"}
 system = {path = "core/system"}
 
+hal_ll_i2c_master = {path = "hal_ll/i2c/hal_ll_i2c_master"}
+
 [features]

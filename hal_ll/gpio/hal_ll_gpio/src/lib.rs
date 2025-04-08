@@ -41,8 +41,17 @@
 
 use hal_ll_gpio_port::*;
 use hal_ll_gpio_port::pin_names::{hal_ll_port_name_t,hal_ll_port_size_t,hal_ll_gpio_mask_t, hal_ll_pin_name_t};
-pub use hal_ll_gpio_port::pin_names;
-pub use hal_ll_gpio_port::{hal_ll_gpio_direction_t,hal_ll_gpio_port_t,hal_ll_gpio_pin_t};
+pub use hal_ll_gpio_port::{
+    hal_ll_gpio_direction_t,
+    hal_ll_gpio_port_t,
+    hal_ll_gpio_pin_t,
+    pin_names,
+    module_struct,
+    hal_ll_gpio_module_struct_init,
+    VALUE,
+    GPIO_MODULE_STRUCT_END,
+    gpio_constants
+};
 
 pub fn hal_ll_gpio_configure_pin(pin: *mut hal_ll_gpio_pin_t, name: hal_ll_pin_name_t , direction: hal_ll_gpio_direction_t)
 {

@@ -43,6 +43,9 @@ pub const GPIO_PIN_MASK_LOW: u16 = 0x00FF;
 pub const GPIO_PIN_MASK_HIGH: u16 = 0xFF00;
 pub const GPIO_PIN_MASK_ALL: u16 = 0xFFFF;
 
+pub const GPIO_AF_MASK: u32 = 0x0F;
+pub const GPIO_PIN_NAME_MASK: u32 = 0xFF;
+
 pub const GPIO_OSPEEDER_OSPEEDR0 : u32 = 0x03;
 pub const GPIO_MODER_MODER0 : u32 = 0x03;
 pub const GPIO_OTYPER_OT_0 : u32 = 0x01;

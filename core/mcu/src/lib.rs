@@ -65,11 +65,23 @@ pub const ADC_MODULE_3: u8 = 3;
 
 pub const ADC_MODULE_COUNT: u8 = 3;
 
+pub const I2C_MODULE_1: u8 = 1;
+pub const I2C_MODULE_2: u8 = 2;
+pub const I2C_MODULE_3: u8 = 3;
+
+pub const I2C_MODULE_COUNT: u8 = 3;
+
 //present in hal_ll_adc_pin_map
 pub const ADC_BASE_ADDR: u32 = APB2_BASE_ADDR + 0x2000;
 pub const ADC1_BASE_ADDR: u32 = ADC_BASE_ADDR;
 pub const ADC2_BASE_ADDR: u32 = ADC_BASE_ADDR + 0x100;
 pub const ADC3_BASE_ADDR: u32 = ADC_BASE_ADDR + 0x200;
+
+//present in hal_ll_i2c_pin_map
+pub const I2C_BASE_ADDR: u32 = APB1_BASE_ADDR + 0x5400;
+pub const I2C1_BASE_ADDR: u32 = I2C_BASE_ADDR;
+pub const I2C2_BASE_ADDR: u32 = I2C_BASE_ADDR + 0x400;
+pub const I2C3_BASE_ADDR: u32 = I2C_BASE_ADDR + 0x800;
 
 //present in core_header.h
 pub const ADDRESS_RCC_CR         : u32 = 0x40023800;
