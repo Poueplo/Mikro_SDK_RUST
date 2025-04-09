@@ -40,33 +40,28 @@
 #![no_std]
 #![allow(non_upper_case_globals)]
 
-use hal_adc::*;
+use hal_i2c_master::*;
 use drv_name::*;
 
-pub use hal_adc::hal_adc_config_t as analog_in_config_t;
-pub use hal_adc::hal_adc_t as analog_in_t;
-pub use hal_adc::hal_adc_resolution_t as analog_in_resolution_t;
-pub use hal_adc::HAL_ADC_ERROR as  DRV_ADC_ERROR;
-pub use hal_adc::hal_adc_vref_t as analog_in_vref_t;
-pub use hal_adc::{ADC_RESOLUTION_DEFAULT, ADC_VREF_DEFAULT};
+pub use hal_i2c_master::hal_i2c_master_config_t as i2c_master_config_t;
+pub use hal_i2c_master::hal_i2c_master_t as i2c_master_t;
+pub use hal_i2c_master::hal_i2c_master_speed_t as i2c_master_speed_t;
+pub use hal_i2c_master::HAL_I2C_MASTER_ERROR as  DRV_I2C_MASTER_ERROR;
 
-type Result<T> = core::result::Result<T, DRV_ADC_ERROR>;
+type Result<T> = core::result::Result<T, DRV_I2C_MASTER_ERROR>;
 
-static mut previous_initialized: analog_in_t = analog_in_t{ 
-        handle: hal_adc_handle_register_t{ adc_handle: 0, init_ll_state: false },
-        config: analog_in_config_t{ pin: HAL_PIN_NC, 
-                                    resolution: ADC_RESOLUTION_DEFAULT, 
-                                    vref_input: hal_adc_vref_t::ADC_VREF_EXTERNAL, 
-                                    vref_value: 0.0}, 
-        };
+static mut previous_initialized: i2c_master_t = i2c_master_t{ 
+    handle: hal_i2c_master_handle_register_t{ i2c_master_handle: 0, init_ll_state: false },
+    config: i2c_master_config_t{ addr: 0, sda: HAL_PIN_NC, scl: HAL_PIN_NC, speed: hal_i2c_master_speed_t::I2C_MASTER_SPEED_100K, timeout_pass_count: 10000 }, 
+    };
 
-fn _acquire( obj: &mut analog_in_t, obj_open_state: bool) -> Result<()> {
+fn _acquire( obj: &mut i2c_master_t, obj_open_state: bool) -> Result<()> {
     if obj_open_state && (unsafe{previous_initialized == *obj}) {
-        return Err(DRV_ADC_ERROR::ACQUIRE_FAIL);
+        return Err(DRV_I2C_MASTER_ERROR::ACQUIRE_FAIL);
     }
 
     if unsafe{previous_initialized != *obj} {
-        match hal_adc_open( obj, obj_open_state ) {
+        match hal_i2c_master_open( obj, obj_open_state ) {
             Ok(_) => {
                 unsafe{previous_initialized = *obj;}
                 return Ok(())
@@ -79,7 +74,7 @@ fn _acquire( obj: &mut analog_in_t, obj_open_state: bool) -> Result<()> {
 }
 
 
-pub fn analog_in_open( obj: &mut analog_in_t, config: analog_in_config_t ) -> Result<()> {
+pub fn i2c_master_open( obj: &mut i2c_master_t, config: i2c_master_config_t ) -> Result<()> {
     obj.config = config;
 
     match _acquire( obj, true ) {
@@ -88,78 +83,88 @@ pub fn analog_in_open( obj: &mut analog_in_t, config: analog_in_config_t ) -> Re
     }
 }
 
-pub fn analog_in_set_resolution( obj: &mut analog_in_t, resolution: analog_in_resolution_t ) -> Result<()> {
+pub fn i2c_master_set_speed( obj: &mut i2c_master_t, speed: hal_i2c_master_speed_t ) -> Result<()> {
     match _acquire( obj, false ) {
         Ok(_) => (),
         Err(e) => return Err(e),
     }
 
-    obj.config.resolution = resolution;
+    obj.config.speed = speed;
     
-    match hal_adc_set_resolution( obj, obj.config ) {
-        Ok(_) => Ok(()),
-        Err(e) => return Err(e),
-    }
-
-}
-
-pub fn analog_in_set_vref_input( obj: &mut analog_in_t, vref_input: analog_in_vref_t ) -> Result<()> {
-    match _acquire( obj, false ) {
-        Ok(_) => (),
-        Err(e) => return Err(e),
-    }
-
-    obj.config.vref_input = vref_input;
-    
-    match hal_adc_set_vref_input( obj, obj.config ) {
+    match hal_i2c_master_set_speed( obj, obj.config ) {
         Ok(_) => Ok(()),
         Err(e) => return Err(e),
     }
 }
 
-pub fn analog_in_set_vref_value( obj: &mut analog_in_t, vref_value: f32 ) -> Result<()> {
+pub fn i2c_master_set_timeout( obj: &mut i2c_master_t, timeout_pass_count: u16 ) -> Result<()> {
     match _acquire( obj, false ) {
         Ok(_) => (),
         Err(e) => return Err(e),
     }
 
-    obj.config.vref_value = vref_value;
+    obj.config.timeout_pass_count = timeout_pass_count;
     
-    match hal_adc_set_vref_value( obj, obj.config ) {
+    match hal_i2c_master_set_timeout( obj, obj.config ) {
         Ok(_) => Ok(()),
         Err(e) => return Err(e),
     }
 }
 
-pub fn analog_in_read( obj: &mut analog_in_t) -> Result<u16> {
+pub fn i2c_master_set_slave_address( obj: &mut i2c_master_t, address: u8 ) -> Result<()> {
+    match _acquire( obj, false ) {
+        Ok(_) => (),
+        Err(e) => return Err(e),
+    }
+
+    obj.config.addr = address;
+    
+    match hal_i2c_master_set_slave_address( obj, obj.config ) {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(e),
+    }
+}
+
+pub fn i2c_master_write( obj: &mut i2c_master_t, write_data_buf: &mut [u8], len_write_data: usize ) -> Result<()> {
     match _acquire( obj, false ) {
         Ok(_) => (),
         Err(e) => return Err(e),
     }
     
-    match hal_adc_read( obj) {
-        Ok(r) => Ok(r),
+    match hal_i2c_master_write( obj, write_data_buf, len_write_data ) {
+        Ok(_) => Ok(()),
         Err(e) => return Err(e),
     }
 }
 
-pub fn analog_in_read_voltage( obj: &mut analog_in_t) -> Result<f32> {
+pub fn i2c_master_read( obj: &mut i2c_master_t, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<()> {
     match _acquire( obj, false ) {
         Ok(_) => (),
         Err(e) => return Err(e),
     }
     
-    match hal_adc_read_voltage( obj) {
-        Ok(r) => Ok(r),
+    match hal_i2c_master_read( obj, read_data_buf, len_read_data ) {
+        Ok(_) => Ok(()),
         Err(e) => return Err(e),
     }
 }
 
+pub fn i2c_master_write_then_read( obj: &mut i2c_master_t, write_data_buf: &mut [u8], len_write_data: usize, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<()> {
+    match _acquire( obj, false ) {
+        Ok(_) => (),
+        Err(e) => return Err(e),
+    }
+    
+    match hal_i2c_master_write_then_read( obj, write_data_buf, len_write_data, read_data_buf, len_read_data ) {
+        Ok(_) => Ok(()),
+        Err(e) => return Err(e),
+    }
+}
 
-pub fn analog_in_close(obj: &mut analog_in_t) -> Result<()> {
-    match hal_adc_close(obj) {
+pub fn i2c_master_close(obj: &mut i2c_master_t) -> Result<()> {
+    match hal_i2c_master_close(obj) {
         Ok(_) => {
-            unsafe{previous_initialized = analog_in_t::default();}
+            unsafe{previous_initialized = i2c_master_t::default();}
             Ok(())
         },
         Err(e) => Err(e),

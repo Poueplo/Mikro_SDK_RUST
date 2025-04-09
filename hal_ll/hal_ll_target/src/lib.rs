@@ -49,3 +49,10 @@ pub mod bit_control {
 
 pub use pin_names::*;
 pub use bit_control::*;
+
+
+pub struct hal_ll_pin_af_t
+{
+    pub pin_name : hal_ll_pin_name_t,
+    pub pin_af : u32,
+}

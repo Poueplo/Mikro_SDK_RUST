@@ -213,8 +213,6 @@ static mut hal_ll_adc_hw_specifics_map:[hal_ll_adc_hw_specifics_map_t; (ADC_MODU
     hal_ll_adc_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
 ];
 
-static mut hal_ll_module_error : usize = 0;
-
 
 ////////////// PUBLIC function //////////////////
 
@@ -437,12 +435,13 @@ fn hal_ll_adc_map_pin(module_index: u8, index: &mut hal_ll_adc_pin_id) {
 fn hal_ll_get_specifics<'a>( handle: hal_ll_adc_handle_register_t ) -> &'a mut hal_ll_adc_hw_specifics_map_t{
     unsafe{
         let mut hal_ll_module_count : usize = ADC_MODULE_COUNT as usize;
+        let mut hal_ll_module_error : usize = 0;
         hal_ll_module_error = hal_ll_module_count;
 
     while hal_ll_module_count > 0 {
         hal_ll_module_count -= 1;
 
-        let base = handle.adc_handle;
+        let base: u32 = handle.adc_handle;
 
         if base == hal_ll_adc_hw_specifics_map[hal_ll_module_count].base {
             return &mut hal_ll_adc_hw_specifics_map[hal_ll_module_count];

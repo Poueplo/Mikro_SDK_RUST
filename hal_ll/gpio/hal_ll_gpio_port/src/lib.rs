@@ -47,12 +47,35 @@
 pub use hal_ll_target::pin_names;
 use hal_ll_target::*;
 use hal_ll_gpio_constants::*;
+pub mod gpio_constants {
+    pub use hal_ll_gpio_constants::{
+        GPIO_CFG_MODE_ALT_FUNCTION,
+        GPIO_CFG_SPEED_HIGH,
+        GPIO_CFG_OTYPE_OD
+    };
+}
 
 //==========================================================//
 
 pub const RESET_PINS_OFFSET: u8 = 16;
 
+pub const GPIO_MODULE_STRUCT_END: u32 = 0xFFFF_FFFF;
+pub const GPIO_AF_OFFSET: u8 = 8;
+
 pub type hal_ll_gpio_base_t = handle_t;
+
+pub struct module_struct
+{
+  pub pins: [u32; 13],
+  pub configs: [u32; 13],
+  pub gpio_remap: u32
+}
+
+impl Default for module_struct {
+    fn default() -> Self {
+        Self { pins: [GPIO_MODULE_STRUCT_END; 13], configs: [GPIO_MODULE_STRUCT_END; 13], gpio_remap: 0 }
+    }
+}
 
 pub struct hal_ll_gpio_t
 {
@@ -141,6 +164,18 @@ pub fn hal_ll_gpio_digital_input(port: u32, pin_mask: u16)
 pub fn hal_ll_gpio_digital_output(port: u32, pin_mask: u16) 
 {
     hal_ll_gpio_config(port, pin_mask, GPIO_CFG_DIGITAL_OUTPUT);
+}
+
+pub fn hal_ll_gpio_module_struct_init(module: &mut module_struct, state: bool)
+{
+    let mut index: i32 = 0;
+
+    while  module.pins[ index as usize] != GPIO_MODULE_STRUCT_END 
+    {
+        _hal_ll_gpio_config_pin_alternate_enable(  module.pins[ index as usize],  module.configs[ index as usize], state );
+
+        index = index + 1;
+    }
 }
 
 //TODO : optimize per MCU
@@ -307,4 +342,49 @@ fn hal_ll_gpio_config(port: u32, pin_mask: u16, config: u32)
         }
 
     }
+}
+
+pub fn _hal_ll_gpio_config_pin_alternate_enable(module_pin: u32, module_config: u32, state: bool)
+{
+    let pin_name: hal_ll_pin_name_t;
+    let mut pin_index: u8;
+    let alternate_function: u32;
+    let port_ptr: *mut hal_ll_gpio_base_handle_t;
+
+    pin_name  = (module_pin & GPIO_PIN_NAME_MASK) as u8;
+
+    alternate_function = ( module_pin >> GPIO_AF_OFFSET ) & GPIO_AF_MASK;
+
+    port_ptr = hal_ll_gpio_port_base( hal_ll_gpio_port_index ( pin_name ) ) as *mut hal_ll_gpio_base_handle_t;
+
+    hal_ll_gpio_clock_enable( port_ptr as u32 );
+
+    pin_index = hal_ll_gpio_pin_index( pin_name );
+    unsafe{
+        if ( pin_index > 7 )
+        {
+            pin_index -= 8;
+            if ( state ) {
+                (*port_ptr).afrh &= !(( GPIO_AF_MASK ) << ( pin_index * 4 ) );
+                (*port_ptr).afrh |= (( alternate_function ) << ( pin_index * 4 ) );
+            } else {
+                (*port_ptr).afrh &= !(( alternate_function ) << ( pin_index * 4 ) );
+            }
+        }
+        else
+        {
+            if ( state ) {
+                (*port_ptr).afrl &= !(( GPIO_AF_MASK ) << ( pin_index * 4 ) );
+                (*port_ptr).afrl |= (( alternate_function ) << ( pin_index * 4 ) );
+            } else {
+                (*port_ptr).afrl &= !(( alternate_function ) << ( pin_index * 4 ) );
+            }
+        }
+    }
+
+    hal_ll_gpio_config( port_ptr as u32, hal_ll_gpio_pin_mask( pin_name ), module_config );
+}
+
+pub fn VALUE(pin: hal_ll_pin_name_t, func: u32)  -> u32 {
+    pin as u32 | (func << GPIO_AF_OFFSET)
 }
