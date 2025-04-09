@@ -124,6 +124,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_i2c_master"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_i2c_master",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_ll_adc"
 version = "0.1.0"
 dependencies = [
@@ -218,6 +226,7 @@ dependencies = [
  "drv_digital_out",
  "drv_name",
  "drv_port",
+ "hal_i2c_master",
  "hal_ll_i2c_master",
  "panic-halt",
  "system",

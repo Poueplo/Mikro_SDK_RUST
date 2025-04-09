@@ -38,12 +38,14 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
 
 use hal_ll_target::*;
 use hal_ll_i2c_pin_map::*;
 use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef};
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
 use core::fmt;
 use core::arch::asm;
 
@@ -132,11 +134,11 @@ enum hal_ll_i2c_master_end_mode_t
 
 
 #[repr(u32)]
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_i2c_master_speed_t
 {
-    HAL_LL_I2C_MASTER_SPEED_100K = 100000,
-    HAL_LL_I2C_MASTER_SPEED_400K = 400000,
+    I2C_MASTER_SPEED_100K = 100000,
+    I2C_MASTER_SPEED_400K = 400000,
 }
 
 
@@ -162,17 +164,17 @@ struct hal_ll_i2c_hw_specifics_map_t
 }
 
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct hal_ll_i2c_master_handle_register_t
 {
-    pub hal_ll_i2c_master_handle : handle_t,
+    pub i2c_master_handle : handle_t,
     pub init_ll_state: bool
 }
 
 impl Default for hal_ll_i2c_master_handle_register_t {
     fn default() -> Self {
         Self {
-            hal_ll_i2c_master_handle : 0,
+            i2c_master_handle : 0,
             init_ll_state : false
         }
     }
@@ -197,16 +199,16 @@ struct hal_ll_i2c_base_handle_t
 
 static mut hal_ll_module_state: [hal_ll_i2c_master_handle_register_t; I2C_MODULE_COUNT as usize]  = [ 
     hal_ll_i2c_master_handle_register_t{
-        hal_ll_i2c_master_handle : 0, 
+        i2c_master_handle : 0, 
         init_ll_state : false
         };
         I2C_MODULE_COUNT as usize];
 
 static mut hal_ll_i2c_hw_specifics_map:[hal_ll_i2c_hw_specifics_map_t; (I2C_MODULE_COUNT+1) as usize] = [
-    hal_ll_i2c_hw_specifics_map_t{base: I2C1_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
-    hal_ll_i2c_hw_specifics_map_t{base: I2C2_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
-    hal_ll_i2c_hw_specifics_map_t{base: I2C3_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
-    hal_ll_i2c_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K, address: 0, timeout: 0}
+    hal_ll_i2c_hw_specifics_map_t{base: I2C1_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    hal_ll_i2c_hw_specifics_map_t{base: I2C2_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    hal_ll_i2c_hw_specifics_map_t{base: I2C3_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    hal_ll_i2c_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: 0}
 ];
 
 
@@ -236,7 +238,7 @@ pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin
 
         *hal_module_id = pin_check_result;
 
-        hal_ll_module_state[pin_check_result as usize].hal_ll_i2c_master_handle = hal_ll_i2c_hw_specifics_map[pin_check_result as usize].base;
+        hal_ll_module_state[pin_check_result as usize].i2c_master_handle = hal_ll_i2c_hw_specifics_map[pin_check_result as usize].base;
         
         Ok(hal_ll_module_state[pin_check_result as usize])
     }
@@ -249,7 +251,7 @@ pub fn hal_ll_module_configure_i2c(handle: &mut hal_ll_i2c_master_handle_registe
 
     hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local );
     unsafe{
-        hal_ll_module_state[pin_check_result].hal_ll_i2c_master_handle = hal_ll_i2c_hw_specifics_map[pin_check_result].base;
+        hal_ll_module_state[pin_check_result].i2c_master_handle = hal_ll_i2c_hw_specifics_map[pin_check_result].base;
         hal_ll_module_state[pin_check_result].init_ll_state = true;
     }
     hal_handle.init_ll_state = true;
@@ -327,12 +329,12 @@ pub fn hal_ll_i2c_master_close(  handle: &mut hal_ll_i2c_master_handle_register_
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let pin_check_result: usize = hal_ll_i2c_hw_specifics_map_local.module_index as usize;
 
-    if hal_handle.hal_ll_i2c_master_handle != 0 {
+    if hal_handle.i2c_master_handle != 0 {
         *hal_handle = hal_ll_i2c_master_handle_register_t::default();
 
         hal_ll_i2c_hw_specifics_map_local.address = 0;
         hal_ll_i2c_hw_specifics_map_local.timeout = HAL_LL_I2C_DEFAULT_PASS_COUNT;
-        hal_ll_i2c_hw_specifics_map_local.speed = hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K;
+        hal_ll_i2c_hw_specifics_map_local.speed = hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K;
 
         hal_ll_i2c_master_set_clock(hal_ll_i2c_hw_specifics_map_local, true);
         hal_ll_i2c_master_alternate_functions_set_state( hal_ll_i2c_hw_specifics_map_local, false );
@@ -565,6 +567,7 @@ fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, w
     Ok(())
 }
 
+#[allow(unused_variables, unused_assignments)]
 fn hal_ll_i2c_master_clear_status_reg(i2c_ptr: *mut hal_ll_i2c_base_handle_t) {
     unsafe{
         let mut tmp: u32 = (*i2c_ptr).sr1;
@@ -659,7 +662,7 @@ fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, 
                         index_list[hal_ll_module_id as usize].pin_scl = scl_index;
                         index_list[hal_ll_module_id as usize].pin_sda = sda_index;
 
-                        if unsafe{hal_ll_module_state[ hal_ll_module_id as usize].hal_ll_i2c_master_handle} == hal_ll_i2c_master_handle_register_t::default().hal_ll_i2c_master_handle{
+                        if unsafe{hal_ll_module_state[ hal_ll_module_id as usize].i2c_master_handle} == hal_ll_i2c_master_handle_register_t::default().i2c_master_handle{
                             return hal_ll_module_id;
                         } else {
                             index_counter = index_counter + 1;
@@ -680,6 +683,7 @@ fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, 
     }
 }
 
+#[allow(unused_variables, unused_assignments)]
 fn hal_ll_get_specifics<'a>(handle: hal_ll_i2c_master_handle_register_t) -> &'a mut hal_ll_i2c_hw_specifics_map_t {
     let mut hal_ll_module_count: usize = I2C_MODULE_COUNT as usize;
     let mut hal_ll_module_error : usize = 0;
@@ -689,7 +693,7 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_i2c_master_handle_register_t) -> &'a 
         while hal_ll_module_count > 0 {
             hal_ll_module_count -= 1;
 
-            let base: u32 = handle.hal_ll_i2c_master_handle;
+            let base: u32 = handle.i2c_master_handle;
 
             if base == hal_ll_i2c_hw_specifics_map[hal_ll_module_count].base {
                 return &mut hal_ll_i2c_hw_specifics_map[hal_ll_module_count];
@@ -758,11 +762,12 @@ fn hal_ll_i2c_master_alternate_functions_set_state(map: &mut hal_ll_i2c_hw_speci
     }
 }
 
+#[allow(unused_variables, unused_assignments)]
 fn hal_ll_i2c_calculate_speed(clock_value: u32, speed: u32) -> u32 {
     let mut tmp_one: u32 = 0;
     let mut tmp_two: u32 = 0;
 
-    if speed <= hal_ll_i2c_master_speed_t::HAL_LL_I2C_MASTER_SPEED_100K as u32 {
+    if speed <= hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K as u32 {
         tmp_one = clock_value / ( speed << 1 );
         if tmp_one < HAL_LL_I2C_CCR_MINIMUM_ALLOWED_VALUE {
             return HAL_LL_I2C_CCR_MINIMUM_ALLOWED_VALUE & 0xCFFF;
