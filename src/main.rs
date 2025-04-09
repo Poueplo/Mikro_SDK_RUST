@@ -42,7 +42,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
-use cortex_m_rt::entry; use hal_i2c_master::hal_i2c_master_open;
+use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
