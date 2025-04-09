@@ -44,29 +44,13 @@
 use hal_ll_i2c_master::*;
 use hal_target::*;
 use hal_target::pin_names::*;
-use core::fmt;
 
 
 pub use hal_ll_i2c_master::hal_ll_i2c_master_speed_t as hal_i2c_master_speed_t;
 pub use hal_ll_i2c_master::hal_ll_i2c_master_handle_register_t as hal_i2c_master_handle_register_t;
+pub use hal_ll_i2c_master::HAL_LL_I2C_MASTER_ERROR as HAL_I2C_MASTER_ERROR;
 
-
-#[derive(Debug)]
-pub enum HAL_I2C_ERROR {
-    I2C_MASTER_ERROR,
-    ACQUIRE_FAIL
-}
-
-impl fmt::Display for HAL_I2C_ERROR {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::I2C_MASTER_ERROR => write!(f, "I2C_MASTER_ERROR occurred"),
-            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),
-        }
-    }
-}
-
-type Result<T> = core::result::Result<T, HAL_I2C_ERROR>;
+type Result<T> = core::result::Result<T, HAL_LL_I2C_MASTER_ERROR>;
 
 #[derive(Clone, Copy, PartialEq)]
 pub struct hal_i2c_master_config_t {
@@ -131,14 +115,14 @@ pub fn hal_i2c_master_open(handle: &mut hal_i2c_master_t, hal_obj_open_state: bo
         Some(_) => {
             if hal_obj_open_state
             {
-                return Err(HAL_I2C_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             } else {
                 return Ok(())
             }
         },
         None => {
             if !hal_obj_open_state {
-                return Err(HAL_I2C_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             }
         },
     }
@@ -153,7 +137,7 @@ pub fn hal_i2c_master_open(handle: &mut hal_i2c_master_t, hal_obj_open_state: bo
             },
             Err(_) => {
                 hal_obj.handle = hal_i2c_master_t::default().handle;
-                return Err(HAL_I2C_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             },
         }
 
@@ -166,7 +150,7 @@ pub fn hal_i2c_master_set_slave_address(handle: &mut hal_i2c_master_t, config: h
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     hal_ll_i2c_master_set_slave_address(hal_handle , config.addr);
@@ -179,7 +163,7 @@ pub fn hal_i2c_master_set_speed(handle: &mut hal_i2c_master_t, config: hal_i2c_m
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     hal_ll_i2c_master_set_speed(hal_handle , config.speed);
@@ -192,7 +176,7 @@ pub fn hal_i2c_master_set_timeout(handle: &mut hal_i2c_master_t, config: hal_i2c
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     hal_ll_i2c_master_set_timeout(hal_handle , config.timeout_pass_count);
@@ -204,11 +188,11 @@ pub fn hal_i2c_master_read(handle: &mut hal_i2c_master_t,  read_data_buf: &mut [
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     if len_read_data == 0 {
-        return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR);
     }
 
     if !hal_handle.init_ll_state {
@@ -218,7 +202,7 @@ pub fn hal_i2c_master_read(handle: &mut hal_i2c_master_t,  read_data_buf: &mut [
     
     match hal_ll_i2c_master_read(hal_handle, read_data_buf, len_read_data) {
         Ok(_) => Ok(()),
-        Err(_) => Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        Err(e) => Err(e),
     }
 }
 
@@ -227,11 +211,11 @@ pub fn hal_i2c_master_write(handle: &mut hal_i2c_master_t,  write_data_buf: &mut
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     if len_write_data == 0 {
-        return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR);
     }
 
     if !hal_handle.init_ll_state {
@@ -241,7 +225,7 @@ pub fn hal_i2c_master_write(handle: &mut hal_i2c_master_t,  write_data_buf: &mut
     
     match hal_ll_i2c_master_write(hal_handle, write_data_buf, len_write_data) {
         Ok(_) => Ok(()),
-        Err(_) => Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        Err(e) => Err(e),
     }
 }
 
@@ -251,11 +235,11 @@ pub fn hal_i2c_master_write_then_read(handle: &mut hal_i2c_master_t,  write_data
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     if len_write_data == 0 || len_read_data == 0 {
-        return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR);
     }
 
     if !hal_handle.init_ll_state {
@@ -265,7 +249,7 @@ pub fn hal_i2c_master_write_then_read(handle: &mut hal_i2c_master_t,  write_data
     
     match hal_ll_i2c_master_write_then_read(hal_handle, write_data_buf, len_write_data, read_data_buf, len_read_data) {
         Ok(_) => Ok(()),
-        Err(_) => Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        Err(e) => Err(e),
     }
 }
 
@@ -274,7 +258,7 @@ pub fn hal_i2c_master_close( handle: &mut hal_i2c_master_t) -> Result<()> {
     let hal_handle: &mut hal_i2c_master_handle_register_t;
     match hal_is_handle_register( hal_obj ){
         Some(h) => hal_handle = h ,
-        None => return Err(HAL_I2C_ERROR::I2C_MASTER_ERROR),
+        None => return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
     if (hal_handle.i2c_master_handle != 0) & (hal_handle.i2c_master_handle != 0xFFFF_FFFF)
@@ -288,5 +272,5 @@ pub fn hal_i2c_master_close( handle: &mut hal_i2c_master_t) -> Result<()> {
         return Ok(())
     }
 
-    Err(HAL_I2C_ERROR::I2C_MASTER_ERROR)
+    Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ERROR)
 }

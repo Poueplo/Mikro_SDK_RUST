@@ -85,45 +85,42 @@ const HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTED : u32 = 0x0007_0084; /* TRA, BUSY
 
 #[derive(Debug)]
 pub enum HAL_LL_I2C_MASTER_ERROR {
-    HAL_LL_I2C_MASTER_WRONG_PINS,
-    HAL_LL_I2C_MASTER_MODULE_ERROR
+    I2C_MASTER_WRONG_PINS,
+    I2C_MASTER_MODULE_ERROR,
+    I2C_MASTER_TIMEOUT_START,
+    I2C_MASTER_TIMEOUT_STOP,
+    I2C_MASTER_TIMEOUT_WRITE,
+    I2C_MASTER_TIMEOUT_READ,
+    I2C_MASTER_ARBITRATION_LOST,
+    I2C_MASTER_TIMEOUT_INIT,
+    I2C_MASTER_TIMEOUT_WAIT_IDLE,
+    I2C_MASTER_BUFFER_ERROR,
+    ACQUIRE_FAIL,
+    I2C_MASTER_ERROR
 }
 
 impl fmt::Display for HAL_LL_I2C_MASTER_ERROR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::HAL_LL_I2C_MASTER_WRONG_PINS => write!(f, "HAL_LL_I2C_MASTER_WRONG_PINS occurred"),
-            Self::HAL_LL_I2C_MASTER_MODULE_ERROR => write!(f, "HAL_LL_I2C_MASTER_MODULE_ERROR occurred"),
+            Self::I2C_MASTER_WRONG_PINS => write!(f, "I2C_MASTER_WRONG_PINS occurred"),
+            Self::I2C_MASTER_MODULE_ERROR => write!(f, "I2C_MASTER_MODULE_ERROR occurred"),
+            Self::I2C_MASTER_TIMEOUT_START => write!(f, "I2C_MASTER_TIMEOUT_START occurred"),
+            Self::I2C_MASTER_TIMEOUT_STOP => write!(f, "I2C_MASTER_TIMEOUT_STOP occurred"),
+            Self::I2C_MASTER_TIMEOUT_WRITE => write!(f, "I2C_MASTER_TIMEOUT_WRITE occurred"),
+            Self::I2C_MASTER_TIMEOUT_READ => write!(f, "I2C_MASTER_TIMEOUT_READ occurred"),
+            Self::I2C_MASTER_ARBITRATION_LOST => write!(f, "I2C_MASTER_ARBITRATION_LOST occurred"),
+            Self::I2C_MASTER_TIMEOUT_INIT => write!(f, "I2C_MASTER_TIMEOUT_INIT occurred"),
+            Self::I2C_MASTER_TIMEOUT_WAIT_IDLE => write!(f, "I2C_MASTER_TIMEOUT_WAIT_IDLE occurred"),
+            Self::I2C_MASTER_BUFFER_ERROR => write!(f, "I2C_MASTER_BUFFER_ERROR occurred"),                    
+            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),                    
+            Self::I2C_MASTER_ERROR => write!(f, "I2C_MASTER_ERROR occurred"),                    
         }
     }
 }
 
-#[derive(Debug)]
-pub enum HAL_LL_I2C_MASTER_TIMEOUT {
-    HAL_LL_I2C_MASTER_TIMEOUT_START,
-    HAL_LL_I2C_MASTER_TIMEOUT_STOP,
-    HAL_LL_I2C_MASTER_TIMEOUT_WRITE,
-    HAL_LL_I2C_MASTER_TIMEOUT_READ,
-    HAL_LL_I2C_MASTER_ARBITRATION_LOST,
-    HAL_LL_I2C_MASTER_TIMEOUT_INIT,
-    HAL_LL_I2C_MASTER_TIMEOUT_WAIT_IDLE,
-    HAL_LL_I2C_MASTER_BUFFER_ERROR
-}
 
-impl fmt::Display for HAL_LL_I2C_MASTER_TIMEOUT {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        match self {
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_START => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_START occurred"),
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_STOP => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_STOP occurred"),
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_WRITE => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_WRITE occurred"),
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_READ => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_READ occurred"),
-            Self::HAL_LL_I2C_MASTER_ARBITRATION_LOST => write!(f, "HAL_LL_I2C_MASTER_ARBITRATION_LOST occurred"),
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_INIT => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_INIT occurred"),
-            Self::HAL_LL_I2C_MASTER_TIMEOUT_WAIT_IDLE => write!(f, "HAL_LL_I2C_MASTER_TIMEOUT_WAIT_IDLE occurred"),
-            Self::HAL_LL_I2C_MASTER_BUFFER_ERROR => write!(f, "HAL_LL_I2C_MASTER_BUFFER_ERROR occurred"),                    
-                    }
-    }
-}
+type Result<T> = core::result::Result<T, HAL_LL_I2C_MASTER_ERROR>;
+
 
 #[derive(PartialEq)]
 enum hal_ll_i2c_master_end_mode_t
@@ -214,7 +211,7 @@ static mut hal_ll_i2c_hw_specifics_map:[hal_ll_i2c_hw_specifics_map_t; (I2C_MODU
 
 ///////// public functions
 
-pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, hal_module_id: &mut u8) -> Result<hal_ll_i2c_master_handle_register_t, HAL_LL_I2C_MASTER_ERROR> {
+pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, hal_module_id: &mut u8) -> Result<hal_ll_i2c_master_handle_register_t> {
     let pin_check_result: u8;
     let mut index_list: [hal_ll_i2c_pin_id; I2C_MODULE_COUNT as usize] = [
         hal_ll_i2c_pin_id{ pin_scl: HAL_LL_PIN_NC, pin_sda: HAL_LL_PIN_NC };
@@ -223,7 +220,7 @@ pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin
 
     pin_check_result = hal_ll_i2c_master_check_pins(scl, sda, &mut index_list);
     if pin_check_result == HAL_LL_PIN_NC {
-        return Err(HAL_LL_I2C_MASTER_ERROR::HAL_LL_I2C_MASTER_WRONG_PINS);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_WRONG_PINS);
     }
     
     unsafe{
@@ -288,7 +285,7 @@ pub fn hal_ll_i2c_master_set_slave_address(handle: &mut hal_ll_i2c_master_handle
     }
 }
 
-pub fn hal_ll_i2c_master_read( handle: &mut hal_ll_i2c_master_handle_register_t, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT>{
+pub fn hal_ll_i2c_master_read( handle: &mut hal_ll_i2c_master_handle_register_t, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<()>{
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
@@ -298,7 +295,7 @@ pub fn hal_ll_i2c_master_read( handle: &mut hal_ll_i2c_master_handle_register_t,
     }
 }
 
-pub fn hal_ll_i2c_master_write(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize ) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT>{
+pub fn hal_ll_i2c_master_write(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize ) -> Result<()>{
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
@@ -308,7 +305,7 @@ pub fn hal_ll_i2c_master_write(  handle: &mut hal_ll_i2c_master_handle_register_
     }
 }
 
-pub fn hal_ll_i2c_master_write_then_read(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize,  read_data_buf: &mut [u8], len_read_data: usize) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT>{
+pub fn hal_ll_i2c_master_write_then_read(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize,  read_data_buf: &mut [u8], len_read_data: usize) -> Result<()>{
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
@@ -350,13 +347,13 @@ pub fn hal_ll_i2c_master_close(  handle: &mut hal_ll_i2c_master_handle_register_
 }
 
 ///////// private functions
-fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, read_data_buf: &mut [u8], len_read_data: usize, mode: hal_ll_i2c_master_end_mode_t) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT> {
+fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, read_data_buf: &mut [u8], len_read_data: usize, mode: hal_ll_i2c_master_end_mode_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
     let mut time_counter: u16 = map.timeout;
     let mut transfer_counter: usize = 0;
 
     if read_data_buf.len() < len_read_data {
-        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_BUFFER_ERROR);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_BUFFER_ERROR);
     }
 
     if mode != hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_WRITE_THEN_READ {
@@ -377,7 +374,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
             while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_ADDR_BIT ) == 0 {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                     }
 
                     time_counter -= 1;
@@ -391,7 +388,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
                 while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_RECEIVED ) {
                     if map.timeout > 0 {
                         if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                         }
 
                         time_counter -= 1;
@@ -401,7 +398,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
                 while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0  {
                     if map.timeout > 0 {
                         if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                         }
 
                         time_counter -= 1;
@@ -430,7 +427,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
             while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED ) {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                     }
 
                     time_counter -= 1;
@@ -442,7 +439,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
                 while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_RECEIVED ) {
                     if map.timeout > 0 {
                         if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                         }
     
                         time_counter -= 1;
@@ -456,7 +453,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
             while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0 {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                     }    
                     time_counter -= 1;
                 }
@@ -471,7 +468,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
             while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0 {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_READ);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
                     }    
                     time_counter -= 1;
                 }
@@ -489,7 +486,7 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
     }
 }
 
-fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, write_data_buf: &mut [u8], len_write_data: usize, mode: hal_ll_i2c_master_end_mode_t) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT> {
+fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, write_data_buf: &mut [u8], len_write_data: usize, mode: hal_ll_i2c_master_end_mode_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
     let mut time_counter: u16 = map.timeout;
     let mut transfer_counter: usize = 0;
@@ -505,7 +502,7 @@ fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, w
         while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED ) {
             if map.timeout > 0 {
                 if time_counter == 0 {
-                    return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_WRITE);
+                    return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                 }
 
                 time_counter -= 1;
@@ -521,7 +518,7 @@ fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, w
             while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTING ) {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_WRITE);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                     }
     
                     time_counter -= 1;
@@ -537,7 +534,7 @@ fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, w
         while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTED ) {
             if map.timeout > 0 {
                 if time_counter == 0 {
-                    return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_WRITE);
+                    return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                 }
                 
                 time_counter -= 1;
@@ -553,7 +550,7 @@ fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, w
             while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_MODE_SELECT ) {
                 if map.timeout > 0 {
                     if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_WRITE);
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                     }
                     
                     time_counter -= 1;
@@ -576,25 +573,25 @@ fn hal_ll_i2c_master_clear_status_reg(i2c_ptr: *mut hal_ll_i2c_base_handle_t) {
     }
 }
 
-fn hal_ll_i2c_master_start(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT> {
+fn hal_ll_i2c_master_start(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
     let mut time_counter: u16 = map.timeout;
 
     let status: bool = hal_ll_i2c_master_wait_for_idle( map ).is_ok();
     if !status  {
-        return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_START);
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_START);
     }
     unsafe{
         set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_START_BIT);
     
         if check_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_SR1_ARLO_BIT ) == 1 {
-            return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_ARBITRATION_LOST);
+            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ARBITRATION_LOST);
         }
     }
     while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_MODE_SELECT) {
         if  map.timeout > 0  {
             if time_counter == 0 {
-                return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_START);
+                return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_START);
             }
             time_counter -= 1;
         }
@@ -603,14 +600,14 @@ fn hal_ll_i2c_master_start(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()
     Ok(())
 }
 
-fn hal_ll_i2c_master_wait_for_idle(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<(), HAL_LL_I2C_MASTER_TIMEOUT> {
+fn hal_ll_i2c_master_wait_for_idle(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
     let mut time_counter: u16 = map.timeout;
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
 
     while  !hal_ll_i2c_master_is_idle(i2c_ptr ) {
         if map.timeout > 0 {
             if time_counter == 0 {
-                return Err(HAL_LL_I2C_MASTER_TIMEOUT::HAL_LL_I2C_MASTER_TIMEOUT_WAIT_IDLE);
+                return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WAIT_IDLE);
             }
 
             time_counter -= 1;
