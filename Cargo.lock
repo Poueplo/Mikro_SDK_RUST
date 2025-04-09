@@ -82,6 +82,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_i2c_master"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_i2c_master",
+]
+
+[[package]]
 name = "drv_name"
 version = "0.1.0"
 dependencies = [
@@ -224,10 +232,9 @@ dependencies = [
  "drv_analog_in",
  "drv_digital_in",
  "drv_digital_out",
+ "drv_i2c_master",
  "drv_name",
  "drv_port",
- "hal_i2c_master",
- "hal_ll_i2c_master",
  "panic-halt",
  "system",
 ]

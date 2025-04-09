@@ -49,10 +49,9 @@ use panic_halt;
 
 use drv_digital_in::*;
 use drv_digital_out::*;
+use drv_i2c_master::*;
 use drv_name::*;
 use system::*;
-
-use hal_i2c_master::*;
 
 const pin_scl: pin_name_t = GPIO_B8;
 const pin_sda: pin_name_t = GPIO_B9;
@@ -77,25 +76,17 @@ fn main() -> ! {
     }
 
 
-    let mut hal_module_id: u8 = 0;
-
-    let mut i2c: hal_i2c_master_t = hal_i2c_master_t::default();
-    let mut i2c_config: hal_i2c_master_config_t = hal_i2c_master_config_t::default();
+    let mut i2c: i2c_master_t = i2c_master_t::default();
+    let mut i2c_config: i2c_master_config_t = i2c_master_config_t::default();
 
     i2c_config.sda = pin_sda;
     i2c_config.scl = pin_scl;
-    i2c_config.addr = 0x50;
-    i2c_config.timeout_pass_count = 0;
-    i2c_config.speed = hal_i2c_master_speed_t::I2C_MASTER_SPEED_400K;
-    
-    i2c.config = i2c_config;
 
-    hal_i2c_master_open(&mut i2c, true);
+    i2c_master_open(&mut i2c, i2c_config);
 
-
-    hal_i2c_master_set_timeout(&mut i2c, i2c_config);
-    hal_i2c_master_set_slave_address(&mut i2c, i2c_config);
-    hal_i2c_master_set_speed(&mut i2c, i2c_config);
+    i2c_master_set_timeout(&mut i2c, 0);
+    i2c_master_set_slave_address(&mut i2c, 0x50);
+    i2c_master_set_speed(&mut i2c, i2c_master_speed_t::I2C_MASTER_SPEED_400K);
 
 
     let mut data_buff: [u8; 16] = [0; 16];
@@ -106,20 +97,20 @@ fn main() -> ! {
 
     
 
-    hal_i2c_master_write(&mut i2c, &mut write_buf, 5);
+    i2c_master_write(&mut i2c, &mut write_buf, 5);
     Delay_ms(10);
 
-    hal_i2c_master_write_then_read(&mut i2c, &mut write_buf, 1, &mut data_buff, 3);
-    hal_i2c_master_read(&mut i2c, &mut data_buff, 1);
+    i2c_master_write_then_read(&mut i2c, &mut write_buf, 1, &mut data_buff, 3);
+    i2c_master_read(&mut i2c, &mut data_buff, 1);
 
-    hal_i2c_master_write(&mut i2c, &mut write_buf2, 5);
+    i2c_master_write(&mut i2c, &mut write_buf2, 5);
     Delay_ms(10);
 
-    hal_i2c_master_write_then_read(&mut i2c, &mut write_buf2, 1, &mut data_buff, 1);
-    hal_i2c_master_read(&mut i2c, &mut data_buff, 3);
+    i2c_master_write_then_read(&mut i2c, &mut write_buf2, 1, &mut data_buff, 1);
+    i2c_master_read(&mut i2c, &mut data_buff, 3);
 
 
-    hal_i2c_master_close(&mut i2c);
+    i2c_master_close(&mut i2c);
 
     loop {}
 }
