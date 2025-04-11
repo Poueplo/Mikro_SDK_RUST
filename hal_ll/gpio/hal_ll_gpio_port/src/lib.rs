@@ -51,7 +51,8 @@ pub mod gpio_constants {
     pub use hal_ll_gpio_constants::{
         GPIO_CFG_MODE_ALT_FUNCTION,
         GPIO_CFG_SPEED_HIGH,
-        GPIO_CFG_OTYPE_OD
+        GPIO_CFG_OTYPE_OD,
+        GPIO_CFG_OTYPE_PP
     };
 }
 

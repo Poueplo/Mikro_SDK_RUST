@@ -201,6 +201,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_spi_master"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "hal_ll_spi_master_pin_map",
+ "hal_ll_target",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_spi_master_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
+]
+
+[[package]]
 name = "hal_ll_target"
 version = "0.1.1"
 dependencies = [
@@ -235,6 +252,7 @@ dependencies = [
  "drv_i2c_master",
  "drv_name",
  "drv_port",
+ "hal_ll_spi_master",
  "panic-halt",
  "system",
 ]

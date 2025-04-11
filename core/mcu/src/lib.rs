@@ -71,6 +71,15 @@ pub const I2C_MODULE_3: u8 = 3;
 
 pub const I2C_MODULE_COUNT: u8 = 3;
 
+pub const SPI_MODULE_1: u8 = 1;
+pub const SPI_MODULE_2: u8 = 2;
+pub const SPI_MODULE_3: u8 = 3;
+pub const SPI_MODULE_4: u8 = 4;
+pub const SPI_MODULE_5: u8 = 5;
+pub const SPI_MODULE_6: u8 = 6;
+
+pub const SPI_MODULE_COUNT: u8 = 6;
+
 //present in hal_ll_adc_pin_map
 pub const ADC_BASE_ADDR: u32 = APB2_BASE_ADDR + 0x2000;
 pub const ADC1_BASE_ADDR: u32 = ADC_BASE_ADDR;
@@ -82,6 +91,14 @@ pub const I2C_BASE_ADDR: u32 = APB1_BASE_ADDR + 0x5400;
 pub const I2C1_BASE_ADDR: u32 = I2C_BASE_ADDR;
 pub const I2C2_BASE_ADDR: u32 = I2C_BASE_ADDR + 0x400;
 pub const I2C3_BASE_ADDR: u32 = I2C_BASE_ADDR + 0x800;
+
+//present in hal_ll_spi_master_pin_map
+pub const SPI1_MASTER_BASE_ADDR : u32 = 0x4001_3000;
+pub const SPI2_MASTER_BASE_ADDR : u32 = 0x4000_3800;
+pub const SPI3_MASTER_BASE_ADDR : u32 = 0x4000_3C00;
+pub const SPI4_MASTER_BASE_ADDR : u32 = 0x4001_3400;
+pub const SPI5_MASTER_BASE_ADDR : u32 = 0x4001_5000;
+pub const SPI6_MASTER_BASE_ADDR : u32 = 0x4001_5400;
 
 //present in core_header.h
 pub const ADDRESS_RCC_CR         : u32 = 0x40023800;

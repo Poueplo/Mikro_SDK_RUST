@@ -33,6 +33,6 @@ system = {path = "core/system"}
 
 
 #hal_i2c_master = {path = "hal/lib/i2c"}
-#hal_ll_i2c_master = {path = "hal_ll/i2c/hal_ll_i2c_master"}
+hal_ll_spi_master = {path = "hal_ll/spi/hal_ll_spi_master"}
 
 [features]
