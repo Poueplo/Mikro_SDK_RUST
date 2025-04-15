@@ -47,70 +47,70 @@ use cortex_m_rt::entry;
 use panic_halt;
 
 
-use drv_digital_in::*;
+//use drv_digital_in::*;
 use drv_digital_out::*;
-use drv_i2c_master::*;
+use drv_port::*;
+use drv_spi_master::*;
 use drv_name::*;
 use system::*;
 
-const pin_scl: pin_name_t = GPIO_B8;
-const pin_sda: pin_name_t = GPIO_B9;
+
+const pin_sck: pin_name_t = GPIO_A5;
+const pin_miso: pin_name_t = GPIO_A6;
+const pin_mosi: pin_name_t = GPIO_B5;
+const pin_cs: pin_name_t = GPIO_B4;
+const pin_hld: pin_name_t = GPIO_E13;
+
+const error_port: port_name_t = GPIO_PORT_D;
+
 
 #[entry]
 fn main() -> ! {
 
     system_init();
 
-    let mut scl: digital_out_t = digital_out_t::default();
-    let mut sda: digital_in_t = digital_in_t::default();
-
-    digital_out_init(&mut scl , pin_scl );
-    digital_in_init(&mut sda , pin_sda);
-    digital_out_high(&mut scl );
-    while ( digital_in_read(&mut sda ).ok().unwrap() == 0)
-    {
-        digital_out_low(&mut scl);
-        Delay_ms(1);
-        digital_out_high(&mut scl);
-        Delay_ms(1);
-    }
-
-
-    let mut i2c: i2c_master_t = i2c_master_t::default();
-    let mut i2c_config: i2c_master_config_t = i2c_master_config_t::default();
-
-    i2c_config.sda = pin_sda;
-    i2c_config.scl = pin_scl;
-
-    i2c_master_open(&mut i2c, i2c_config);
-
-    i2c_master_set_timeout(&mut i2c, 0);
-    i2c_master_set_slave_address(&mut i2c, 0x50);
-    i2c_master_set_speed(&mut i2c, i2c_master_speed_t::I2C_MASTER_SPEED_400K);
-
-
+    let mut error: port_t = port_t::default();
+    let mut error_output : u16 = 0;
     let mut data_buff: [u8; 16] = [0; 16];
-    let mut write_buf: [u8; 5] = [0x00, 0x55, 0x56, 0x57, 0x58];
-    let mut write_buf2: [u8; 5] = [0x00, 0x65, 0x66, 0x67, 0x68];
+    let mut spi_write_buff: [u8; 14] = [0x02, 0x00, 0x00, 0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
+    let mut spi_read_order: [u8; 4] = [0x03, 0x00, 0x00, 0x00];
 
+    let mut hld: digital_out_t = digital_out_t::default();
+    digital_out_init(&mut hld , pin_hld );
 
+    digital_out_high(&mut hld);
+
+    port_init(&mut error, error_port, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+
+    let mut spi : spi_master_t = spi_master_t::default(); 
+    let mut spi_config : spi_master_config_t = spi_master_config_t::default();
+
+    spi_config.sck = pin_sck;
+    spi_config.miso = pin_miso;
+    spi_config.mosi = pin_mosi;
+
+    spi_master_set_chip_select_polarity(spi_master_chip_select_polarity_t::SPI_MASTER_CHIP_SELECT_POLARITY_ACTIVE_LOW);
+    spi_master_open(&mut spi, spi_config);
+    //hal_spi_master_set_mode(&mut spi, spi_config);
+
+    spi_config.default_write_data = 0x55;
+    //hal_spi_master_set_default_write_data(&mut spi, spi_config);
 
     
+    spi_master_select_device(pin_cs);
+    spi_master_write(&mut spi, &mut spi_write_buff, 14);
+    spi_master_deselect_device(pin_cs);
+    delay_1ms();
+    spi_master_select_device(pin_cs);
+    spi_master_write(&mut spi, &mut spi_read_order, 4);
+    spi_master_read(&mut spi, &mut data_buff, 10);
+    spi_master_deselect_device(pin_cs);
+    delay_1ms();
+    spi_master_select_device(pin_cs);
+    spi_master_write_then_read(&mut spi, &mut spi_read_order, 4, &mut data_buff, 10);
+    spi_master_deselect_device(pin_cs);
 
-    i2c_master_write(&mut i2c, &mut write_buf, 5);
-    Delay_ms(10);
-
-    i2c_master_write_then_read(&mut i2c, &mut write_buf, 1, &mut data_buff, 3);
-    i2c_master_read(&mut i2c, &mut data_buff, 1);
-
-    i2c_master_write(&mut i2c, &mut write_buf2, 5);
-    Delay_ms(10);
-
-    i2c_master_write_then_read(&mut i2c, &mut write_buf2, 1, &mut data_buff, 1);
-    i2c_master_read(&mut i2c, &mut data_buff, 3);
-
-
-    i2c_master_close(&mut i2c);
+    spi_master_close(&mut spi);
 
     loop {}
 }

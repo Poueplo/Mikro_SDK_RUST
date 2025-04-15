@@ -29,10 +29,11 @@ drv_digital_in = {path = "drv/lib/drv_digital_in"}
 drv_digital_out = {path = "drv/lib/drv_digital_out"}
 drv_analog_in = {path = "drv/lib/drv_analog_in"}
 drv_i2c_master = {path = "drv/lib/drv_i2c_master"}
+drv_spi_master = {path = "drv/lib/drv_spi_master"}
 system = {path = "core/system"}
 
 
-#hal_i2c_master = {path = "hal/lib/i2c"}
-#hal_ll_i2c_master = {path = "hal_ll/i2c/hal_ll_i2c_master"}
+hal_spi_master = {path = "hal/lib/spi"}
+hal_ll_spi_master = {path = "hal_ll/spi/hal_ll_spi_master"}
 
 [features]
