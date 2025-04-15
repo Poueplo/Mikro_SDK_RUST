@@ -76,12 +76,16 @@ const HAL_LL_I2C_SPI_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_
 #[derive(Debug)]
 pub enum HAL_LL_SPI_MASTER_ERROR {
     SPI_MASTER_WRONG_PINS,
+    ACQUIRE_FAIL,
+    SPI_MASTER_ERROR,
 }
 
 impl fmt::Display for HAL_LL_SPI_MASTER_ERROR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::SPI_MASTER_WRONG_PINS => write!(f, "SPI_MASTER_WRONG_PINS occurred"),                  
+            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),                  
+            Self::SPI_MASTER_ERROR => write!(f, "SPI_MASTER_ERROR occurred"),                  
         }
     }
 }
@@ -205,6 +209,19 @@ pub fn hal_ll_spi_master_register_handle(sck: hal_ll_pin_name_t, miso: hal_ll_pi
         
         Ok(hal_ll_module_state[pin_check_result as usize])
     }
+}
+
+pub fn hal_ll_module_configure_spi(handle: &mut hal_ll_spi_master_handle_register_t) {
+    let hal_handle : &mut hal_ll_spi_master_handle_register_t = handle;
+    let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_spi_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
+    let pin_check_result: usize = hal_ll_i2c_hw_specifics_map_local.module_index as usize;
+
+    hal_ll_spi_init( hal_ll_i2c_hw_specifics_map_local );
+    unsafe{
+        hal_ll_module_state[pin_check_result].spi_master_handle = hal_ll_spi_hw_specifics_map[pin_check_result].base;
+        hal_ll_module_state[pin_check_result].init_ll_state = true;
+    }
+    hal_handle.init_ll_state = true;
 }
 
 pub fn hal_ll_spi_master_set_default_write_data(handle: &mut hal_ll_spi_master_handle_register_t, dummy_data: u8) {

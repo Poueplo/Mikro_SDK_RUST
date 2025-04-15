@@ -32,7 +32,7 @@ drv_i2c_master = {path = "drv/lib/drv_i2c_master"}
 system = {path = "core/system"}
 
 
-#hal_i2c_master = {path = "hal/lib/i2c"}
+hal_spi_master = {path = "hal/lib/spi"}
 hal_ll_spi_master = {path = "hal_ll/spi/hal_ll_spi_master"}
 
 [features]
