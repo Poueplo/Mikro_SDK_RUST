@@ -50,10 +50,10 @@ use panic_halt;
 //use drv_digital_in::*;
 use drv_digital_out::*;
 use drv_port::*;
+use drv_spi_master::*;
 use drv_name::*;
 use system::*;
 
-use hal_spi_master::*;
 
 const pin_sck: pin_name_t = GPIO_A5;
 const pin_miso: pin_name_t = GPIO_A6;
@@ -82,35 +82,35 @@ fn main() -> ! {
 
     port_init(&mut error, error_port, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
 
-    let mut spi : hal_spi_master_t = hal_spi_master_t::default(); 
-    let mut spi_config : hal_spi_master_config_t = hal_spi_master_config_t::default();
+    let mut spi : spi_master_t = spi_master_t::default(); 
+    let mut spi_config : spi_master_config_t = spi_master_config_t::default();
 
-    spi.config.sck = pin_sck;
-    spi.config.miso = pin_miso;
-    spi.config.mosi = pin_mosi;
+    spi_config.sck = pin_sck;
+    spi_config.miso = pin_miso;
+    spi_config.mosi = pin_mosi;
 
-    hal_spi_master_set_chip_select_polarity(hal_spi_master_chip_select_polarity_t::SPI_MASTER_CHIP_SELECT_POLARITY_ACTIVE_LOW);
-    hal_spi_master_open(&mut spi, true);
+    spi_master_set_chip_select_polarity(spi_master_chip_select_polarity_t::SPI_MASTER_CHIP_SELECT_POLARITY_ACTIVE_LOW);
+    spi_master_open(&mut spi, spi_config);
     //hal_spi_master_set_mode(&mut spi, spi_config);
 
     spi_config.default_write_data = 0x55;
     //hal_spi_master_set_default_write_data(&mut spi, spi_config);
 
     
-    hal_spi_master_select_device(pin_cs);
-    hal_spi_master_write(&mut spi, &mut spi_write_buff, 14);
-    hal_spi_master_deselect_device(pin_cs);
+    spi_master_select_device(pin_cs);
+    spi_master_write(&mut spi, &mut spi_write_buff, 14);
+    spi_master_deselect_device(pin_cs);
     delay_1ms();
-    hal_spi_master_select_device(pin_cs);
-    hal_spi_master_write(&mut spi, &mut spi_read_order, 4);
-    hal_spi_master_read(&mut spi, &mut data_buff, 10);
-    hal_spi_master_deselect_device(pin_cs);
+    spi_master_select_device(pin_cs);
+    spi_master_write(&mut spi, &mut spi_read_order, 4);
+    spi_master_read(&mut spi, &mut data_buff, 10);
+    spi_master_deselect_device(pin_cs);
     delay_1ms();
-    hal_spi_master_select_device(pin_cs);
-    hal_spi_master_write_then_read(&mut spi, &mut spi_read_order, 4, &mut data_buff, 10);
-    hal_spi_master_deselect_device(pin_cs);
+    spi_master_select_device(pin_cs);
+    spi_master_write_then_read(&mut spi, &mut spi_read_order, 4, &mut data_buff, 10);
+    spi_master_deselect_device(pin_cs);
 
-    hal_spi_master_close(&mut spi);
+    spi_master_close(&mut spi);
 
     loop {}
 }

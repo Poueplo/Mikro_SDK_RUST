@@ -50,6 +50,8 @@ use system::*;
 pub use hal_ll_spi_master::hal_ll_spi_master_handle_register_t as hal_spi_master_handle_register_t;
 pub use hal_ll_spi_master::hal_ll_spi_master_mode_t as hal_spi_master_mode_t;
 pub use hal_ll_spi_master::HAL_LL_SPI_MASTER_ERROR as HAL_SPI_MASTER_ERROR;
+pub use hal_ll_spi_master::HAL_LL_SPI_MASTER_SPEED_100K as HAL_SPI_MASTER_SPEED_100K;
+pub use hal_ll_spi_master::SPI_MASTER_MODE_DEFAULT;
 
 type Result<T> = core::result::Result<T, HAL_SPI_MASTER_ERROR>;
 
@@ -72,7 +74,7 @@ impl Default for hal_spi_master_config_t {
             sck: HAL_PIN_NC, 
             miso: HAL_PIN_NC, 
             mosi: HAL_PIN_NC, 
-            speed: HAL_LL_SPI_MASTER_SPEED_100K, 
+            speed: HAL_SPI_MASTER_SPEED_100K, 
             mode: SPI_MASTER_MODE_DEFAULT
         }
     }
@@ -94,7 +96,7 @@ impl Default for hal_spi_master_t {
     fn default() -> Self {
         Self { 
             handle: hal_spi_master_handle_register_t{ spi_master_handle: 0, init_ll_state: false }, 
-            config: hal_spi_master_config_t{ default_write_data: 0x00, sck: HAL_PIN_NC, miso: HAL_PIN_NC, mosi: HAL_PIN_NC, speed: HAL_LL_SPI_MASTER_SPEED_100K, mode: SPI_MASTER_MODE_DEFAULT } 
+            config: hal_spi_master_config_t{ default_write_data: 0x00, sck: HAL_PIN_NC, miso: HAL_PIN_NC, mosi: HAL_PIN_NC, speed: HAL_SPI_MASTER_SPEED_100K, mode: SPI_MASTER_MODE_DEFAULT } 
         }
     }
 }
