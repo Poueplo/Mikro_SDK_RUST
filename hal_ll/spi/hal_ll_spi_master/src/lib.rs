@@ -38,6 +38,9 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_camel_case_types)]
+#![allow(non_upper_case_globals)]
+#![allow(unused)]
 
 use hal_ll_target::*;
 use hal_ll_spi_master_pin_map::*;
@@ -182,10 +185,8 @@ static mut hal_ll_spi_hw_specifics_map: [hal_ll_spi_hw_specifics_map_t; (SPI_MOD
 
 pub fn hal_ll_spi_master_register_handle(sck: hal_ll_pin_name_t, miso: hal_ll_pin_name_t, mosi: hal_ll_pin_name_t, hal_module_id: &mut u8) -> Result<hal_ll_spi_master_handle_register_t> {
     let pin_check_result: u8;
-    let mut index_list: [hal_ll_spi_pin_id; SPI_MODULE_COUNT as usize] = [
+    let mut index_list: hal_ll_spi_pin_id = 
         hal_ll_spi_pin_id{ pin_sck: HAL_LL_PIN_NC, pin_miso: HAL_LL_PIN_NC, pin_mosi: HAL_LL_PIN_NC};
-        SPI_MODULE_COUNT as usize
-    ];
 
     pin_check_result = hal_ll_spi_master_check_pins(sck, miso, mosi, &mut index_list);
     if pin_check_result == HAL_LL_PIN_NC {
@@ -347,7 +348,7 @@ fn hal_ll_spi_master_read_bare_metal(map: &mut hal_ll_spi_hw_specifics_map_t, re
     }
 }
 
-fn hal_ll_spi_master_check_pins(sck: hal_ll_pin_name_t, miso: hal_ll_pin_name_t, mosi: hal_ll_pin_name_t, index_list: &mut [hal_ll_spi_pin_id; SPI_MODULE_COUNT as usize]) -> u8 {
+fn hal_ll_spi_master_check_pins(sck: hal_ll_pin_name_t, miso: hal_ll_pin_name_t, mosi: hal_ll_pin_name_t, index_list: &mut hal_ll_spi_pin_id) -> u8 {
     let sck_map_size: u8 = _spi_sck_map.len() as u8 ;
     let miso_map_size: u8 = _spi_miso_map.len() as u8 ;
     let mosi_map_size: u8 = _spi_mosi_map.len() as u8 ;
@@ -370,9 +371,9 @@ fn hal_ll_spi_master_check_pins(sck: hal_ll_pin_name_t, miso: hal_ll_pin_name_t,
                                     // Get module number
                                     hal_ll_module_id = _spi_sck_map[sck_index as usize].module_index;
                                     // Map pin names
-                                    index_list[hal_ll_module_id as usize].pin_sck = sck_index;
-                                    index_list[hal_ll_module_id as usize].pin_miso = miso_index;
-                                    index_list[hal_ll_module_id as usize].pin_mosi = mosi_index;
+                                    index_list.pin_sck = sck_index;
+                                    index_list.pin_miso = miso_index;
+                                    index_list.pin_mosi = mosi_index;
 
                                     if unsafe{hal_ll_module_state[ hal_ll_module_id as usize].spi_master_handle} == hal_ll_spi_master_handle_register_t::default().spi_master_handle {
                                         return hal_ll_module_id;
@@ -420,16 +421,16 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_spi_master_handle_register_t) -> &'a 
 }
 
 
-fn hal_ll_spi_master_map_pins(module_index: usize, index_list: &mut [hal_ll_spi_pin_id; SPI_MODULE_COUNT as usize]) {
+fn hal_ll_spi_master_map_pins(module_index: usize, index_list: &mut hal_ll_spi_pin_id) {
     unsafe{
         // Map new pins
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_sck.pin_name = _spi_sck_map[ index_list[module_index as usize].pin_sck as usize].pin;
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_mosi.pin_name = _spi_mosi_map[ index_list[module_index as usize].pin_mosi as usize].pin;
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_miso.pin_name = _spi_miso_map[ index_list[module_index as usize].pin_miso as usize].pin;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_sck.pin_name = _spi_sck_map[ index_list.pin_sck as usize].pin;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_mosi.pin_name = _spi_mosi_map[ index_list.pin_mosi as usize].pin;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_miso.pin_name = _spi_miso_map[ index_list.pin_miso as usize].pin;
         // SCL and SDA could have different alternate function settings, hence save both AF values
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_sck.pin_af = _spi_sck_map[ index_list[module_index as usize].pin_sck as usize].af;
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_mosi.pin_af = _spi_mosi_map[ index_list[module_index as usize].pin_mosi as usize].af;
-        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_miso.pin_af = _spi_miso_map[ index_list[module_index as usize].pin_miso as usize].af;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_sck.pin_af = _spi_sck_map[ index_list.pin_sck as usize].af;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_mosi.pin_af = _spi_mosi_map[ index_list.pin_mosi as usize].af;
+        hal_ll_spi_hw_specifics_map[module_index as usize].pins.pin_miso.pin_af = _spi_miso_map[ index_list.pin_miso as usize].af;
     }
 }
 

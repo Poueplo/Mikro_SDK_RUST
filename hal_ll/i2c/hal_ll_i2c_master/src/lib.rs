@@ -213,10 +213,8 @@ static mut hal_ll_i2c_hw_specifics_map:[hal_ll_i2c_hw_specifics_map_t; (I2C_MODU
 
 pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, hal_module_id: &mut u8) -> Result<hal_ll_i2c_master_handle_register_t> {
     let pin_check_result: u8;
-    let mut index_list: [hal_ll_i2c_pin_id; I2C_MODULE_COUNT as usize] = [
-        hal_ll_i2c_pin_id{ pin_scl: HAL_LL_PIN_NC, pin_sda: HAL_LL_PIN_NC };
-        I2C_MODULE_COUNT as usize
-    ];
+    let mut index_list: hal_ll_i2c_pin_id = hal_ll_i2c_pin_id{ pin_scl: HAL_LL_PIN_NC, pin_sda: HAL_LL_PIN_NC };
+
 
     pin_check_result = hal_ll_i2c_master_check_pins(scl, sda, &mut index_list);
     if pin_check_result == HAL_LL_PIN_NC {
@@ -633,7 +631,7 @@ fn hal_ll_i2c_master_check_event(i2c_ptr: *mut hal_ll_i2c_base_handle_t, event: 
     (hal_ll_i2c_master_get_status(i2c_ptr) & event ) == event
 }
 
-fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, index_list: &mut [hal_ll_i2c_pin_id; I2C_MODULE_COUNT as usize]) -> u8 {
+fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, index_list: &mut hal_ll_i2c_pin_id) -> u8 {
     let scl_map_size: u8 = hal_ll_i2c_scl_map.len() as u8 ;
     let sda_map_size: u8 = hal_ll_i2c_sda_map.len() as u8 ;
 
@@ -656,8 +654,8 @@ fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, 
                         // Get module number
                         hal_ll_module_id = hal_ll_i2c_scl_map[scl_index as usize].module_index;
                         // Map pin names
-                        index_list[hal_ll_module_id as usize].pin_scl = scl_index;
-                        index_list[hal_ll_module_id as usize].pin_sda = sda_index;
+                        index_list.pin_scl = scl_index;
+                        index_list.pin_sda = sda_index;
 
                         if unsafe{hal_ll_module_state[ hal_ll_module_id as usize].i2c_master_handle} == hal_ll_i2c_master_handle_register_t::default().i2c_master_handle{
                             return hal_ll_module_id;
@@ -730,14 +728,14 @@ fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_s
     }
 }
 
-fn hal_ll_i2c_master_map_pins(module_index: usize, index_list: &mut [hal_ll_i2c_pin_id; I2C_MODULE_COUNT as usize]) {
+fn hal_ll_i2c_master_map_pins(module_index: usize, index_list: &mut hal_ll_i2c_pin_id) {
     unsafe{
         // Map new pins
-        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_scl.pin_name = hal_ll_i2c_scl_map[ index_list[module_index].pin_scl as usize].pin;
-        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_sda.pin_name = hal_ll_i2c_sda_map[ index_list[module_index].pin_sda as usize].pin;
+        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_scl.pin_name = hal_ll_i2c_scl_map[ index_list.pin_scl as usize].pin;
+        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_sda.pin_name = hal_ll_i2c_sda_map[ index_list.pin_sda as usize].pin;
         // SCL and SDA could have different alternate function settings, hence save both AF values
-        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_scl.pin_af = hal_ll_i2c_scl_map[ index_list[module_index].pin_scl as usize].af;
-        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_sda.pin_af = hal_ll_i2c_sda_map[ index_list[module_index].pin_sda as usize].af;
+        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_scl.pin_af = hal_ll_i2c_scl_map[ index_list.pin_scl as usize].af;
+        hal_ll_i2c_hw_specifics_map[module_index].pins.pin_sda.pin_af = hal_ll_i2c_sda_map[ index_list.pin_sda as usize].af;
     }
 }
 
