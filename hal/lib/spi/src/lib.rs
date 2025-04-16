@@ -45,7 +45,6 @@ use hal_ll_spi_master::*;
 use hal_target::*;
 use hal_target::pin_names::*;
 use hal_gpio::*;
-use system::*;
 
 pub use hal_ll_spi_master::hal_ll_spi_master_handle_register_t as hal_spi_master_handle_register_t;
 pub use hal_ll_spi_master::hal_ll_spi_master_mode_t as hal_spi_master_mode_t;

@@ -38,6 +38,7 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_camel_case_types)]
 
 pub mod pin_names {
     pub use hal_ll_pin_names::*;
