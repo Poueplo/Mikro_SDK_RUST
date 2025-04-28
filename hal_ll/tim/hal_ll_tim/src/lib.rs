@@ -52,13 +52,11 @@ const HAL_LL_TIM_ENABLE_COUNTER_BIT: u32 = 0;
 const HAL_LL_TIM_BDTR_MOE_BIT: u32 = 15;
 
 const HAL_LL_TIM_CCMR_CCS_OUTPUT: u32 = 0x3;
-const HAL_LL_TIM_CCMR_OCFE: u32 = 0x4;
 const HAL_LL_TIM_CCMR_OCP: u32 = 0x8;
 const HAL_LL_TIM_CCMR_OCM: u32 = 0x70;
 const HAL_LL_TIM_CCMR_OCM_PWM_MODE_1: u32 = 0x60;
 
 const HAL_LL_TIM_CR1_DIR_BIT: u32 = 4;
-const HAL_LL_TIM_CR2_CCPC: u32 = 0;
 
 //APB1
 const HAL_LL_TIM_ENABLE_2: u8 = 0;
@@ -247,7 +245,7 @@ pub fn hal_ll_tim_set_duty(handle: &mut hal_ll_tim_handle_register_t, pin: hal_l
     let tim_ptr : *mut hal_ll_tim_base_handle_t = hal_ll_tim_hw_specifics_map_local.base as *mut hal_ll_tim_base_handle_t;
 
     let tmp_duty: f32;
-    let mut max_duty: u32 = 0;
+    let max_duty: u32;
     let max_period: u16;
     let mut channel: hal_ll_tim_channel_t = hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE;
 
@@ -303,7 +301,7 @@ pub fn hal_ll_tim_start(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_p
         *tmp_ptr |= (HAL_LL_TIM_CCMR_OCM_PWM_MODE_1) << offset;
 
         //enable channel
-        set_reg_bit(&(*tim_ptr).ccer as *const u32 as u32, ((channel as u32) * 2));
+        set_reg_bit(&(*tim_ptr).ccer as *const u32 as u32, (channel as u32) * 2);
         clear_reg_bit(&(*tim_ptr).ccer as *const u32 as u32, ((channel as u32) * 2) + 1);
 
         //enable timer
@@ -354,6 +352,7 @@ pub fn hal_ll_tim_close(handle: &mut hal_ll_tim_handle_register_t) {
 }
 
 ///////// private functions
+#[allow(unused)]
 fn hal_ll_tim_check_pins(pin: hal_ll_pin_name_t, index: &mut u8, config_index: &mut u8) -> u8
 {
     let tim_map_size: u8 = _tim_map.len() as u8 ;
