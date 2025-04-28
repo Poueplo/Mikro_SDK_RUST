@@ -46,3 +46,4 @@ pub type hal_ll_gpio_mask_t = u16;
 pub type hal_ll_pin_name_t = u8;
 pub type hal_ll_port_name_t = u8;
 pub type hal_ll_port_size_t = u16;
+// pub type hal_ll_channel_t = u8;

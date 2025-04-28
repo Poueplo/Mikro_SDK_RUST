@@ -47,70 +47,118 @@ use cortex_m_rt::entry;
 use panic_halt;
 
 
-//use drv_digital_in::*;
-use drv_digital_out::*;
-use drv_port::*;
-use drv_spi_master::*;
+use hal_ll_tim::*;
 use drv_name::*;
 use system::*;
 
-
-const pin_sck: pin_name_t = GPIO_A5;
-const pin_miso: pin_name_t = GPIO_A6;
-const pin_mosi: pin_name_t = GPIO_B5;
-const pin_cs: pin_name_t = GPIO_B4;
-const pin_hld: pin_name_t = GPIO_E13;
-
-const error_port: port_name_t = GPIO_PORT_D;
-
+const pin_tim_1: pin_name_t = GPIO_E9;  //channel 1
+const pin_tim_2: pin_name_t = GPIO_E11; //channel 2
+const pin_tim_3: pin_name_t = GPIO_E13; //channel 3
+const pin_tim_4: pin_name_t = GPIO_E14; //channel 4
+const pin_tim_5: pin_name_t = GPIO_E8;  //channel 1N
+const pin_tim_6: pin_name_t = GPIO_E10; //channel 2N
+const pin_tim_7: pin_name_t = GPIO_E12; //channel 3N
 
 #[entry]
 fn main() -> ! {
 
     system_init();
 
-    let mut error: port_t = port_t::default();
-    let mut error_output : u16 = 0;
-    let mut data_buff: [u8; 16] = [0; 16];
-    let mut spi_write_buff: [u8; 14] = [0x02, 0x00, 0x00, 0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
-    let mut spi_read_order: [u8; 4] = [0x03, 0x00, 0x00, 0x00];
+    let mut tim: hal_ll_tim_handle_register_t = hal_ll_tim_handle_register_t::default();
+    let mut module_index: u8 = 0;
+    let mut error: u8 = 0;
 
-    let mut hld: digital_out_t = digital_out_t::default();
-    digital_out_init(&mut hld , pin_hld );
+    tim = hal_ll_tim_register_handle(pin_tim_1, &mut module_index).ok().unwrap();
+    match hal_ll_tim_register_handle(pin_tim_2, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 1,
+    }
 
-    digital_out_high(&mut hld);
+    match hal_ll_tim_register_handle(pin_tim_3, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 2,
+    }
 
-    port_init(&mut error, error_port, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+    match hal_ll_tim_register_handle(pin_tim_4, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 3,
+    }
 
-    let mut spi : spi_master_t = spi_master_t::default(); 
-    let mut spi_config : spi_master_config_t = spi_master_config_t::default();
+    match hal_ll_tim_register_handle(pin_tim_5, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 4,
+    }
 
-    spi_config.sck = pin_sck;
-    spi_config.miso = pin_miso;
-    spi_config.mosi = pin_mosi;
+    match hal_ll_tim_register_handle(pin_tim_6, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 5,
+    }
 
-    spi_master_set_chip_select_polarity(spi_master_chip_select_polarity_t::SPI_MASTER_CHIP_SELECT_POLARITY_ACTIVE_LOW);
-    spi_master_open(&mut spi, spi_config);
-    //hal_spi_master_set_mode(&mut spi, spi_config);
+    match hal_ll_tim_register_handle(pin_tim_7, &mut module_index) {
+        Ok(register) => tim = register,
+        Err(_) => error = 6,
+    }
 
-    spi_config.default_write_data = 0x55;
-    //hal_spi_master_set_default_write_data(&mut spi, spi_config);
+    hal_ll_tim_set_freq(&mut tim, 0x55D);
 
-    
-    spi_master_select_device(pin_cs);
-    spi_master_write(&mut spi, &mut spi_write_buff, 14);
-    spi_master_deselect_device(pin_cs);
-    delay_1ms();
-    spi_master_select_device(pin_cs);
-    spi_master_write(&mut spi, &mut spi_read_order, 4);
-    spi_master_read(&mut spi, &mut data_buff, 10);
-    spi_master_deselect_device(pin_cs);
-    delay_1ms();
-    spi_master_select_device(pin_cs);
-    spi_master_write_then_read(&mut spi, &mut spi_read_order, 4, &mut data_buff, 10);
-    spi_master_deselect_device(pin_cs);
+    let mut duty1: f32 = 0.1;
+    let mut duty2: f32 = 0.1;
+    let mut duty3: f32 = 0.1;
+    let mut duty4: f32 = 0.1;
 
-    spi_master_close(&mut spi);
+    hal_ll_tim_set_duty(&mut tim, pin_tim_1, duty1);
+    hal_ll_tim_set_duty(&mut tim, pin_tim_2, duty2);
+    hal_ll_tim_set_duty(&mut tim, pin_tim_3, duty3);
+    hal_ll_tim_set_duty(&mut tim, pin_tim_4, duty4);
 
-    loop {}
+    hal_ll_tim_start(&mut tim, pin_tim_1);
+    hal_ll_tim_start(&mut tim, pin_tim_2);
+    hal_ll_tim_start(&mut tim, pin_tim_3);
+    hal_ll_tim_start(&mut tim, pin_tim_4);
+    hal_ll_tim_start(&mut tim, pin_tim_5);
+    hal_ll_tim_start(&mut tim, pin_tim_6);
+    hal_ll_tim_start(&mut tim, pin_tim_7);
+
+    // hal_ll_tim_set_duty(&mut tim, pin_tim_1, 0.5);
+    // Delay_ms(100);
+    // hal_ll_tim_stop(&mut tim, pin_tim_5);
+
+
+    // duty1 += 0.1;
+    // duty2 += 0.2;
+    // duty3 += 0.3;
+    // duty4 += 0.4;
+    // hal_ll_tim_set_duty(&mut tim, pin_tim_1, duty1);
+    // hal_ll_tim_set_duty(&mut tim, pin_tim_2, duty2);
+    // hal_ll_tim_set_duty(&mut tim, pin_tim_3, duty3);
+    // hal_ll_tim_set_duty(&mut tim, pin_tim_4, duty4);
+    // Delay_ms(100);
+
+    // hal_ll_tim_close(&mut tim);
+
+    loop {
+        hal_ll_tim_set_duty(&mut tim, pin_tim_1, duty1);
+        hal_ll_tim_set_duty(&mut tim, pin_tim_2, duty2);
+        hal_ll_tim_set_duty(&mut tim, pin_tim_3, duty3);
+        hal_ll_tim_set_duty(&mut tim, pin_tim_4, duty4);
+        Delay_ms(100);
+        duty1 += 0.1;
+        duty2 += 0.2;
+        duty3 += 0.3;
+        duty4 += 0.4;
+
+
+        if duty1 > 1.0 {
+            duty1 = 0.1;
+        }
+        if duty2 > 1.0 {
+            duty2 = 0.1;
+        }
+        if duty3 > 1.0 {
+            duty3 = 0.1;
+        }
+        if duty4 > 1.0 {
+            duty4 = 0.1;
+        }
+    }
 }

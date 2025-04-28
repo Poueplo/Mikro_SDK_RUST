@@ -34,6 +34,6 @@ system = {path = "core/system"}
 
 
 hal_spi_master = {path = "hal/lib/spi"}
-hal_ll_spi_master = {path = "hal_ll/spi/hal_ll_spi_master"}
+hal_ll_tim = {path = "hal_ll/tim/hal_ll_tim"}
 
 [features]

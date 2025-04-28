@@ -238,6 +238,23 @@ name = "hal_ll_target_names"
 version = "0.1.1"
 
 [[package]]
+name = "hal_ll_tim"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "hal_ll_target",
+ "hal_ll_tim_pin_map",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_tim_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
+]
+
+[[package]]
 name = "hal_spi_master"
 version = "0.1.0"
 dependencies = [
@@ -271,7 +288,7 @@ dependencies = [
  "drv_name",
  "drv_port",
  "drv_spi_master",
- "hal_ll_spi_master",
+ "hal_ll_tim",
  "hal_spi_master",
  "panic-halt",
  "system",
