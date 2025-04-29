@@ -49,8 +49,7 @@ use cortex_m_rt::entry;
 use panic_halt;
 
 
-use hal_ll_tim::*;
-use hal_pwm::*;
+use drv_pwm::*;
 use drv_name::*;
 use system::*;
 
@@ -71,102 +70,98 @@ fn main() -> ! {
 
     system_init();
 
-    let mut tim: hal_ll_tim_handle_register_t = hal_ll_tim_handle_register_t::default();
-    let mut module_index: u8 = 0;
-    let mut error: u8 = 0;
-    let mut pwm_1: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_2: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_3: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_4: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_5: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_6: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_7: hal_pwm_t = hal_pwm_t::default();
+    let mut pwm_1: pwm_t = pwm_t::default();
+    let mut pwm_2: pwm_t = pwm_t::default();
+    let mut pwm_3: pwm_t = pwm_t::default();
+    let mut pwm_4: pwm_t = pwm_t::default();
+    let mut pwm_5: pwm_t = pwm_t::default();
+    let mut pwm_6: pwm_t = pwm_t::default();
+    let mut pwm_7: pwm_t = pwm_t::default();
 
     
-    let mut pwm_8: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_9: hal_pwm_t = hal_pwm_t::default();
-    let mut pwm_10: hal_pwm_t = hal_pwm_t::default();
+    let mut pwm_8: pwm_t = pwm_t::default();
+    let mut pwm_9: pwm_t = pwm_t::default();
+    let mut pwm_10: pwm_t = pwm_t::default();
     
 
-    pwm_1.config.pin = pin_tim_1;
-    pwm_2.config.pin = pin_tim_2;
-    pwm_3.config.pin = pin_tim_3;
-    pwm_4.config.pin = pin_tim_4;
-    pwm_5.config.pin = pin_tim_5;
-    pwm_6.config.pin = pin_tim_6;
-    pwm_7.config.pin = pin_tim_7;
+    let mut pwm_config_1: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_2: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_3: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_4: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_5: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_6: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_7: pwm_config_t = pwm_config_t::default();
 
-    pwm_8.config.pin = pin_tim_8;
-    pwm_9.config.pin = pin_tim_9;
-    pwm_10.config.pin = pin_tim_10;
+    
+    let mut pwm_config_8: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_9: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_10: pwm_config_t = pwm_config_t::default();
 
-    hal_pwm_open(&mut pwm_1, true);
-    hal_pwm_open(&mut pwm_2, true);
-    hal_pwm_open(&mut pwm_3, true);
-    hal_pwm_open(&mut pwm_4, true);
-    hal_pwm_open(&mut pwm_5, true);
-    hal_pwm_open(&mut pwm_6, true);
-    hal_pwm_open(&mut pwm_7, true);
+    pwm_config_1.pin = pin_tim_1;
+    pwm_config_2.pin = pin_tim_2;
+    pwm_config_3.pin = pin_tim_3;
+    pwm_config_4.pin = pin_tim_4;
+    pwm_config_5.pin = pin_tim_5;
+    pwm_config_6.pin = pin_tim_6;
+    pwm_config_7.pin = pin_tim_7;
 
-    hal_pwm_open(&mut pwm_8, true);
-    hal_pwm_open(&mut pwm_9, true);
-    hal_pwm_open(&mut pwm_10, true);
+    pwm_config_8.pin = pin_tim_8;
+    pwm_config_9.pin = pin_tim_9;
+    pwm_config_10.pin = pin_tim_10;
 
-    tim = pwm_1.handle;
+    pwm_open(&mut pwm_1, pwm_config_1);
+    pwm_open(&mut pwm_2, pwm_config_2);
+    pwm_open(&mut pwm_3, pwm_config_3);
+    pwm_open(&mut pwm_4, pwm_config_4);
+    pwm_open(&mut pwm_5, pwm_config_5);
+    pwm_open(&mut pwm_6, pwm_config_6);
+    pwm_open(&mut pwm_7, pwm_config_7);
 
-    hal_pwm_set_freq(&mut pwm_4, 0x55D);
+    pwm_open(&mut pwm_8, pwm_config_8);
+    pwm_open(&mut pwm_9, pwm_config_9);
+    pwm_open(&mut pwm_10,pwm_config_10);
+
+    pwm_set_freq(&mut pwm_4, 0x55D);
 
     let mut duty1: f32 = 0.1;
     let mut duty2: f32 = 0.1;
     let mut duty3: f32 = 0.1;
     let mut duty4: f32 = 0.1;
 
-    hal_pwm_set_duty(&mut pwm_5, duty1);
-    hal_pwm_set_duty(&mut pwm_6, duty2);
-    hal_pwm_set_duty(&mut pwm_7, duty3);
-    hal_pwm_set_duty(&mut pwm_4, duty4);
+    pwm_set_duty(&mut pwm_5, duty1);
+    pwm_set_duty(&mut pwm_6, duty2);
+    pwm_set_duty(&mut pwm_7, duty3);
+    pwm_set_duty(&mut pwm_4, duty4);
 
     
-    hal_pwm_set_duty(&mut pwm_8, 0.5);
-    hal_pwm_set_duty(&mut pwm_9, 0.4);
-    hal_pwm_set_duty(&mut pwm_10, 0.3);
+    pwm_set_duty(&mut pwm_8, 0.5);
+    pwm_set_duty(&mut pwm_9, 0.4);
+    pwm_set_duty(&mut pwm_10, 0.3);
 
-    hal_pwm_start(&mut pwm_1);
-    hal_pwm_start(&mut pwm_2);
-    hal_pwm_start(&mut pwm_3);
-    hal_pwm_start(&mut pwm_4);
-    hal_pwm_start(&mut pwm_5);
-    hal_pwm_start(&mut pwm_6);
-    hal_pwm_start(&mut pwm_7);
+    pwm_start(&mut pwm_1);
+    pwm_start(&mut pwm_2);
+    pwm_start(&mut pwm_3);
+    pwm_start(&mut pwm_4);
+    pwm_start(&mut pwm_5);
+    pwm_start(&mut pwm_6);
+    pwm_start(&mut pwm_7);
 
     
-    hal_pwm_start(&mut pwm_8);
-    hal_pwm_start(&mut pwm_9);
-    hal_pwm_start(&mut pwm_10);
+    pwm_start(&mut pwm_8);
+    pwm_start(&mut pwm_9);
+    pwm_start(&mut pwm_10);
 
     Delay_ms(1000);
-    hal_pwm_stop(&mut pwm_9);
+    pwm_stop(&mut pwm_9);
     Delay_ms(1000);
-    hal_pwm_close(&mut pwm_10);
-    hal_pwm_close(&mut pwm_9);
-
-    // duty1 += 0.1;
-    // duty2 += 0.2;
-    // duty3 += 0.3;
-    // duty4 += 0.4;
-    // hal_ll_tim_set_duty(&mut tim, pin_tim_1, duty1);
-    // hal_ll_tim_set_duty(&mut tim, pin_tim_2, duty2);
-    // hal_ll_tim_set_duty(&mut tim, pin_tim_3, duty3);
-    // hal_ll_tim_set_duty(&mut tim, pin_tim_4, duty4);
-    // Delay_ms(100);
-
-    // hal_ll_tim_close(&mut tim);
+    pwm_close(&mut pwm_10);
+    pwm_close(&mut pwm_9);
 
     loop {
-        hal_pwm_set_duty(&mut pwm_5, duty1);
-        hal_pwm_set_duty(&mut pwm_6, duty2);
-        hal_pwm_set_duty(&mut pwm_7, duty3);
-        hal_pwm_set_duty(&mut pwm_4, duty4);
+        pwm_set_duty(&mut pwm_5, duty1);
+        pwm_set_duty(&mut pwm_6, duty2);
+        pwm_set_duty(&mut pwm_7, duty3);
+        pwm_set_duty(&mut pwm_4, duty4);
         Delay_ms(100);
         duty1 += 0.1;
         duty2 += 0.2;

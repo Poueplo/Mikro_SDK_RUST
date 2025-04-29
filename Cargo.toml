@@ -30,10 +30,11 @@ drv_digital_out = {path = "drv/lib/drv_digital_out"}
 drv_analog_in = {path = "drv/lib/drv_analog_in"}
 drv_i2c_master = {path = "drv/lib/drv_i2c_master"}
 drv_spi_master = {path = "drv/lib/drv_spi_master"}
+drv_pwm = {path = "drv/lib/drv_pwm"}
 system = {path = "core/system"}
 
 
 hal_pwm = {path = "hal/lib/pwm"}
-hal_ll_tim = {path = "hal_ll/tim/hal_ll_tim"}
+#hal_ll_tim = {path = "hal_ll/tim/hal_ll_tim"}
 
 [features]
