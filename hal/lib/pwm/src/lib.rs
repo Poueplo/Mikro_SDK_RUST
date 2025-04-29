@@ -225,7 +225,14 @@ pub fn hal_pwm_set_duty(handle: &mut hal_pwm_t, duty_ratio: f32) -> Result<()> {
         hal_obj.handle = *hal_handle;
     }
 
-    hal_ll_tim_set_duty(hal_handle , hal_obj.config.pin, duty_ratio);
+    if duty_ratio < 0.0 {
+        hal_ll_tim_set_duty(hal_handle , hal_obj.config.pin, 0.0);
+    } else if duty_ratio > 1.0 {
+        hal_ll_tim_set_duty(hal_handle , hal_obj.config.pin, 1.0);
+    } else {
+        hal_ll_tim_set_duty(hal_handle , hal_obj.config.pin, duty_ratio);
+    }
+
     hal_obj.handle = *hal_handle;
     Ok(())
 }
