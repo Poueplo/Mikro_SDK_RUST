@@ -255,6 +255,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_pwm"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_tim",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_spi_master"
 version = "0.1.0"
 dependencies = [
@@ -289,7 +297,7 @@ dependencies = [
  "drv_port",
  "drv_spi_master",
  "hal_ll_tim",
- "hal_spi_master",
+ "hal_pwm",
  "panic-halt",
  "system",
 ]

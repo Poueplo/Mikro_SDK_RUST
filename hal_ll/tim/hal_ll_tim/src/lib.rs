@@ -83,14 +83,16 @@ pub enum HAL_LL_TIM_ERROR {
     TIM_WRONG_PIN,
     ACQUIRE_FAIL,
     TIM_MODULE_ERROR,
+    PWM_ERROR,
 }
 
 impl fmt::Display for HAL_LL_TIM_ERROR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            Self::TIM_WRONG_PIN => write!(f, "TIM_WRONG_PIN occurred"),                  
-            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),                  
-            Self::TIM_MODULE_ERROR => write!(f, "TIM_MODULE_ERROR occurred"),                  
+            Self::TIM_WRONG_PIN => write!(f, "TIM_WRONG_PIN occurred"),
+            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),
+            Self::TIM_MODULE_ERROR => write!(f, "TIM_MODULE_ERROR occurred"),
+            Self::PWM_ERROR => write!(f, "PWM_ERROR occurred"),
         }
     }
 }
@@ -162,19 +164,19 @@ static mut hal_ll_module_state: [hal_ll_tim_handle_register_t; TIM_MODULE_COUNT 
         TIM_MODULE_COUNT as usize];
 
 static mut hal_ll_tim_hw_specifics_map: [hal_ll_tim_hw_specifics_map_t; (TIM_MODULE_COUNT + 1) as usize] = [
-    hal_ll_tim_hw_specifics_map_t{ base: TIM1_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_1) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM2_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_2) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM3_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_3) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM4_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_4) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM5_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_5) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM8_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_8) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM9_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_9) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM10_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_10) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM11_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_11) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM12_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_12) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM13_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_13) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM14_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: hal_ll_tim_module_num(TIM_MODULE_14) },
-    hal_ll_tim_hw_specifics_map_t{ base: HAL_LL_MODULE_ERROR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0, freq_hz: 0, module_index: HAL_LL_MODULE_ERROR as u8},
+    hal_ll_tim_hw_specifics_map_t{ base: TIM1_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_1) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM2_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_2) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM3_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_3) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM4_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_4) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM5_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_5) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM8_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_8) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM9_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_9) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM10_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_10) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM11_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_11) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM12_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_12) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM13_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_13) },
+    hal_ll_tim_hw_specifics_map_t{ base: TIM14_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_14) },
+    hal_ll_tim_hw_specifics_map_t{ base: HAL_LL_MODULE_ERROR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: HAL_LL_MODULE_ERROR as u8},
 ];
 
 ///////// public functions
@@ -203,6 +205,19 @@ pub fn hal_ll_tim_register_handle(pin: hal_ll_pin_name_t, hal_module_id: &mut u8
         
         Ok(hal_ll_module_state[pin_check_result as usize])
     }
+}
+
+pub fn hal_ll_module_configure_tim(handle: &mut hal_ll_tim_handle_register_t) {
+    let hal_handle : &mut hal_ll_tim_handle_register_t = handle;
+    let hal_ll_tim_hw_specifics_map_local: &mut hal_ll_tim_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
+    let pin_check_result: usize = hal_ll_tim_hw_specifics_map_local.module_index as usize;
+
+    hal_ll_tim_init( hal_ll_tim_hw_specifics_map_local );
+    unsafe{
+        hal_ll_module_state[pin_check_result].tim_handle = hal_ll_tim_hw_specifics_map[pin_check_result].base;
+        hal_ll_module_state[pin_check_result].init_ll_state = true;
+    }
+    hal_handle.init_ll_state = true;
 }
 
 pub fn hal_ll_tim_set_freq(handle: &mut hal_ll_tim_handle_register_t, freq_hz: u32) {
@@ -269,7 +284,7 @@ pub fn hal_ll_tim_set_duty(handle: &mut hal_ll_tim_handle_register_t, pin: hal_l
 
 }
 
-pub fn hal_ll_tim_start(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_pin_name_t) {
+pub fn hal_ll_tim_start(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_pin_name_t) -> Result<()> {
     let hal_handle : &mut hal_ll_tim_handle_register_t = handle;
     let hal_ll_tim_hw_specifics_map_local: &mut hal_ll_tim_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let tim_ptr : *mut hal_ll_tim_base_handle_t = hal_ll_tim_hw_specifics_map_local.base as *mut hal_ll_tim_base_handle_t;
@@ -281,6 +296,10 @@ pub fn hal_ll_tim_start(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_p
         if hal_ll_tim_hw_specifics_map_local.config[config_index as usize].pin == pin {
             channel = hal_ll_tim_hw_specifics_map_local.config[config_index as usize].channel;
         }
+    }
+
+    if channel == hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE {
+        return Err(HAL_LL_TIM_ERROR::TIM_WRONG_PIN);
     }
 
     unsafe{
@@ -307,10 +326,10 @@ pub fn hal_ll_tim_start(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_p
         //enable timer
         set_reg_bit(&(*tim_ptr).cr1 as *const u32 as u32, HAL_LL_TIM_ENABLE_COUNTER_BIT);
     }
-
+    Ok(())
 }
 
-pub fn hal_ll_tim_stop(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_pin_name_t) {
+pub fn hal_ll_tim_stop(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_pin_name_t)  -> Result<()>  {
     let hal_handle : &mut hal_ll_tim_handle_register_t = handle;
     let hal_ll_tim_hw_specifics_map_local: &mut hal_ll_tim_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let tim_ptr : *mut hal_ll_tim_base_handle_t = hal_ll_tim_hw_specifics_map_local.base as *mut hal_ll_tim_base_handle_t;
@@ -321,9 +340,15 @@ pub fn hal_ll_tim_stop(handle: &mut hal_ll_tim_handle_register_t, pin: hal_ll_pi
             channel = hal_ll_tim_hw_specifics_map_local.config[config_index as usize].channel;
         }
     }
+
+    if channel == hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE {
+        return Err(HAL_LL_TIM_ERROR::TIM_WRONG_PIN);
+    }
+
     unsafe {
         clear_reg_bit(&(*tim_ptr).ccer as *const u32 as u32, (channel as u32) * 2);
     }
+    Ok(())
 }
 
 pub fn hal_ll_tim_close(handle: &mut hal_ll_tim_handle_register_t) {
@@ -335,7 +360,7 @@ pub fn hal_ll_tim_close(handle: &mut hal_ll_tim_handle_register_t) {
         *hal_handle = hal_ll_tim_handle_register_t::default();
 
         hal_ll_tim_hw_specifics_map_local.max_period = 0;
-        hal_ll_tim_hw_specifics_map_local.freq_hz = 0;
+        hal_ll_tim_hw_specifics_map_local.freq_hz = 1;
 
         hal_ll_tim_set_clock(hal_ll_tim_hw_specifics_map_local, true);
         hal_ll_tim_alternate_functions_set_state(&mut hal_ll_tim_hw_specifics_map_local, false );

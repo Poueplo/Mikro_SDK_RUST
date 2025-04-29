@@ -33,7 +33,7 @@ drv_spi_master = {path = "drv/lib/drv_spi_master"}
 system = {path = "core/system"}
 
 
-hal_spi_master = {path = "hal/lib/spi"}
+hal_pwm = {path = "hal/lib/pwm"}
 hal_ll_tim = {path = "hal_ll/tim/hal_ll_tim"}
 
 [features]
