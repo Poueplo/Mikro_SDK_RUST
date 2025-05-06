@@ -115,14 +115,14 @@ pub fn hal_i2c_master_open(handle: &mut hal_i2c_master_t, hal_obj_open_state: bo
         Some(_) => {
             if hal_obj_open_state
             {
-                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             } else {
                 return Ok(())
             }
         },
         None => {
             if !hal_obj_open_state {
-                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             }
         },
     }
@@ -137,7 +137,7 @@ pub fn hal_i2c_master_open(handle: &mut hal_i2c_master_t, hal_obj_open_state: bo
             },
             Err(_) => {
                 hal_obj.handle = hal_i2c_master_t::default().handle;
-                return Err(HAL_LL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
+                return Err(HAL_I2C_MASTER_ERROR::ACQUIRE_FAIL) 
             },
         }
 

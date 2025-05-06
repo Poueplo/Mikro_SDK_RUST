@@ -42,75 +42,144 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
+use core::prelude::v1;
+
 use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
 
-//use drv_digital_in::*;
-use drv_digital_out::*;
-use drv_port::*;
-use drv_spi_master::*;
+use drv_pwm::*;
 use drv_name::*;
 use system::*;
 
+const pin_tim_1: pin_name_t = GPIO_E9;  //channel 1
+const pin_tim_2: pin_name_t = GPIO_E11; //channel 2
+const pin_tim_3: pin_name_t = GPIO_E13; //channel 3
+const pin_tim_4: pin_name_t = GPIO_E14; //channel 4
+const pin_tim_5: pin_name_t = GPIO_E8;  //channel 1N
+const pin_tim_6: pin_name_t = GPIO_E10; //channel 2N
+const pin_tim_7: pin_name_t = GPIO_E12; //channel 3N
 
-const pin_sck: pin_name_t = GPIO_A5;
-const pin_miso: pin_name_t = GPIO_A6;
-const pin_mosi: pin_name_t = GPIO_B5;
-const pin_cs: pin_name_t = GPIO_B4;
-const pin_hld: pin_name_t = GPIO_E13;
-
-const error_port: port_name_t = GPIO_PORT_D;
-
+const pin_tim_8: pin_name_t = GPIO_C6;  //channel 1
+const pin_tim_9: pin_name_t = GPIO_C7; //channel 2
+const pin_tim_10: pin_name_t = GPIO_C8; //channel 3
 
 #[entry]
 fn main() -> ! {
 
     system_init();
 
-    let mut error: port_t = port_t::default();
-    let mut error_output : u16 = 0;
-    let mut data_buff: [u8; 16] = [0; 16];
-    let mut spi_write_buff: [u8; 14] = [0x02, 0x00, 0x00, 0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
-    let mut spi_read_order: [u8; 4] = [0x03, 0x00, 0x00, 0x00];
-
-    let mut hld: digital_out_t = digital_out_t::default();
-    digital_out_init(&mut hld , pin_hld );
-
-    digital_out_high(&mut hld);
-
-    port_init(&mut error, error_port, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
-
-    let mut spi : spi_master_t = spi_master_t::default(); 
-    let mut spi_config : spi_master_config_t = spi_master_config_t::default();
-
-    spi_config.sck = pin_sck;
-    spi_config.miso = pin_miso;
-    spi_config.mosi = pin_mosi;
-
-    spi_master_set_chip_select_polarity(spi_master_chip_select_polarity_t::SPI_MASTER_CHIP_SELECT_POLARITY_ACTIVE_LOW);
-    spi_master_open(&mut spi, spi_config);
-    //hal_spi_master_set_mode(&mut spi, spi_config);
-
-    spi_config.default_write_data = 0x55;
-    //hal_spi_master_set_default_write_data(&mut spi, spi_config);
+    let mut pwm_1: pwm_t = pwm_t::default();
+    let mut pwm_2: pwm_t = pwm_t::default();
+    let mut pwm_3: pwm_t = pwm_t::default();
+    let mut pwm_4: pwm_t = pwm_t::default();
+    let mut pwm_5: pwm_t = pwm_t::default();
+    let mut pwm_6: pwm_t = pwm_t::default();
+    let mut pwm_7: pwm_t = pwm_t::default();
 
     
-    spi_master_select_device(pin_cs);
-    spi_master_write(&mut spi, &mut spi_write_buff, 14);
-    spi_master_deselect_device(pin_cs);
-    delay_1ms();
-    spi_master_select_device(pin_cs);
-    spi_master_write(&mut spi, &mut spi_read_order, 4);
-    spi_master_read(&mut spi, &mut data_buff, 10);
-    spi_master_deselect_device(pin_cs);
-    delay_1ms();
-    spi_master_select_device(pin_cs);
-    spi_master_write_then_read(&mut spi, &mut spi_read_order, 4, &mut data_buff, 10);
-    spi_master_deselect_device(pin_cs);
+    let mut pwm_8: pwm_t = pwm_t::default();
+    let mut pwm_9: pwm_t = pwm_t::default();
+    let mut pwm_10: pwm_t = pwm_t::default();
+    
 
-    spi_master_close(&mut spi);
+    let mut pwm_config_1: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_2: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_3: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_4: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_5: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_6: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_7: pwm_config_t = pwm_config_t::default();
 
-    loop {}
+    
+    let mut pwm_config_8: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_9: pwm_config_t = pwm_config_t::default();
+    let mut pwm_config_10: pwm_config_t = pwm_config_t::default();
+
+    pwm_config_1.pin = pin_tim_1;
+    pwm_config_2.pin = pin_tim_2;
+    pwm_config_3.pin = pin_tim_3;
+    pwm_config_4.pin = pin_tim_4;
+    pwm_config_5.pin = pin_tim_5;
+    pwm_config_6.pin = pin_tim_6;
+    pwm_config_7.pin = pin_tim_7;
+
+    pwm_config_8.pin = pin_tim_8;
+    pwm_config_9.pin = pin_tim_9;
+    pwm_config_10.pin = pin_tim_10;
+
+    pwm_open(&mut pwm_1, pwm_config_1);
+    pwm_open(&mut pwm_2, pwm_config_2);
+    pwm_open(&mut pwm_3, pwm_config_3);
+    pwm_open(&mut pwm_4, pwm_config_4);
+    pwm_open(&mut pwm_5, pwm_config_5);
+    pwm_open(&mut pwm_6, pwm_config_6);
+    pwm_open(&mut pwm_7, pwm_config_7);
+
+    pwm_open(&mut pwm_8, pwm_config_8);
+    pwm_open(&mut pwm_9, pwm_config_9);
+    pwm_open(&mut pwm_10,pwm_config_10);
+
+    pwm_set_freq(&mut pwm_4, 0x55D);
+
+    let mut duty1: f32 = 0.1;
+    let mut duty2: f32 = 0.1;
+    let mut duty3: f32 = 0.1;
+    let mut duty4: f32 = 0.1;
+
+    pwm_set_duty(&mut pwm_5, duty1);
+    pwm_set_duty(&mut pwm_6, duty2);
+    pwm_set_duty(&mut pwm_7, duty3);
+    pwm_set_duty(&mut pwm_4, duty4);
+
+    
+    pwm_set_duty(&mut pwm_8, 0.5);
+    pwm_set_duty(&mut pwm_9, 0.4);
+    pwm_set_duty(&mut pwm_10, 0.3);
+
+    pwm_start(&mut pwm_1);
+    pwm_start(&mut pwm_2);
+    pwm_start(&mut pwm_3);
+    pwm_start(&mut pwm_4);
+    pwm_start(&mut pwm_5);
+    pwm_start(&mut pwm_6);
+    pwm_start(&mut pwm_7);
+
+    
+    pwm_start(&mut pwm_8);
+    pwm_start(&mut pwm_9);
+    pwm_start(&mut pwm_10);
+
+    Delay_ms(1000);
+    pwm_stop(&mut pwm_9);
+    Delay_ms(1000);
+    pwm_close(&mut pwm_10);
+    pwm_close(&mut pwm_9);
+
+    loop {
+        pwm_set_duty(&mut pwm_5, duty1);
+        pwm_set_duty(&mut pwm_6, duty2);
+        pwm_set_duty(&mut pwm_7, duty3);
+        pwm_set_duty(&mut pwm_4, duty4);
+        Delay_ms(100);
+        duty1 += 0.1;
+        duty2 += 0.2;
+        duty3 += 0.3;
+        duty4 += 0.4;
+
+
+        if duty1 > 1.0 {
+            duty1 = 0.1;
+        }
+        if duty2 > 1.0 {
+            duty2 = 0.1;
+        }
+        if duty3 > 1.0 {
+            duty3 = 0.1;
+        }
+        if duty4 > 1.0 {
+            duty4 = 0.1;
+        }
+    }
 }

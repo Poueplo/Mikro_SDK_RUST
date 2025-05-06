@@ -80,6 +80,34 @@ pub const SPI_MODULE_6: u8 = 6;
 
 pub const SPI_MODULE_COUNT: u8 = 6;
 
+pub const TIM_MODULE_1: u8 = 1;
+pub const TIM_MODULE_2: u8 = 2;
+pub const TIM_MODULE_3: u8 = 3;
+pub const TIM_MODULE_4: u8 = 4;
+pub const TIM_MODULE_5: u8 = 5;
+pub const TIM_MODULE_8: u8 = 6;
+pub const TIM_MODULE_9: u8 = 7;
+pub const TIM_MODULE_10: u8 = 8;
+pub const TIM_MODULE_11: u8 = 9;
+pub const TIM_MODULE_12: u8 = 10;
+pub const TIM_MODULE_13: u8 = 11;
+pub const TIM_MODULE_14: u8 = 12;
+
+pub const TIM1_BUS: u8 = 2;
+pub const TIM2_BUS: u8 = 1;
+pub const TIM3_BUS: u8 = 1;
+pub const TIM4_BUS: u8 = 1;
+pub const TIM5_BUS: u8 = 1;
+pub const TIM8_BUS: u8 = 2;
+pub const TIM9_BUS: u8 = 2;
+pub const TIM10_BUS: u8 = 2;
+pub const TIM11_BUS: u8 = 2;
+pub const TIM12_BUS: u8 = 1;
+pub const TIM13_BUS: u8 = 1;
+pub const TIM14_BUS: u8 = 1;
+
+pub const TIM_MODULE_COUNT: u8 = 12;
+
 //present in hal_ll_adc_pin_map
 pub const ADC_BASE_ADDR: u32 = APB2_BASE_ADDR + 0x2000;
 pub const ADC1_BASE_ADDR: u32 = ADC_BASE_ADDR;
@@ -99,6 +127,20 @@ pub const SPI3_MASTER_BASE_ADDR : u32 = 0x4000_3C00;
 pub const SPI4_MASTER_BASE_ADDR : u32 = 0x4001_3400;
 pub const SPI5_MASTER_BASE_ADDR : u32 = 0x4001_5000;
 pub const SPI6_MASTER_BASE_ADDR : u32 = 0x4001_5400;
+
+//prsent in hal_ll_tim_pin_map
+pub const TIM1_BASE_ADDR : u32 = 0x4001_0000;
+pub const TIM2_BASE_ADDR : u32 = 0x4000_0000;
+pub const TIM3_BASE_ADDR : u32 = 0x4000_0400;
+pub const TIM4_BASE_ADDR : u32 = 0x4000_0800;
+pub const TIM5_BASE_ADDR : u32 = 0x4000_0C00;
+pub const TIM8_BASE_ADDR : u32 = 0x4001_0400;
+pub const TIM9_BASE_ADDR : u32 = 0x4001_4000;
+pub const TIM10_BASE_ADDR : u32 = 0x4001_4400;
+pub const TIM11_BASE_ADDR : u32 = 0x4001_4800;
+pub const TIM12_BASE_ADDR : u32 = 0x4000_1800;
+pub const TIM13_BASE_ADDR : u32 = 0x4000_1C00;
+pub const TIM14_BASE_ADDR : u32 = 0x4000_2000;
 
 //present in core_header.h
 pub const ADDRESS_RCC_CR         : u32 = 0x40023800;

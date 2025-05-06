@@ -141,11 +141,6 @@ pub struct hal_ll_adc_base_handle_t
     pub dr      : u32,
 }
 
-struct hal_ll_adc_pin_id
-{
-    pub pin_an : [u8; ADC_MODULE_COUNT as usize],
-}
-
 #[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_adc_resolution_t
 {
@@ -218,7 +213,7 @@ static mut hal_ll_adc_hw_specifics_map:[hal_ll_adc_hw_specifics_map_t; (ADC_MODU
 
 pub fn hal_ll_adc_register_handle(pin: hal_ll_pin_name_t, vref_input: hal_ll_adc_voltage_reference_t, resolution : hal_ll_adc_resolution_t, hal_module_id: &mut u8) -> Result<hal_ll_adc_handle_register_t> {
     let pin_check_result: u8;
-    let mut index: hal_ll_adc_pin_id = hal_ll_adc_pin_id{pin_an: [HAL_LL_PIN_NC; ADC_MODULE_COUNT as usize]};
+    let mut index: u8 = 0;
 
     pin_check_result = hal_ll_adc_check_pins(pin, &mut index);
     if pin_check_result == HAL_LL_PIN_NC {
@@ -380,7 +375,7 @@ pub fn hal_ll_adc_close(handle: &mut hal_ll_adc_handle_register_t) {
 }
 
 ///////////// PRIVATE function /////////////////
-fn hal_ll_adc_check_pins(pin: hal_ll_pin_name_t, index: &mut hal_ll_adc_pin_id) -> u8
+fn hal_ll_adc_check_pins(pin: hal_ll_pin_name_t, index: &mut u8) -> u8
 {
     let adc_map_size: u8 = _adc_map.len() as u8 ;
     let mut index_counter: u8 = 0;
@@ -404,7 +399,7 @@ fn hal_ll_adc_check_pins(pin: hal_ll_pin_name_t, index: &mut hal_ll_adc_pin_id) 
             // Get module number
             hal_ll_module_id = _adc_map[pin_index as usize].module_index;
             // Map pin name
-            index.pin_an[hal_ll_module_id as usize] = pin_index;
+            *index = pin_index;
 
             // Check if module is taken
             if  hal_ll_adc_handle_register_t::default().adc_handle == unsafe{hal_ll_module_state[hal_ll_module_id as usize].adc_handle}  {               
@@ -425,13 +420,14 @@ fn hal_ll_adc_check_pins(pin: hal_ll_pin_name_t, index: &mut hal_ll_adc_pin_id) 
     }
 }
 
-fn hal_ll_adc_map_pin(module_index: u8, index: &mut hal_ll_adc_pin_id) {
+fn hal_ll_adc_map_pin(module_index: u8, index: &mut u8) {
     unsafe{
-        hal_ll_adc_hw_specifics_map[module_index as usize].pin = _adc_map[ index.pin_an[module_index as usize] as usize].pin;
-        hal_ll_adc_hw_specifics_map[module_index as usize].channel = _adc_map[ index.pin_an[module_index as usize] as usize ].channel;
+        hal_ll_adc_hw_specifics_map[module_index as usize].pin = _adc_map[ *index as usize].pin;
+        hal_ll_adc_hw_specifics_map[module_index as usize].channel = _adc_map[ *index as usize ].channel;
     }
 }
 
+#[allow(unused_assignments)]
 fn hal_ll_get_specifics<'a>( handle: hal_ll_adc_handle_register_t ) -> &'a mut hal_ll_adc_hw_specifics_map_t{
     unsafe{
         let mut hal_ll_module_count : usize = ADC_MODULE_COUNT as usize;

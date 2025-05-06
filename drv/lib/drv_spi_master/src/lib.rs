@@ -97,7 +97,7 @@ pub fn spi_master_set_chip_select_polarity(polarity: spi_master_chip_select_pola
     hal_spi_master_set_chip_select_polarity(polarity)
 }
 
-pub fn i2c_master_set_speed( obj: &mut spi_master_t, speed: u32 ) -> Result<()> {
+pub fn spi_master_set_speed( obj: &mut spi_master_t, speed: u32 ) -> Result<()> {
     match _acquire( obj, false ) {
         Ok(_) => (),
         Err(e) => return Err(e),

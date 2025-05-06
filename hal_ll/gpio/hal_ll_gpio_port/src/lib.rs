@@ -40,6 +40,7 @@
 #![no_std]
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
+#![allow(non_snake_case)]
 #![allow(unused)]
 
 //to change place at some point
@@ -50,9 +51,10 @@ use hal_ll_gpio_constants::*;
 pub mod gpio_constants {
     pub use hal_ll_gpio_constants::{
         GPIO_CFG_MODE_ALT_FUNCTION,
+        GPIO_CFG_SPEED_LOW,
         GPIO_CFG_SPEED_HIGH,
         GPIO_CFG_OTYPE_OD,
-        GPIO_CFG_OTYPE_PP
+        GPIO_CFG_OTYPE_PP,
     };
 }
 

@@ -106,6 +106,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_pwm"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_pwm",
+]
+
+[[package]]
 name = "drv_spi_master"
 version = "0.1.0"
 dependencies = [
@@ -238,6 +246,31 @@ name = "hal_ll_target_names"
 version = "0.1.1"
 
 [[package]]
+name = "hal_ll_tim"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "hal_ll_target",
+ "hal_ll_tim_pin_map",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_tim_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
+]
+
+[[package]]
+name = "hal_pwm"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_tim",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_spi_master"
 version = "0.1.0"
 dependencies = [
@@ -270,9 +303,9 @@ dependencies = [
  "drv_i2c_master",
  "drv_name",
  "drv_port",
+ "drv_pwm",
  "drv_spi_master",
- "hal_ll_spi_master",
- "hal_spi_master",
+ "hal_pwm",
  "panic-halt",
  "system",
 ]

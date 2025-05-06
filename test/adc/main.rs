@@ -38,12 +38,54 @@
 ****************************************************************************/
 
 #![no_std]
-#![allow(non_camel_case_types)]
+#![no_main]
+#![allow(non_upper_case_globals)]
+#![allow(unused_imports)]
 
-pub type handle_t = u32;
-pub type hal_ll_base_addr_t = u32;
-pub type hal_ll_gpio_mask_t = u16;
-pub type hal_ll_pin_name_t = u8;
-pub type hal_ll_port_name_t = u8;
-pub type hal_ll_port_size_t = u16;
-// pub type hal_ll_channel_t = u8;
+use cortex_m_rt::entry;
+// The runtime
+use panic_halt;
+
+
+use drv_analog_in::*;
+use drv_digital_out::*;
+use drv_port::*;
+use drv_name::*;
+use system::*;
+
+const port_out: port_name_t = GPIO_PORT_E;
+const pin_an: pin_name_t = GPIO_A3;
+
+
+#[entry]
+fn main() -> ! {
+
+    system_init();
+
+    let mut read_value: u16 = 0;
+    let mut read_voltage: f32 = 0.0;
+    let mut adc1: analog_in_t = analog_in_t::default();
+    let config_1: analog_in_config_t =  analog_in_config_t{ pin: pin_an, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+
+    let drv_config: analog_in_t = analog_in_t::default();
+
+    adc1.config = analog_in_config_t{ pin: pin_an, resolution: analog_in_resolution_t::ADC_RESOLUTION_12_BIT, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0 };
+
+    analog_in_open(&mut adc1, config_1);
+
+    analog_in_set_vref_value(&mut adc1, 25.0);
+
+
+    let mut output1: port_t = port_t::default();
+
+    port_init(&mut output1 , port_out, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+    
+    
+    loop {
+        read_value = analog_in_read(&mut adc1).ok().unwrap();
+        read_voltage = analog_in_read_voltage(&mut adc1).ok().unwrap();
+
+        port_write(&mut output1, read_value);
+        
+    }
+}
