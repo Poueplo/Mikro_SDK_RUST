@@ -51,6 +51,7 @@ use core::arch::asm;
 
 use mcu::*;
 use common_header::*;
+use system_reset::*;
 
 const ADDRESS_SCB_AIRCR     : u32 = 0xE000ED0C;
 const SCB_AIRCR_SYSRESETREQ : u8  = 2;
@@ -196,6 +197,7 @@ pub fn enable_overdrive_mode() {
     {   }
 }
 
+#[unsafe(no_mangle)]
 pub fn system_init() {
     system_clock_set_default();
 

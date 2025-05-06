@@ -1,5 +1,5 @@
 [package]
-name = "system"
+name = "system_reset"
 version = "0.1.0"
 edition = "2024"
 author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
@@ -13,9 +13,3 @@ lto = true
 [profile.dev]
 opt-level = 0 
 lto = false  
-
-
-[dependencies]
-mcu = { path = "../mcu"}
-common_header = { path = "../common_header"}
-system_reset = { path = "../system_reset" }

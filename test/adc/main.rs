@@ -42,7 +42,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
-use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
@@ -57,10 +56,8 @@ const port_out: port_name_t = GPIO_PORT_E;
 const pin_an: pin_name_t = GPIO_A3;
 
 
-#[entry]
+#[unsafe(no_mangle)]
 fn main() -> ! {
-
-    system_init();
 
     let mut read_value: u16 = 0;
     let mut read_voltage: f32 = 0.0;

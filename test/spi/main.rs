@@ -42,7 +42,6 @@
 #![allow(non_upper_case_globals)]
 //#![allow(unused_imports)]
 
-use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
@@ -59,12 +58,8 @@ const pin_cs: pin_name_t = GPIO_B4;
 const pin_hld: pin_name_t = GPIO_E13;
 
 
-
-
-#[entry]
+#[unsafe(no_mangle)]
 fn main() -> ! {
-
-    system_init();
 
     let mut data_buff: [u8; 16] = [0; 16];
     let mut spi_write_buff: [u8; 14] = [0x02, 0x00, 0x00, 0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
