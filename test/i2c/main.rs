@@ -42,7 +42,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
-use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
@@ -56,10 +55,8 @@ use system::*;
 const pin_scl: pin_name_t = GPIO_B8;
 const pin_sda: pin_name_t = GPIO_B9;
 
-#[entry]
+#[unsafe(no_mangle)]
 fn main() -> ! {
-
-    system_init();
 
     let mut scl: digital_out_t = digital_out_t::default();
     let mut sda: digital_in_t = digital_in_t::default();
@@ -67,7 +64,7 @@ fn main() -> ! {
     digital_out_init(&mut scl , pin_scl );
     digital_in_init(&mut sda , pin_sda);
     digital_out_high(&mut scl );
-    while ( digital_in_read(&mut sda ).ok().unwrap() == 0)
+    while  digital_in_read(&mut sda ).ok().unwrap() == 0
     {
         digital_out_low(&mut scl);
         Delay_ms(1);
@@ -93,9 +90,6 @@ fn main() -> ! {
     let mut write_buf: [u8; 11] = [0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
     let mut write_buf2: [u8; 10] = [0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x78, 0x61, 0x6E, 0x61];
 
-
-
-    
 
     i2c_master_write(&mut i2c, &mut write_buf, 11);
     Delay_ms(10);
