@@ -42,9 +42,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
-use core::prelude::v1;
-
-use cortex_m_rt::entry;
 // The runtime
 use panic_halt;
 
@@ -65,10 +62,9 @@ const pin_tim_8: pin_name_t = GPIO_C6;  //channel 1
 const pin_tim_9: pin_name_t = GPIO_C7; //channel 2
 const pin_tim_10: pin_name_t = GPIO_C8; //channel 3
 
-#[entry]
-fn main() -> ! {
 
-    system_init();
+#[unsafe(no_mangle)]
+fn main() -> ! {
 
     let mut pwm_1: pwm_t = pwm_t::default();
     let mut pwm_2: pwm_t = pwm_t::default();
