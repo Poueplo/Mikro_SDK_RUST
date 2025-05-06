@@ -91,10 +91,7 @@ LoopFillZerobss:
   cmp r2, r4
   bcc FillZerobss
 
-/* Call the clock system initialization function.*/
-  //bl systemInit /* Changed to call MikroE system init API. */   
-/* Call static constructors */
-    //bl __libc_init_array
+ 
 /* Call the application's entry point.*/
   bl  Reset
   bx  lr    
