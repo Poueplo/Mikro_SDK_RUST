@@ -206,6 +206,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_uart"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "hal_ll_target",
+ "hal_ll_uart_pin_map",
+ "interrupt",
+ "system",
+]
+
+[[package]]
+name = "hal_ll_uart_pin_map"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_pin_names",
+]
+
+[[package]]
 name = "hal_pwm"
 version = "0.1.0"
 dependencies = [
@@ -231,6 +249,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "interrupt"
+version = "0.1.0"
+dependencies = [
+ "bit_control",
+]
+
+[[package]]
 name = "mcu"
 version = "0.1.1"
 
@@ -246,8 +271,10 @@ dependencies = [
  "drv_port",
  "drv_pwm",
  "drv_spi_master",
- "hal_pwm",
+ "hal_ll_uart",
+ "interrupt",
  "panic-halt",
+ "ring",
  "system",
 ]
 
@@ -256,6 +283,10 @@ name = "panic-halt"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a513e167849a384b7f9b746e517604398518590a9142f4846a32e3c2a4de7b11"
+
+[[package]]
+name = "ring"
+version = "0.1.0"
 
 [[package]]
 name = "system"

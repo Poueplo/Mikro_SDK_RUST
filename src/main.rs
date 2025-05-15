@@ -45,137 +45,135 @@
 // The runtime
 use panic_halt;
 
-
-use drv_pwm::*;
+use drv_port::*;
 use drv_name::*;
 use system::*;
+use interrupt::interrupt_helper::*;
+use ring::ring_buf8_t;
+use hal_ll_uart::*;
 
-const pin_tim_1: pin_name_t = GPIO_E9;  //channel 1
-const pin_tim_2: pin_name_t = GPIO_E11; //channel 2
-const pin_tim_3: pin_name_t = GPIO_E13; //channel 3
-const pin_tim_4: pin_name_t = GPIO_E14; //channel 4
-const pin_tim_5: pin_name_t = GPIO_E8;  //channel 1N
-const pin_tim_6: pin_name_t = GPIO_E10; //channel 2N
-const pin_tim_7: pin_name_t = GPIO_E12; //channel 3N
+const port_out: port_name_t = GPIO_PORT_E;
+const port_interrupt: port_name_t = GPIO_PORT_B;
+const tx_pin: pin_name_t = GPIO_C6;
+const rx_pin: pin_name_t = GPIO_C7;
+const tx_pin1: pin_name_t = GPIO_B6;
+const rx_pin1: pin_name_t = GPIO_B7;
 
-const pin_tim_8: pin_name_t = GPIO_C6;  //channel 1
-const pin_tim_9: pin_name_t = GPIO_C7; //channel 2
-const pin_tim_10: pin_name_t = GPIO_C8; //channel 3
-
+static mut toggle : bool = false;
+static mut ring_buffer_rx : ring_buf8_t<255> = ring_buf8_t::<255>::init();
+static mut ring_buffer_tx : ring_buf8_t<255> = ring_buf8_t::<255>::init();
 
 #[unsafe(no_mangle)]
 fn main() -> ! {
 
-    let mut pwm_1: pwm_t = pwm_t::default();
-    let mut pwm_2: pwm_t = pwm_t::default();
-    let mut pwm_3: pwm_t = pwm_t::default();
-    let mut pwm_4: pwm_t = pwm_t::default();
-    let mut pwm_5: pwm_t = pwm_t::default();
-    let mut pwm_6: pwm_t = pwm_t::default();
-    let mut pwm_7: pwm_t = pwm_t::default();
+    let mut output1: port_t = port_t::default();
+    let mut output2: port_t = port_t::default();
+    port_init(&mut output1 , port_out, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
+    port_init(&mut output2 , port_interrupt, 0xFFFF, gpio_direction_t::GPIO_DIGITAL_OUTPUT);
 
+    let mut value : u16;
+
+    let mut uart : hal_ll_uart_handle_register_t;
+    let mut uart1 : hal_ll_uart_handle_register_t;
+    let mut module_index : u8 = 0;
+
+    uart1 = hal_ll_uart_register_handle(tx_pin1, rx_pin1, &mut module_index).ok().unwrap();
+    uart = hal_ll_uart_register_handle(tx_pin, rx_pin, &mut module_index).ok().unwrap();
+
+    hal_ll_uart_register_irq_handler(interruption_handler);
     
-    let mut pwm_8: pwm_t = pwm_t::default();
-    let mut pwm_9: pwm_t = pwm_t::default();
-    let mut pwm_10: pwm_t = pwm_t::default();
+    hal_ll_module_configure_uart(&mut uart);
+    hal_ll_module_configure_uart(&mut uart1);
     
-
-    let mut pwm_config_1: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_2: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_3: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_4: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_5: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_6: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_7: pwm_config_t = pwm_config_t::default();
-
     
-    let mut pwm_config_8: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_9: pwm_config_t = pwm_config_t::default();
-    let mut pwm_config_10: pwm_config_t = pwm_config_t::default();
+    hal_ll_uart_set_baud(&mut uart1, 9600);
+    //hal_ll_uart_set_parity(&mut uart, hal_ll_uart_parity_t::HAL_LL_UART_PARITY_ODD);
 
-    pwm_config_1.pin = pin_tim_1;
-    pwm_config_2.pin = pin_tim_2;
-    pwm_config_3.pin = pin_tim_3;
-    pwm_config_4.pin = pin_tim_4;
-    pwm_config_5.pin = pin_tim_5;
-    pwm_config_6.pin = pin_tim_6;
-    pwm_config_7.pin = pin_tim_7;
+    hal_ll_core_disable_interrupts();
+    hal_ll_uart_irq_enable(&mut uart, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+    hal_ll_core_enable_interrupts();
 
-    pwm_config_8.pin = pin_tim_8;
-    pwm_config_9.pin = pin_tim_9;
-    pwm_config_10.pin = pin_tim_10;
+    hal_ll_uart_close(&mut uart1);
 
-    pwm_open(&mut pwm_1, pwm_config_1);
-    pwm_open(&mut pwm_2, pwm_config_2);
-    pwm_open(&mut pwm_3, pwm_config_3);
-    pwm_open(&mut pwm_4, pwm_config_4);
-    pwm_open(&mut pwm_5, pwm_config_5);
-    pwm_open(&mut pwm_6, pwm_config_6);
-    pwm_open(&mut pwm_7, pwm_config_7);
-
-    pwm_open(&mut pwm_8, pwm_config_8);
-    pwm_open(&mut pwm_9, pwm_config_9);
-    pwm_open(&mut pwm_10,pwm_config_10);
-
-    pwm_set_freq(&mut pwm_4, 0x55D);
-
-    let mut duty1: f32 = 0.1;
-    let mut duty2: f32 = 0.1;
-    let mut duty3: f32 = 0.1;
-    let mut duty4: f32 = 0.1;
-
-    pwm_set_duty(&mut pwm_5, duty1);
-    pwm_set_duty(&mut pwm_6, duty2);
-    pwm_set_duty(&mut pwm_7, duty3);
-    pwm_set_duty(&mut pwm_4, duty4);
-
-    
-    pwm_set_duty(&mut pwm_8, 0.5);
-    pwm_set_duty(&mut pwm_9, 0.4);
-    pwm_set_duty(&mut pwm_10, 0.3);
-
-    pwm_start(&mut pwm_1);
-    pwm_start(&mut pwm_2);
-    pwm_start(&mut pwm_3);
-    pwm_start(&mut pwm_4);
-    pwm_start(&mut pwm_5);
-    pwm_start(&mut pwm_6);
-    pwm_start(&mut pwm_7);
-
-    
-    pwm_start(&mut pwm_8);
-    pwm_start(&mut pwm_9);
-    pwm_start(&mut pwm_10);
-
-    Delay_ms(1000);
-    pwm_stop(&mut pwm_9);
-    Delay_ms(1000);
-    pwm_close(&mut pwm_10);
-    pwm_close(&mut pwm_9);
+    let mut buffer : [u8; 255] = [0; 255];
 
     loop {
-        pwm_set_duty(&mut pwm_5, duty1);
-        pwm_set_duty(&mut pwm_6, duty2);
-        pwm_set_duty(&mut pwm_7, duty3);
-        pwm_set_duty(&mut pwm_4, duty4);
-        Delay_ms(100);
-        duty1 += 0.1;
-        duty2 += 0.2;
-        duty3 += 0.3;
-        duty4 += 0.4;
+        hal_ll_core_disable_interrupts();
+        let mut data_length: u8 = 0;
+        unsafe {
+            {
+                let buffer_rx = &raw mut ring_buffer_rx;
+                let mut index: usize = 0;
+                while!(*buffer_rx).is_empty() && index < buffer.len() {
+                    buffer[index] = (*buffer_rx).pop().ok().unwrap() as u8;
+                    index += 1;
+                    data_length += 1;
+                }
+            }
 
+            {
+                if data_length > 0 {
+                    let mut index: usize = 0;
+                    let buffer_tx = &raw mut ring_buffer_tx;
 
-        if duty1 > 1.0 {
-            duty1 = 0.1;
+                    while !(*buffer_tx).is_full() && index < data_length as usize {
+                        (*buffer_tx).push(buffer[index]);
+                        index += 1;
+                    }
+
+                    if index > 0 {
+                        hal_ll_uart_irq_enable(&mut uart, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                
+                        hal_ll_uart_write(&mut uart, (*buffer_tx).pop().ok().unwrap());
+                    }
+                }
+            }
         }
-        if duty2 > 1.0 {
-            duty2 = 0.1;
+        hal_ll_core_enable_interrupts();
+        //Delay_ms(100);
+    }
+}
+
+fn interruption_handler(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uart_irq_t) {
+    unsafe {
+        {
+            let buffer_rx = &raw mut ring_buffer_rx;
+            if event == hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX
+            {
+                let rd_data : u8;
+                if (*buffer_rx).is_full()
+                {
+                    hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX );
+                    return;
+                }
+
+                rd_data = hal_ll_uart_read( handle );
+                (*buffer_rx).push(rd_data );
+            }
         }
-        if duty3 > 1.0 {
-            duty3 = 0.1;
-        }
-        if duty4 > 1.0 {
-            duty4 = 0.1;
+
+        {
+            // If TX interrupt triggered
+            let buffer_tx = &raw mut ring_buffer_tx;
+            if event == hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX
+            {
+                let wr_data : u8;
+               
+                match (*buffer_tx).pop()
+                {
+                    Ok(data) => wr_data = data,
+                    Err(_) => {
+                        hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX );
+                        return;
+                    },
+                }
+                hal_ll_uart_write(handle, wr_data);
+
+                if (*buffer_tx).is_empty()
+                {
+                    hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX );
+                }
+            }
         }
     }
 }
