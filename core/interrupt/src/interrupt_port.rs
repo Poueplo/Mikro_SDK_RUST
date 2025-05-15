@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#![no_std]
+#![allow(non_snake_case)]
 
 
 
@@ -110,7 +110,7 @@ pub fn hal_ll_core_port_nvic_disable_irq(IRQn : u8)
 }
 
 
-
+#[allow(unused_assignments)]
 pub fn hal_ll_core_port_nvic_set_priority_irq(IRQn : u8, IRQn_priority : hal_ll_core_irq_priority_levels )
 {
     let reg : *mut u32;

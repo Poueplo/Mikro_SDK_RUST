@@ -38,6 +38,9 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+#![allow(non_snake_case)]
 
 use hal_ll_target::*;
 use hal_ll_uart_pin_map::*;
@@ -45,7 +48,7 @@ use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
 use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
 use interrupt::interrupt_helper::*;
-use core::{f32::consts, fmt};
+use core::fmt;
 
 const HAL_LL_UART_ACCEPTABLE_ERROR : f32 = 1.0;
 
@@ -57,10 +60,10 @@ const HAL_LL_UART5EN  : u32 = 20;
 const HAL_LL_USART6EN : u32 =  5;
 const HAL_LL_UART7EN  : u32 = 30;
 const HAL_LL_UART8EN  : u32 = 31;
-const HAL_LL_UART9EN  : u32 =  6;
-const HAL_LL_UART10EN : u32 =  7;
+// const HAL_LL_UART9EN  : u32 =  6;
+// const HAL_LL_UART10EN : u32 =  7;
 
-const HAL_LL_UART_IT_CLEAR_MASK : u32 = 0x360;
+// const HAL_LL_UART_IT_CLEAR_MASK : u32 = 0x360;
 const HAL_LL_UART_IT_CR1_MASK : u32 = 0x1F0;
 const HAL_LL_UART_IT_CR2_MASK : u32 = 0x40;
 const HAL_LL_UART_IT_CR3_MASK : u32 = 0x401;
@@ -85,11 +88,11 @@ const HAL_LL_UART_CR1_RE : u32 = 2;
 const HAL_LL_UART_STATUS_RXNE_FLAG : u32 =  1 << 5;
 const HAL_LL_UART_STATUS_TXE_FLAG  : u32 = 1 << 7;
 
-const HAL_LL_UART_IT_PE : u32 = 0x10000100;
+// const HAL_LL_UART_IT_PE : u32 = 0x10000100;
 const HAL_LL_UART_IT_TXE : u32 = 7;
-const HAL_LL_UART_IT_TC : u32 = 0x10000040;
+// const HAL_LL_UART_IT_TC : u32 = 0x10000040;
 const HAL_LL_UART_IT_RXNE : u32 = 5;
-const HAL_LL_UART_IT_IDLE : u32 = 0x10000010;
+// const HAL_LL_UART_IT_IDLE : u32 = 0x10000010;
 
 const HAL_LL_UART_AF_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_HIGH | GPIO_CFG_OTYPE_PP;
 
@@ -208,6 +211,7 @@ struct hal_ll_uart_hw_specifics_map_t
     pub data_bit : hal_ll_uart_data_bits_t,
 }
 
+#[allow(dead_code)]
 enum hal_ll_uart_state_t
 {
     HAL_LL_UART_DISABLE,
@@ -729,6 +733,7 @@ fn hal_ll_uart_set_stop_bits_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t
     }
 }
 
+#[allow(unused_assignments)]
 fn hal_ll_uart_set_baud_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
     let hal_ll_baud_value : u32 = ((hal_ll_uart_get_clock_speed(map.module_index) / map.baud_rate.baud) / 4) - 1;
@@ -819,6 +824,7 @@ fn hal_ll_uart_init(map: &mut hal_ll_uart_hw_specifics_map_t) {
     hal_ll_uart_hw_init(map);
 }
 
+#[allow(unused_variables)]
 fn empty_handler(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uart_irq_t ){}
 
 ///// INTERRUPT HANDLERS

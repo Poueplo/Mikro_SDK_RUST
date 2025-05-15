@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#![no_std]
+#![allow(non_snake_case)]
 
 use crate::interrupt_defines::*;
 use crate::interrupt_port::*;

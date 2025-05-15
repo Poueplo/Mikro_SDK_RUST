@@ -37,7 +37,7 @@
 **
 ****************************************************************************/
 
-#![no_std]
+#![allow(non_camel_case_types)]
 
 #[repr(u8)]
 #[derive(Clone, Copy)]
@@ -66,6 +66,8 @@ pub fn hal_ll_core_irq(irq_val : u8) -> u8 { irq_val - 16 }
 
 pub const HAL_LL_CORE_IRQ_MASK : u8 = 0x1F;
 pub const HAL_LL_CORE_LOW_NIBBLE : u8 = 0xF;
+
+#[allow(dead_code)]
 pub const HAL_LL_CORE_HIGH_NIBBLE : u8 = 0xF0;
 pub const HAL_LL_CORE_IVT_INT_MEM_MANAGE : u8 = 4;
 pub const HAL_LL_CORE_IVT_INT_BUS_FAULT : u8 = 5;
@@ -85,5 +87,7 @@ pub const HAL_LL_CORE_NVIC_ICER_1 : u32 = 0xE000E184;
 pub const HAL_LL_CORE_NVIC_ICER_2 : u32 = 0xE000E188;
 pub const HAL_LL_CORE_NVIC_IPR_0 : u32 = 0xE000E400;
 pub const HAL_LL_CORE_NVIC_SCB_SHPR1 : u32 = 0xE000ED18;
+#[allow(dead_code)]
 pub const HAL_LL_CORE_NVIC_SCB_SHPR2 : u32 = 0xE000ED1C;
+#[allow(dead_code)]
 pub const HAL_LL_CORE_NVIC_SCB_SHPR3 : u32 = 0xE000ED20;
