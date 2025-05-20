@@ -528,6 +528,16 @@ pub fn hal_uart_close(handle: &mut hal_uart_t)  -> Result<()> {
 }
 
 ///// cursed programming ahead
+fn get_handle_index(handle : &mut hal_uart_handle_register_t) -> u8 {
+    for i in 0 .. UART_MODULE_COUNT as usize {
+        unsafe{
+            if handle.uart_handle == hal_module_state[i].uart_handle {
+                return ( i + 1 ) as u8;
+            }
+        }
+    }
+    0xFF
+}
 
 pub fn hal_uart_bytes_available(handle: &mut hal_uart_t) -> Result<usize> {
     let hal_obj: &mut hal_uart_t = handle;
@@ -641,17 +651,6 @@ pub fn hal_uart_clear(handle: &mut hal_uart_t) -> Result<()> {
         }
         Ok(())
     }
-}
-
-fn get_handle_index(handle : &mut hal_uart_handle_register_t) -> u8 {
-    for i in 0 .. UART_MODULE_COUNT as usize {
-        unsafe{
-            if handle.uart_handle == hal_module_state[i].uart_handle {
-                return ( i + 1 ) as u8;
-            }
-        }
-    }
-    0xFF
 }
 
 fn is_buffer_full(handle : &mut hal_uart_handle_register_t, event : hal_uart_irq_t) -> bool {
