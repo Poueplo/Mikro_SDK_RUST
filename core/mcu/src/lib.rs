@@ -108,6 +108,28 @@ pub const TIM14_BUS: u8 = 1;
 
 pub const TIM_MODULE_COUNT: u8 = 12;
 
+pub const UART_MODULE_1: u8 = 1;
+pub const UART_MODULE_2: u8 = 2;
+pub const UART_MODULE_3: u8 = 3;
+pub const UART_MODULE_4: u8 = 4;
+pub const UART_MODULE_5: u8 = 5;
+pub const UART_MODULE_6: u8 = 6;
+pub const UART_MODULE_7: u8 = 7;
+pub const UART_MODULE_8: u8 = 8;
+
+pub const UART_MODULE_COUNT: u8 = 8;
+
+pub const UART1_NVIC: u8 = 37;
+pub const UART2_NVIC: u8 = 38;
+pub const UART3_NVIC: u8 = 39;
+pub const UART4_NVIC: u8 = 52;
+pub const UART5_NVIC: u8 = 53;
+pub const UART6_NVIC: u8 = 71;
+pub const UART7_NVIC: u8 = 82;
+pub const UART8_NVIC: u8 = 83;
+
+
+
 //present in hal_ll_adc_pin_map
 pub const ADC_BASE_ADDR: u32 = APB2_BASE_ADDR + 0x2000;
 pub const ADC1_BASE_ADDR: u32 = ADC_BASE_ADDR;
@@ -128,7 +150,7 @@ pub const SPI4_MASTER_BASE_ADDR : u32 = 0x4001_3400;
 pub const SPI5_MASTER_BASE_ADDR : u32 = 0x4001_5000;
 pub const SPI6_MASTER_BASE_ADDR : u32 = 0x4001_5400;
 
-//prsent in hal_ll_tim_pin_map
+//present in hal_ll_tim_pin_map
 pub const TIM1_BASE_ADDR : u32 = 0x4001_0000;
 pub const TIM2_BASE_ADDR : u32 = 0x4000_0000;
 pub const TIM3_BASE_ADDR : u32 = 0x4000_0400;
@@ -141,6 +163,16 @@ pub const TIM11_BASE_ADDR : u32 = 0x4001_4800;
 pub const TIM12_BASE_ADDR : u32 = 0x4000_1800;
 pub const TIM13_BASE_ADDR : u32 = 0x4000_1C00;
 pub const TIM14_BASE_ADDR : u32 = 0x4000_2000;
+
+//present in hal_ll_uart_pin_map
+pub const UART1_BASE_ADDR : u32 = 0x4001_1000;
+pub const UART2_BASE_ADDR : u32 = 0x4000_4400;
+pub const UART3_BASE_ADDR : u32 = 0x4000_4800;
+pub const UART4_BASE_ADDR : u32 = 0x4000_4C00;
+pub const UART5_BASE_ADDR : u32 = 0x4000_5000;
+pub const UART6_BASE_ADDR : u32 = 0x4001_1400;
+pub const UART7_BASE_ADDR : u32 = 0x4000_7800;
+pub const UART8_BASE_ADDR : u32 = 0x4000_7C00;
 
 //present in core_header.h
 pub const ADDRESS_RCC_CR         : u32 = 0x40023800;
