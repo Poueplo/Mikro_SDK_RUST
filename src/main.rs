@@ -42,6 +42,8 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_imports)]
 
+use core::{default, fmt::write};
+
 // The runtime
 use panic_halt;
 
@@ -51,13 +53,14 @@ use system::*;
 use interrupt::interrupt_helper::*;
 use ring::ring_buf8_t;
 use hal_ll_uart::*;
+use hal_uart::*;
 
 const port_out: port_name_t = GPIO_PORT_E;
 const port_interrupt: port_name_t = GPIO_PORT_B;
 const tx_pin: pin_name_t = GPIO_C6;
 const rx_pin: pin_name_t = GPIO_C7;
-const tx_pin1: pin_name_t = GPIO_B6;
-const rx_pin1: pin_name_t = GPIO_B7;
+const tx_pin1: pin_name_t = GPIO_D8;
+const rx_pin1: pin_name_t = GPIO_D9;
 
 static mut toggle : bool = false;
 static mut ring_buffer_rx : ring_buf8_t<255> = ring_buf8_t::<255>::init();
@@ -73,107 +76,56 @@ fn main() -> ! {
 
     let mut value : u16;
 
-    let mut uart : hal_ll_uart_handle_register_t;
-    let mut uart1 : hal_ll_uart_handle_register_t;
-    let mut module_index : u8 = 0;
+    let mut uart : hal_uart_t = hal_uart_t::default();
+    let mut uart1 : hal_uart_t = hal_uart_t::default();
 
-    uart1 = hal_ll_uart_register_handle(tx_pin1, rx_pin1, &mut module_index).ok().unwrap();
-    uart = hal_ll_uart_register_handle(tx_pin, rx_pin, &mut module_index).ok().unwrap();
+    let mut uart_config : hal_uart_config_t = hal_uart_config_t::default();
+    let mut uart1_config : hal_uart_config_t = hal_uart_config_t::default();
+    let mut uart_general_config : hal_uart_config_t = hal_uart_config_t::default();
 
-    hal_ll_uart_register_irq_handler(interruption_handler);
-    
-    hal_ll_module_configure_uart(&mut uart);
-    hal_ll_module_configure_uart(&mut uart1);
-    
-    
-    hal_ll_uart_set_baud(&mut uart1, 9600);
-    //hal_ll_uart_set_parity(&mut uart, hal_ll_uart_parity_t::HAL_LL_UART_PARITY_ODD);
 
-    hal_ll_core_disable_interrupts();
-    hal_ll_uart_irq_enable(&mut uart, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-    hal_ll_core_enable_interrupts();
+    uart_config.rx = rx_pin;
+    uart_config.tx = tx_pin;
+    uart_config.baud = 115200;
+    uart1_config.rx = rx_pin1;
+    uart1_config.tx = tx_pin1;
+    uart1_config.baud = 115200;
 
-    hal_ll_uart_close(&mut uart1);
+
+    uart_general_config.baud = 9600;
+    uart_general_config.is_blocking = false;
+
+
+    uart.config = uart_config;
+    uart1.config = uart1_config;
+
+    hal_uart_open(&mut uart, true);
+    hal_uart_open(&mut uart1, true);
+
+    hal_uart_set_baud(&mut uart, uart_general_config);
+    hal_uart_set_baud(&mut uart1, uart1_config);
+
+    hal_uart_set_blocking(&mut uart, uart_general_config);
 
     let mut buffer : [u8; 255] = [0; 255];
+    let mut write_buff: [u8; 11] = [0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F, 13];
+    let mut read_data_size: usize = 0;
+
+    match hal_uart_read(&mut uart, &mut buffer, 10) {
+            Ok(data_len) => read_data_size = data_len,
+            Err(_) => read_data_size = 0,
+        }
 
     loop {
-        hal_ll_core_disable_interrupts();
-        let mut data_length: u8 = 0;
-        unsafe {
-            {
-                let buffer_rx = &raw mut ring_buffer_rx;
-                let mut index: usize = 0;
-                while!(*buffer_rx).is_empty() && index < buffer.len() {
-                    buffer[index] = (*buffer_rx).pop().ok().unwrap() as u8;
-                    index += 1;
-                    data_length += 1;
-                }
-            }
-
-            {
-                if data_length > 0 {
-                    let mut index: usize = 0;
-                    let buffer_tx = &raw mut ring_buffer_tx;
-
-                    while !(*buffer_tx).is_full() && index < data_length as usize {
-                        (*buffer_tx).push(buffer[index]);
-                        index += 1;
-                    }
-
-                    if index > 0 {
-                        hal_ll_uart_irq_enable(&mut uart, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-                
-                        hal_ll_uart_write(&mut uart, (*buffer_tx).pop().ok().unwrap());
-                    }
-                }
-            }
+        match hal_uart_read(&mut uart, &mut buffer, 255) {
+            Ok(data_len) => read_data_size = data_len,
+            Err(_) => read_data_size = 0,
         }
-        hal_ll_core_enable_interrupts();
-        //Delay_ms(100);
-    }
-}
-
-fn interruption_handler(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uart_irq_t) {
-    unsafe {
-        {
-            let buffer_rx = &raw mut ring_buffer_rx;
-            if event == hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX
-            {
-                let rd_data : u8;
-                if (*buffer_rx).is_full()
-                {
-                    hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX );
-                    return;
-                }
-
-                rd_data = hal_ll_uart_read( handle );
-                (*buffer_rx).push(rd_data );
-            }
-        }
-
-        {
-            // If TX interrupt triggered
-            let buffer_tx = &raw mut ring_buffer_tx;
-            if event == hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX
-            {
-                let wr_data : u8;
-               
-                match (*buffer_tx).pop()
-                {
-                    Ok(data) => wr_data = data,
-                    Err(_) => {
-                        hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX );
-                        return;
-                    },
-                }
-                hal_ll_uart_write(handle, wr_data);
-
-                if (*buffer_tx).is_empty()
-                {
-                    hal_ll_uart_irq_disable( handle, hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX );
-                }
-            }
-        }
+        //hal_uart_write(&mut uart, &mut write_buff, 10);
+        hal_uart_print(&mut uart1, "code lyoko");
+        Delay_ms(1000);
+        hal_uart_println(&mut uart1, " - code xana");
+        Delay_ms(1000);
+        hal_uart_write(&mut uart1, &mut buffer, read_data_size);
     }
 }

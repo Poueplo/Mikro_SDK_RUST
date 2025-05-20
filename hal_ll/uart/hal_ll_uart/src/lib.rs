@@ -119,7 +119,7 @@ impl fmt::Display for HAL_LL_UART_ERROR {
 
 type Result<T> = core::result::Result<T, HAL_LL_UART_ERROR>;
 
-#[derive(PartialEq)]
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_uart_irq_t
 {
     HAL_LL_UART_IRQ_RX,  /* RX INT   */
@@ -147,7 +147,7 @@ impl Default for hal_ll_uart_handle_register_t {
         }
     }
 }
-
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_uart_parity_t
 {
     HAL_LL_UART_PARITY_NONE,
@@ -157,6 +157,7 @@ pub enum hal_ll_uart_parity_t
 
 pub const HAL_LL_UART_PARITY_DEFAULT : hal_ll_uart_parity_t = hal_ll_uart_parity_t::HAL_LL_UART_PARITY_NONE;
 
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_uart_stop_bits_t
 {
     HAL_LL_UART_STOP_BITS_HALF,
@@ -167,6 +168,7 @@ pub enum hal_ll_uart_stop_bits_t
 
 pub const HAL_LL_UART_STOP_BITS_DEFAULT : hal_ll_uart_stop_bits_t = hal_ll_uart_stop_bits_t::HAL_LL_UART_STOP_BITS_ONE;
 
+#[derive(Clone, Copy, PartialEq)]
 pub enum hal_ll_uart_data_bits_t
 {
     HAL_LL_UART_DATA_BITS_7,

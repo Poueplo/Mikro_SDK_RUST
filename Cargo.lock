@@ -249,6 +249,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_uart"
+version = "0.1.0"
+dependencies = [
+ "hal_gpio",
+ "hal_ll_uart",
+ "hal_target",
+ "interrupt",
+ "ring",
+ "system",
+]
+
+[[package]]
 name = "interrupt"
 version = "0.1.0"
 dependencies = [
@@ -272,6 +284,7 @@ dependencies = [
  "drv_pwm",
  "drv_spi_master",
  "hal_ll_uart",
+ "hal_uart",
  "interrupt",
  "panic-halt",
  "ring",

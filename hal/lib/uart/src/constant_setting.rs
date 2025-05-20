@@ -37,67 +37,6 @@
 **
 ****************************************************************************/
 
-#![no_std]
-#![allow(non_camel_case_types)]
-#![allow(non_upper_case_globals)]
 
-#[derive(Clone, Copy, PartialEq)]
-pub struct ring_buf8_t<const capacity : usize> {
-    buffer : [u8; capacity],
-    size : usize,
-    head : usize,
-    tail : usize,
-}
-
-impl<const capacity : usize> ring_buf8_t<capacity> {
-    pub const fn init() -> Self {
-        Self {
-            buffer: [0; capacity],
-            size: 0,
-            head: 0,
-            tail: 0,
-        }
-    }
-
-    pub fn push(&mut self, data_ : u8) -> Result<(), ()> {
-        if self.size == (capacity + 1) {
-            return Err(());
-        }
-
-        self.buffer[self.head] = data_;
-        self.head = (self.head + 1) % capacity;
-        self.size += 1;
-        Ok(())
-    }
-
-    pub fn pop(&mut self) -> Result<u8, ()> {
-        let result : u8;
-        if self.size <= 0 {
-            return Err(());
-        }
-
-        result = self.buffer[self.tail];
-        self.tail = (self.tail + 1) % capacity;
-        self.size -= 1;
-
-        Ok(result)
-    }
-
-    pub fn is_empty(&mut self) -> bool {
-        self.size == 0
-    }
-
-    pub fn is_full(&mut self) -> bool {
-        self.size == capacity
-    }
-
-    pub fn get_size(&mut self) -> usize {
-        self.size
-    }
-
-    pub fn clear(&mut self) {
-        self.size = 0;
-        self.head = 0;
-        self.tail = 0;
-    }
-}
+pub const RING_BUFFER_TX_SIZE : usize = 255;
+pub const RING_BUFFER_RX_SIZE : usize = 255;
