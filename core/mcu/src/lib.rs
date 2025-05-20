@@ -119,14 +119,14 @@ pub const UART_MODULE_8: u8 = 8;
 
 pub const UART_MODULE_COUNT: u8 = 8;
 
-pub const UART1_NVIC: u8 = 53;
-pub const UART2_NVIC: u8 = 54;
-pub const UART3_NVIC: u8 = 55;
-pub const UART4_NVIC: u8 = 68;
-pub const UART5_NVIC: u8 = 69;
-pub const UART6_NVIC: u8 = 87;
-pub const UART7_NVIC: u8 = 98;
-pub const UART8_NVIC: u8 = 99;
+pub const UART1_NVIC: u8 = 37;
+pub const UART2_NVIC: u8 = 38;
+pub const UART3_NVIC: u8 = 39;
+pub const UART4_NVIC: u8 = 52;
+pub const UART5_NVIC: u8 = 53;
+pub const UART6_NVIC: u8 = 71;
+pub const UART7_NVIC: u8 = 82;
+pub const UART8_NVIC: u8 = 83;
 
 
 

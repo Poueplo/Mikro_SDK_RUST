@@ -64,13 +64,13 @@ pub fn hal_ll_core_port_nvic_enable_irq(IRQn : u8)
         }
 
     // General exceptions
-    if IRQn >= 80
+    if IRQn >= 64
     {
-        set_reg_bit( HAL_LL_CORE_NVIC_ISER_2, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 48 {
-        set_reg_bit( HAL_LL_CORE_NVIC_ISER_1, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 16 {
-        set_reg_bit( HAL_LL_CORE_NVIC_ISER_0, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
+        set_reg_bit( HAL_LL_CORE_NVIC_ISER_2, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
+    } else if IRQn >= 32 {
+        set_reg_bit( HAL_LL_CORE_NVIC_ISER_1, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
+    } else if IRQn >= 0 {
+        set_reg_bit( HAL_LL_CORE_NVIC_ISER_0, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
     }
 }
 
@@ -99,22 +99,23 @@ pub fn hal_ll_core_port_nvic_disable_irq(IRQn : u8)
     }
 
     // General exceptions
-    if IRQn >= 80 
+    if IRQn >= 64 
     {
-        set_reg_bit( HAL_LL_CORE_NVIC_ICER_2, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 48 {
-        set_reg_bit( HAL_LL_CORE_NVIC_ICER_1, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 16 {
-        set_reg_bit( HAL_LL_CORE_NVIC_ICER_0, ( ( hal_ll_core_irq( IRQn ) ) & HAL_LL_CORE_IRQ_MASK ) as u32 );
+        set_reg_bit( HAL_LL_CORE_NVIC_ICER_2, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
+    } else if IRQn >= 32 {
+        set_reg_bit( HAL_LL_CORE_NVIC_ICER_1, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
+    } else if IRQn >= 0 {
+        set_reg_bit( HAL_LL_CORE_NVIC_ICER_0, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
     }
 }
 
 
 #[allow(unused_assignments)]
-pub fn hal_ll_core_port_nvic_set_priority_irq(IRQn : u8, IRQn_priority : hal_ll_core_irq_priority_levels )
+pub fn hal_ll_core_port_nvic_set_priority_irq(IRQn_in : u8, IRQn_priority : hal_ll_core_irq_priority_levels )
 {
     let reg : *mut u32;
     let mut tmp_shift: u32 = 0;
+    let IRQn: u8 = IRQn_in + 16;
 
     if IRQn > 15
     {
