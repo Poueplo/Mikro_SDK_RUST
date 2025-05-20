@@ -75,6 +75,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_uart"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_uart",
+]
+
+[[package]]
 name = "hal_adc"
 version = "0.1.0"
 dependencies = [
@@ -283,6 +291,7 @@ dependencies = [
  "drv_port",
  "drv_pwm",
  "drv_spi_master",
+ "drv_uart",
  "hal_ll_uart",
  "hal_uart",
  "interrupt",

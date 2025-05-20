@@ -923,7 +923,6 @@ pub extern "Rust" fn UART4_IRQHandler() {
             }
         }
     }
-    
 }
 
 #[unsafe(no_mangle)]
