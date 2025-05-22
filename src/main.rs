@@ -48,7 +48,7 @@ use panic_halt;
 use drv_name::*;
 use system::*;
 
-use hal_ll_one_wire::*;
+use hal_one_wire::*;
 
 const pin: pin_name_t = GPIO_B1;
 
@@ -56,7 +56,7 @@ const device_command : &[[u8;1]] = &[[0x44], [0xBE]];
 
 #[unsafe(no_mangle)]
 fn main() -> ! {
-    let mut device_address : hal_ll_one_wire_rom_address_t = hal_ll_one_wire_rom_address_t{
+    let mut device_address : hal_one_wire_rom_address_t = hal_one_wire_rom_address_t{
         address: [0; 8],
     };
 
@@ -64,32 +64,32 @@ fn main() -> ! {
     let mut is_converting : [u8;1] = [0;1];
     let mut temperature : f32 = 0.0;
 
-    let mut one_wire : hal_ll_one_wire_t = hal_ll_one_wire_t::default();
+    let mut one_wire : hal_one_wire_t = hal_one_wire_t::default();
 
     one_wire.data_pin = pin;
 
-    hal_ll_one_wire_open(&mut one_wire);
+    hal_one_wire_open(&mut one_wire);
 
     //hal_ll_one_wire_reset();
 
     loop {
         is_converting[0] = 0x0;
-        hal_ll_one_wire_read_rom(&mut device_address);
-        hal_ll_one_wire_write_byte(&device_command[0], 1);
+        hal_one_wire_read_rom(&mut one_wire, &mut device_address);
+        hal_one_wire_write_byte(&mut one_wire, &device_command[0], 1);
         
 
         //the device writes 1s when it finished conversion
         while is_converting[0] != 0xFF {
-            hal_ll_one_wire_read_byte(&mut is_converting, 1);
+            hal_one_wire_read_byte(&mut one_wire, &mut is_converting, 1);
         }
 
         //Delay_ms(150);
 
 
-        hal_ll_one_wire_read_rom(&mut device_address);
-        hal_ll_one_wire_write_byte(&device_command[1], 1);
-        hal_ll_one_wire_read_byte(&mut reading_buffer, 2);
-        hal_ll_one_wire_reset();
+        hal_one_wire_read_rom(&mut one_wire, &mut device_address);
+        hal_one_wire_write_byte(&mut one_wire, &device_command[1], 1);
+        hal_one_wire_read_byte(&mut one_wire,&mut reading_buffer, 2);
+        hal_one_wire_reset(&mut one_wire);
 
         match get_temperature_from_reading(&mut reading_buffer) {
             Ok(t) => temperature = t,

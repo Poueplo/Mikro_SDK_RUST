@@ -240,6 +240,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_one_wire"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_one_wire",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_pwm"
 version = "0.1.0"
 dependencies = [
@@ -301,7 +309,7 @@ dependencies = [
  "drv_spi_master",
  "drv_uart",
  "hal_ll_one_wire",
- "hal_uart",
+ "hal_one_wire",
  "interrupt",
  "panic-halt",
  "ring",

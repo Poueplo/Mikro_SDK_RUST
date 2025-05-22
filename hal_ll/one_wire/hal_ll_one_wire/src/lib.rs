@@ -78,6 +78,7 @@ pub struct hal_ll_one_wire_rom_address_t {
     pub address : [u8; 8],
 }
 
+#[derive(Clone, Copy, PartialEq)]
 pub struct hal_ll_one_wire_t {
     pub data_pin : hal_ll_pin_name_t,
     pub state : bool,

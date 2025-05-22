@@ -35,7 +35,7 @@ interrupt = {path = "core/interrupt"}
 ring = {path = "platform/ring"}
 
 
-hal_uart = {path = "hal/lib/uart"}
+hal_one_wire = {path = "hal/lib/one_wire"} 
 hal_ll_one_wire = {path = "hal_ll/one_wire/hal_ll_one_wire"}
 
 [features]
