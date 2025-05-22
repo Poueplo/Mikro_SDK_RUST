@@ -46,55 +46,107 @@
 use panic_halt;
 
 use drv_name::*;
-use drv_uart::*;
 use system::*;
 
-const tx_pin: pin_name_t = GPIO_C6;
-const rx_pin: pin_name_t = GPIO_C7;
-const tx_pin1: pin_name_t = GPIO_D8;
-const rx_pin1: pin_name_t = GPIO_D9;
+use hal_ll_one_wire::*;
+
+const pin: pin_name_t = GPIO_B1;
+
+const device_command : &[[u8;1]] = &[[0x44], [0xBE]];
 
 #[unsafe(no_mangle)]
 fn main() -> ! {
-    let mut uart : uart_t = uart_t::default();
-    let mut uart1 : uart_t = uart_t::default();
+    let mut device_address : hal_ll_one_wire_rom_address_t = hal_ll_one_wire_rom_address_t{
+        address: [0; 8],
+    };
 
-    let mut uart_config : uart_config_t = uart_config_t::default();
-    let mut uart1_config : uart_config_t = uart_config_t::default();
+    let mut reading_buffer : [u8; 2] = [0; 2];
+    let mut is_converting : [u8;1] = [0;1];
+    let mut temperature : f32 = 0.0;
 
+    let mut one_wire : hal_ll_one_wire_t = hal_ll_one_wire_t::default();
 
-    uart_config.rx = rx_pin;
-    uart_config.tx = tx_pin;
-    uart1_config.rx = rx_pin1;
-    uart1_config.tx = tx_pin1;
+    one_wire.data_pin = pin;
 
-    uart_open(&mut uart, uart_config);
-    uart_open(&mut uart1, uart1_config);
+    hal_ll_one_wire_open(&mut one_wire);
 
-    uart_set_baud(&mut uart, 115200);
-    uart_set_baud(&mut uart1, 9600);
-
-    uart_set_blocking(&mut uart, false);
-
-    let mut buffer : [u8; 255] = [0; 255];
-    let mut write_buff: [u8; 11] = [0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F, 13];
-    let mut read_data_size: usize = 0;
-
-    match uart_read(&mut uart, &mut buffer, 10) {
-            Ok(data_len) => read_data_size = data_len,
-            Err(_) => read_data_size = 0,
-        }
+    //hal_ll_one_wire_reset();
 
     loop {
-        match uart_read(&mut uart, &mut buffer, 255) {
-            Ok(data_len) => read_data_size = data_len,
-            Err(_) => read_data_size = 0,
+        is_converting[0] = 0x0;
+        hal_ll_one_wire_read_rom(&mut device_address);
+        hal_ll_one_wire_write_byte(&device_command[0], 1);
+        
+
+        //the device writes 1s when it finished conversion
+        while is_converting[0] != 0xFF {
+            hal_ll_one_wire_read_byte(&mut is_converting, 1);
         }
-        //hal_uart_write(&mut uart, &mut write_buff, 10);
-        uart_print(&mut uart1, "code lyoko");
-        Delay_ms(1000);
-        uart_println(&mut uart1, " - code xana");
-        Delay_ms(1000);
-        uart_write(&mut uart1, &mut buffer, read_data_size);
+
+        //Delay_ms(150);
+
+
+        hal_ll_one_wire_read_rom(&mut device_address);
+        hal_ll_one_wire_write_byte(&device_command[1], 1);
+        hal_ll_one_wire_read_byte(&mut reading_buffer, 2);
+        hal_ll_one_wire_reset();
+
+        match get_temperature_from_reading(&mut reading_buffer) {
+            Ok(t) => temperature = t,
+            Err(_) => temperature = -500.0,
+        }
+
     }
+}
+
+pub fn get_temperature_from_reading(reading_buffer : &[u8]) -> Result<f32, ()> {
+    if reading_buffer.len() < 2 {
+        return Err(());
+    }
+
+    let mut local_temperature: f32 = 0.0;
+
+    //assuming normal mode
+
+    if (reading_buffer[0] & (1 << 0)) > 0 {
+        local_temperature += 0.0625;
+    }
+    if (reading_buffer[0] & (1 << 1)) > 0 {
+        local_temperature += 0.125;
+    }
+    if (reading_buffer[0] & (1 << 2)) > 0 {
+        local_temperature += 0.25;
+    }
+    if (reading_buffer[0] & (1 << 3)) > 0 {
+        local_temperature += 0.5;
+    }
+    if (reading_buffer[0] & (1 << 4)) > 0 {
+        local_temperature += 1.0;
+    }
+    if (reading_buffer[0] & (1 << 5)) > 0 {
+        local_temperature += 2.0;
+    }
+    if (reading_buffer[0] & (1 << 6)) > 0 {
+        local_temperature += 4.0;
+    }
+    if (reading_buffer[0] & (1 << 7)) > 0 {
+        local_temperature += 8.0;
+    }
+
+    if (reading_buffer[1] & (1 << 0)) > 0 {
+        local_temperature += 16.0;
+    }
+    if (reading_buffer[1] & (1 << 1)) > 0 {
+        local_temperature += 32.0;
+    }
+    if (reading_buffer[1] & (1 << 2)) > 0 {
+        local_temperature += 64.0;
+    }
+
+    if (reading_buffer[1] & (1 << 7)) > 0 {
+        local_temperature = -local_temperature;
+    }
+
+
+    Ok(local_temperature)
 }

@@ -50,7 +50,11 @@ pub use hal_ll_gpio_port::{
     hal_ll_gpio_module_struct_init,
     VALUE,
     GPIO_MODULE_STRUCT_END,
-    gpio_constants
+    gpio_constants,
+    hal_ll_gpio_port_base,
+    hal_ll_gpio_port_index,
+    hal_ll_gpio_pin_mask,
+    hal_ll_gpio_base_handle_t
 };
 
 pub fn hal_ll_gpio_configure_pin(pin: *mut hal_ll_gpio_pin_t, name: hal_ll_pin_name_t , direction: hal_ll_gpio_direction_t)

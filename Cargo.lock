@@ -160,6 +160,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_one_wire"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "system",
+]
+
+[[package]]
 name = "hal_ll_pin_names"
 version = "0.1.1"
 dependencies = [
@@ -292,7 +300,7 @@ dependencies = [
  "drv_pwm",
  "drv_spi_master",
  "drv_uart",
- "hal_ll_uart",
+ "hal_ll_one_wire",
  "hal_uart",
  "interrupt",
  "panic-halt",
