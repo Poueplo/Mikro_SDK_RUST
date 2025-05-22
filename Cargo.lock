@@ -51,6 +51,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_one_wire"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_one_wire",
+]
+
+[[package]]
 name = "drv_port"
 version = "0.1.0"
 dependencies = [
@@ -304,6 +312,7 @@ dependencies = [
  "drv_digital_out",
  "drv_i2c_master",
  "drv_name",
+ "drv_one_wire",
  "drv_port",
  "drv_pwm",
  "drv_spi_master",
