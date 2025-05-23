@@ -51,6 +51,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "drv_one_wire"
+version = "0.1.0"
+dependencies = [
+ "drv_name",
+ "hal_one_wire",
+]
+
+[[package]]
 name = "drv_port"
 version = "0.1.0"
 dependencies = [
@@ -160,6 +168,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_ll_one_wire"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_gpio",
+ "system",
+]
+
+[[package]]
 name = "hal_ll_pin_names"
 version = "0.1.1"
 dependencies = [
@@ -232,6 +248,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "hal_one_wire"
+version = "0.1.0"
+dependencies = [
+ "hal_ll_one_wire",
+ "hal_target",
+]
+
+[[package]]
 name = "hal_pwm"
 version = "0.1.0"
 dependencies = [
@@ -288,12 +312,13 @@ dependencies = [
  "drv_digital_out",
  "drv_i2c_master",
  "drv_name",
+ "drv_one_wire",
  "drv_port",
  "drv_pwm",
  "drv_spi_master",
  "drv_uart",
- "hal_ll_uart",
- "hal_uart",
+ "hal_ll_one_wire",
+ "hal_one_wire",
  "interrupt",
  "panic-halt",
  "ring",

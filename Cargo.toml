@@ -30,12 +30,13 @@ drv_i2c_master = {path = "drv/lib/drv_i2c_master"}
 drv_spi_master = {path = "drv/lib/drv_spi_master"}
 drv_pwm = {path = "drv/lib/drv_pwm"}
 drv_uart = {path = "drv/lib/drv_uart"}
+drv_one_wire = {path = "drv/lib/drv_one_wire"}
 system = {path = "core/system"}
 interrupt = {path = "core/interrupt"}
 ring = {path = "platform/ring"}
 
 
-hal_uart = {path = "hal/lib/uart"}
-hal_ll_uart = {path = "hal_ll/uart/hal_ll_uart"}
+hal_one_wire = {path = "hal/lib/one_wire"} 
+hal_ll_one_wire = {path = "hal_ll/one_wire/hal_ll_one_wire"}
 
 [features]
