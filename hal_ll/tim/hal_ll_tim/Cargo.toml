@@ -18,7 +18,25 @@ lto = false
 [dependencies]
 hal_ll_target = {path = "../../hal_ll_target"}
 hal_ll_gpio = {path = "../../gpio/hal_ll_gpio"}
-hal_ll_tim_pin_map = {path = "../hal_ll_tim_pin_map"}
+
+mcu_definition = {path = "../../../family_definitions/f4"}
+
 system = {path = "../../../core/system"}
 
 [features]
+default = ["tim1","tim2","tim3","tim4","tim5","tim8","tim9","tim10","tim11","tim12","tim13","tim14", "tim"]
+
+tim = ["mcu_definition/tim"]
+
+tim1 = ["mcu_definition/tim1"]
+tim2 = ["mcu_definition/tim2"]
+tim3 = ["mcu_definition/tim3"]
+tim4 = ["mcu_definition/tim4"]
+tim5 = ["mcu_definition/tim5"]
+tim8 = ["mcu_definition/tim8"]
+tim9 = ["mcu_definition/tim9"]
+tim10 = ["mcu_definition/tim10"]
+tim11 = ["mcu_definition/tim11"]
+tim12 = ["mcu_definition/tim12"]
+tim13 = ["mcu_definition/tim13"]
+tim14 = ["mcu_definition/tim14"]

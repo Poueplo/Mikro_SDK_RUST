@@ -42,7 +42,7 @@
 #![allow(non_camel_case_types)]
 
 use hal_ll_target::*;
-use hal_ll_i2c_pin_map::*;
+pub use mcu_definition::i2c::*;
 use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
 use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
@@ -202,9 +202,12 @@ static mut hal_ll_module_state: [hal_ll_i2c_master_handle_register_t; I2C_MODULE
         I2C_MODULE_COUNT as usize];
 
 static mut hal_ll_i2c_hw_specifics_map:[hal_ll_i2c_hw_specifics_map_t; (I2C_MODULE_COUNT+1) as usize] = [
-    hal_ll_i2c_hw_specifics_map_t{base: I2C1_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_1), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
-    hal_ll_i2c_hw_specifics_map_t{base: I2C2_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_2), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
-    hal_ll_i2c_hw_specifics_map_t{base: I2C3_BASE_ADDR, module_index: hal_ll_i2c_module_num(I2C_MODULE_3), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    #[cfg(feature = "i2c1")]
+    hal_ll_i2c_hw_specifics_map_t{base: I2C1_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    #[cfg(feature = "i2c2")]
+    hal_ll_i2c_hw_specifics_map_t{base: I2C2_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    #[cfg(feature = "i2c3")]
+    hal_ll_i2c_hw_specifics_map_t{base: I2C3_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
     hal_ll_i2c_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: 0}
 ];
 
@@ -700,7 +703,8 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_i2c_master_handle_register_t) -> &'a 
 }
 
 fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_state: bool) {
-    if map.module_index == hal_ll_i2c_module_num(I2C_MODULE_1)
+    #[cfg(feature = "i2c1")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_I2C1EN_BIT );
@@ -708,8 +712,8 @@ fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_s
             clear_reg_bit( RCC_APB1ENR, HAL_LL_I2C1EN_BIT );
         }
     }
-
-    if map.module_index == hal_ll_i2c_module_num(I2C_MODULE_2)
+    #[cfg(feature = "i2c2")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_I2C2EN_BIT );
@@ -717,8 +721,8 @@ fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_s
             clear_reg_bit( RCC_APB1ENR, HAL_LL_I2C2EN_BIT );
         }
     }
-
-    if map.module_index == hal_ll_i2c_module_num(I2C_MODULE_3)
+    #[cfg(feature = "i2c3")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_I2C3EN_BIT );

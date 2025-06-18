@@ -18,7 +18,17 @@ lto = false
 [dependencies]
 hal_ll_target = {path = "../../hal_ll_target"}
 hal_ll_gpio = {path = "../../gpio/hal_ll_gpio"}
-hal_ll_i2c_pin_map = {path = "../hal_ll_i2c_pin_map"}
+
+#path must be adapted according to the family
+mcu_definition = {path = "../../../family_definitions/f4"}
+
 system = {path = "../../../core/system"}
 
 [features]
+default = ["i2c1", "i2c2", "i2c3", "i2c"]
+
+i2c = ["mcu_definition/i2c"]
+
+i2c1 = ["mcu_definition/i2c1"]
+i2c2 = ["mcu_definition/i2c2"]
+i2c3 = ["mcu_definition/i2c3"]

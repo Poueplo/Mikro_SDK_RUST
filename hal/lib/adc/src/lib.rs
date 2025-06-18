@@ -43,7 +43,6 @@
 
 use hal_ll_adc::*;
 use hal_target::*;
-use hal_target::pin_names::*;
 use core::fmt;
 
 pub use hal_ll_adc::hal_ll_adc_resolution_t as hal_adc_resolution_t;

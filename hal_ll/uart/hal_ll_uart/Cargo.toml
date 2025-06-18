@@ -18,8 +18,23 @@ lto = false
 [dependencies]
 hal_ll_target = {path = "../../hal_ll_target"}
 hal_ll_gpio = {path = "../../gpio/hal_ll_gpio"}
-hal_ll_uart_pin_map = {path = "../hal_ll_uart_pin_map"}
+
+mcu_definition = {path = "../../../family_definitions/f4"}
+
 system = {path = "../../../core/system"}
 interrupt = {path = "../../../core/interrupt"}
 
 [features]
+
+default = ["uart1","uart2","uart3","uart4","uart5","uart6", "uart"]
+
+uart = ["mcu_definition/uart"]
+
+uart1 = ["mcu_definition/uart1"]
+uart2 = ["mcu_definition/uart2"]
+uart3 = ["mcu_definition/uart3"]
+uart4 = ["mcu_definition/uart4"]
+uart5 = ["mcu_definition/uart5"]
+uart6 = ["mcu_definition/uart6"]
+uart7 = ["mcu_definition/uart7"]
+uart8 = ["mcu_definition/uart8"]

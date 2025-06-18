@@ -18,5 +18,19 @@ lto = false
 [dependencies]
 hal_ll_target = {path = "../../hal_ll_target"}
 hal_ll_gpio = {path = "../../gpio/hal_ll_gpio"}
-hal_ll_spi_master_pin_map = {path = "../hal_ll_spi_master_pin_map"}
+
+mcu_definition = {path = "../../../family_definitions/f4"}
+
 system = {path = "../../../core/system"}
+
+[features]
+default = ["spi1", "spi2", "spi3", "spi4", "spi5", "spi6", "spi"]
+
+spi = ["mcu_definition/spi"]
+
+spi1 = ["mcu_definition/spi1"]
+spi2 = ["mcu_definition/spi2"]
+spi3 = ["mcu_definition/spi3"]
+spi4 = ["mcu_definition/spi4"]
+spi5 = ["mcu_definition/spi5"]
+spi6 = ["mcu_definition/spi6"]

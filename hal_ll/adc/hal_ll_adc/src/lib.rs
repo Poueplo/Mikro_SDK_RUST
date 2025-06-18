@@ -45,7 +45,7 @@
 use hal_ll_target::*;
 use hal_ll_gpio_port::{hal_ll_gpio_analog_input,hal_ll_gpio_port_base,hal_ll_gpio_port_index,hal_ll_gpio_pin_mask};
 use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef};
-use hal_ll_adc_pin_map::*;
+pub use mcu_definition::adc::*;
 use core::fmt;
 
 pub const HAL_LL_ADC_CCR_OFFSET: u32 = 0x304;
@@ -202,9 +202,12 @@ static mut hal_ll_module_state: [hal_ll_adc_handle_register_t; ADC_MODULE_COUNT 
     ADC_MODULE_COUNT as usize];
 
 static mut hal_ll_adc_hw_specifics_map:[hal_ll_adc_hw_specifics_map_t; (ADC_MODULE_COUNT+1) as usize] = [
-    hal_ll_adc_hw_specifics_map_t{base: ADC1_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_1), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_10BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
-    hal_ll_adc_hw_specifics_map_t{base: ADC2_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_2), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
-    hal_ll_adc_hw_specifics_map_t{base: ADC3_BASE_ADDR, module_index: hal_ll_adc_module_num(ADC_MODULE_3), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    #[cfg(feature = "adc1")]
+    hal_ll_adc_hw_specifics_map_t{base: ADC1_BASE_ADDR, module_index: hal_ll_adc_module_num(adc_modules::ADC_MODULE_1 as u8), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_10BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    #[cfg(feature = "adc2")]
+    hal_ll_adc_hw_specifics_map_t{base: ADC2_BASE_ADDR, module_index: hal_ll_adc_module_num(adc_modules::ADC_MODULE_2 as u8), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
+    #[cfg(feature = "adc3")]
+    hal_ll_adc_hw_specifics_map_t{base: ADC3_BASE_ADDR, module_index: hal_ll_adc_module_num(adc_modules::ADC_MODULE_3 as u8), pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC},
     hal_ll_adc_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pin: HAL_LL_PIN_NC, vref_input: ADC_VREF_DEFAULT, vref_value: 0.0, resolution: HAL_LL_ADC_12BIT_RES, channel: hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_NC}
 ];
 
@@ -447,26 +450,32 @@ fn hal_ll_get_specifics<'a>( handle: hal_ll_adc_handle_register_t ) -> &'a mut h
     }
 }
 
+#[cfg(feature = "adc1")]
 fn adc1_enable_clock(){
     set_reg_bit( RCC_APB2ENR, HAL_LL_ADC1_ENABLE_CLOCK);
 }
 
+#[cfg(feature = "adc2")]
 fn adc2_enable_clock(){
     set_reg_bit(RCC_APB2ENR, HAL_LL_ADC2_ENABLE_CLOCK);
 }
 
+#[cfg(feature = "adc3")]
 fn adc3_enable_clock(){
     set_reg_bit(RCC_APB2ENR, HAL_LL_ADC3_ENABLE_CLOCK);
 }
 
 fn _hal_ll_adc_enable_clock(base :  u8) {
-    if base == hal_ll_adc_module_num(ADC_MODULE_1) 
+    #[cfg(feature = "adc1")]
+    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_1 as u8) 
     {adc1_enable_clock();}
-
-    if base == hal_ll_adc_module_num(ADC_MODULE_2) 
+    
+    #[cfg(feature = "adc2")]
+    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_2 as u8) 
     {adc2_enable_clock();}
 
-    if base == hal_ll_adc_module_num(ADC_MODULE_3) 
+    #[cfg(feature = "adc3")]
+    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_3 as u8) 
     {adc3_enable_clock();}    
 }
 

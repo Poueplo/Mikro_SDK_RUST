@@ -118,17 +118,10 @@ dependencies = [
 name = "hal_ll_adc"
 version = "0.1.0"
 dependencies = [
- "hal_ll_adc_pin_map",
  "hal_ll_gpio_port",
  "hal_ll_target",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_adc_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -155,16 +148,9 @@ name = "hal_ll_i2c_master"
 version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
- "hal_ll_i2c_pin_map",
  "hal_ll_target",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_i2c_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -188,16 +174,9 @@ name = "hal_ll_spi_master"
 version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
- "hal_ll_spi_master_pin_map",
  "hal_ll_target",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_spi_master_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -218,15 +197,8 @@ version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
  "hal_ll_target",
- "hal_ll_tim_pin_map",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_tim_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -235,16 +207,9 @@ version = "0.1.0"
 dependencies = [
  "hal_ll_gpio",
  "hal_ll_target",
- "hal_ll_uart_pin_map",
  "interrupt",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_uart_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
 ]
 
 [[package]]
@@ -302,6 +267,13 @@ dependencies = [
 [[package]]
 name = "mcu"
 version = "0.1.1"
+
+[[package]]
+name = "mcu_definition"
+version = "0.1.1"
+dependencies = [
+ "hal_ll_pin_names",
+]
 
 [[package]]
 name = "mikrosdk"

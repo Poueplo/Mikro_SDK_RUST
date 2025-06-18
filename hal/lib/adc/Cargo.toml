@@ -18,3 +18,7 @@ lto = false
 [dependencies]
 hal_ll_adc = { path = "../../../hal_ll/adc/hal_ll_adc" }
 hal_target = { path = "../../interface"}
+
+[features]
+
+adc = ["hal_ll_adc/adc"]

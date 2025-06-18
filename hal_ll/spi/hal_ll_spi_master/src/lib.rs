@@ -43,7 +43,7 @@
 #![allow(unused)]
 
 use hal_ll_target::*;
-use hal_ll_spi_master_pin_map::*;
+pub use mcu_definition::spi::*;
 use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
 use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
@@ -51,11 +51,17 @@ use core::fmt;
 
 pub const HAL_LL_SPI_MASTER_SPEED_100K : u32 = 100_000;
 
+#[cfg(feature = "spi1")]
 const HAL_LL_SPI1EN_BIT : u32 = 12;
+#[cfg(feature = "spi2")]
 const HAL_LL_SPI2EN_BIT : u32 = 14;
+#[cfg(feature = "spi3")]
 const HAL_LL_SPI3EN_BIT : u32 = 15;
+#[cfg(feature = "spi4")]
 const HAL_LL_SPI4EN_BIT : u32 = 13;
+#[cfg(feature = "spi5")]
 const HAL_LL_SPI5EN_BIT : u32 = 20;
+#[cfg(feature = "spi6")]
 const HAL_LL_SPI6EN_BIT : u32 = 21;
 
 const HAL_LL_SPI_MASTER_CLK_PHASE : u32    = 0;
@@ -74,7 +80,7 @@ const HAL_LL_SPI_MASTER_SSOE_BIT : u32 = 2;
 const HAL_LL_SPI_MASTER_FRXTH : u32 = 0;
 
 
-const HAL_LL_I2C_SPI_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_HIGH | GPIO_CFG_OTYPE_PP;
+const HAL_LL_SPI_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_HIGH | GPIO_CFG_OTYPE_PP;
 
 #[derive(Debug)]
 pub enum HAL_LL_SPI_MASTER_ERROR {
@@ -171,12 +177,18 @@ static mut hal_ll_module_state: [hal_ll_spi_master_handle_register_t; SPI_MODULE
         SPI_MODULE_COUNT as usize];
 
 static mut hal_ll_spi_hw_specifics_map: [hal_ll_spi_hw_specifics_map_t; (SPI_MODULE_COUNT + 1) as usize] = [
-    hal_ll_spi_hw_specifics_map_t{ base: SPI1_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_1), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
-    hal_ll_spi_hw_specifics_map_t{ base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_2), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
-    hal_ll_spi_hw_specifics_map_t{ base: SPI3_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_3), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
-    hal_ll_spi_hw_specifics_map_t{ base: SPI4_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_4), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
-    hal_ll_spi_hw_specifics_map_t{ base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_5), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
-    hal_ll_spi_hw_specifics_map_t{ base: SPI6_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(SPI_MODULE_6), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi1")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI1_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_1 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi2")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi3")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI3_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_3 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi4")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI4_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_4 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi5")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
+    #[cfg(feature = "spi6")]
+    hal_ll_spi_hw_specifics_map_t{ base: SPI6_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_6 as u8), pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: HAL_LL_SPI_MASTER_SPEED_100K, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
     hal_ll_spi_hw_specifics_map_t{ base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pins: hal_ll_spi_pin_t{ pin_sck: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_miso: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_mosi: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, dummy_data: 0, speed: 0, hw_actual_speed: 0, mode: SPI_MASTER_MODE_DEFAULT },
 ];
 
@@ -214,10 +226,10 @@ pub fn hal_ll_spi_master_register_handle(sck: hal_ll_pin_name_t, miso: hal_ll_pi
 
 pub fn hal_ll_module_configure_spi(handle: &mut hal_ll_spi_master_handle_register_t) {
     let hal_handle : &mut hal_ll_spi_master_handle_register_t = handle;
-    let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_spi_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
-    let pin_check_result: usize = hal_ll_i2c_hw_specifics_map_local.module_index as usize;
+    let hal_ll_spi_hw_specifics_map_local: &mut hal_ll_spi_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
+    let pin_check_result: usize = hal_ll_spi_hw_specifics_map_local.module_index as usize;
 
-    hal_ll_spi_init( hal_ll_i2c_hw_specifics_map_local );
+    hal_ll_spi_init( hal_ll_spi_hw_specifics_map_local );
     unsafe{
         hal_ll_module_state[pin_check_result].spi_master_handle = hal_ll_spi_hw_specifics_map[pin_check_result].base;
         hal_ll_module_state[pin_check_result].init_ll_state = true;
@@ -444,7 +456,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_1){
+    #[cfg(feature = "spi1")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_1 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_SPI1EN_BIT );
         } else {
@@ -453,7 +466,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         *clock_value = rcc_clocks.PCLK2_Frequency;
     }
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_2){
+    #[cfg(feature = "spi2")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_SPI2EN_BIT );
         } else {
@@ -462,7 +476,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         *clock_value = rcc_clocks.PCLK1_Frequency;
     }
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_3){
+    #[cfg(feature = "spi3")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_3 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_SPI3EN_BIT );
         } else {
@@ -471,7 +486,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         *clock_value = rcc_clocks.PCLK1_Frequency;
     }
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_4){
+    #[cfg(feature = "spi4")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_4 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_SPI4EN_BIT );
         } else {
@@ -480,7 +496,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         *clock_value = rcc_clocks.PCLK2_Frequency;
     }
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_5){
+    #[cfg(feature = "spi5")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_SPI5EN_BIT );
         } else {
@@ -489,7 +506,8 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         *clock_value = rcc_clocks.PCLK2_Frequency;
     }
 
-    if map.module_index == hal_ll_spi_master_module_num(SPI_MODULE_6){
+    #[cfg(feature = "spi6")]
+    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_6 as u8){
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_SPI6EN_BIT );
         } else {
@@ -510,9 +528,9 @@ fn hal_ll_spi_master_alternate_functions_set_state(map: &mut hal_ll_spi_hw_speci
         module.pins[2] = VALUE( (*map).pins.pin_mosi.pin_name, (*map).pins.pin_mosi.pin_af );
         
 
-        module.configs[0] = HAL_LL_I2C_SPI_CONFIG;
-        module.configs[1] = HAL_LL_I2C_SPI_CONFIG;
-        module.configs[2] = HAL_LL_I2C_SPI_CONFIG;
+        module.configs[0] = HAL_LL_SPI_CONFIG;
+        module.configs[1] = HAL_LL_SPI_CONFIG;
+        module.configs[2] = HAL_LL_SPI_CONFIG;
 
         // /* STM32F1xx specific */
         module.gpio_remap = (*map).pins.pin_sck.pin_af;

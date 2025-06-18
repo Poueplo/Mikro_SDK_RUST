@@ -42,7 +42,7 @@
 #![allow(non_upper_case_globals)]
 
 use hal_ll_target::*;
-use hal_ll_tim_pin_map::*;
+pub use mcu_definition::tim::*;
 use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
 use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
@@ -59,19 +59,31 @@ const HAL_LL_TIM_CCMR_OCM_PWM_MODE_1: u32 = 0x60;
 const HAL_LL_TIM_CR1_DIR_BIT: u32 = 4;
 
 //APB1
+#[cfg(feature = "tim2")]
 const HAL_LL_TIM_ENABLE_2: u8 = 0;
+#[cfg(feature = "tim3")]
 const HAL_LL_TIM_ENABLE_3: u8 = 1;
+#[cfg(feature = "tim4")]
 const HAL_LL_TIM_ENABLE_4: u8 = 2;
+#[cfg(feature = "tim5")]
 const HAL_LL_TIM_ENABLE_5: u8 = 3;
+#[cfg(feature = "tim12")]
 const HAL_LL_TIM_ENABLE_12: u8 = 6;
+#[cfg(feature = "tim13")]
 const HAL_LL_TIM_ENABLE_13: u8 = 7;
+#[cfg(feature = "tim14")]
 const HAL_LL_TIM_ENABLE_14: u8 = 8;
 
 //APB2
+#[cfg(feature = "tim1")]
 const HAL_LL_TIM_ENABLE_1: u8 = 0;
+#[cfg(feature = "tim8")]
 const HAL_LL_TIM_ENABLE_8: u8 = 1;
+#[cfg(feature = "tim9")]
 const HAL_LL_TIM_ENABLE_9: u8 = 16;
+#[cfg(feature = "tim10")]
 const HAL_LL_TIM_ENABLE_10: u8 = 17;
+#[cfg(feature = "tim11")]
 const HAL_LL_TIM_ENABLE_11: u8 = 18;
 
 const HAL_LL_APB1_TIMER_CLOCK: u8 = 1;
@@ -164,18 +176,30 @@ static mut hal_ll_module_state: [hal_ll_tim_handle_register_t; TIM_MODULE_COUNT 
         TIM_MODULE_COUNT as usize];
 
 static mut hal_ll_tim_hw_specifics_map: [hal_ll_tim_hw_specifics_map_t; (TIM_MODULE_COUNT + 1) as usize] = [
-    hal_ll_tim_hw_specifics_map_t{ base: TIM1_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_1) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM2_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_2) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM3_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_3) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM4_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_4) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM5_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_5) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM8_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_8) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM9_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_9) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM10_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_10) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM11_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_11) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM12_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_12) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM13_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_13) },
-    hal_ll_tim_hw_specifics_map_t{ base: TIM14_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(TIM_MODULE_14) },
+    #[cfg(feature = "tim1")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM1_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_1 as u8) },
+    #[cfg(feature = "tim2")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM2_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_2 as u8) },
+    #[cfg(feature = "tim3")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM3_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_3 as u8) },
+    #[cfg(feature = "tim4")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM4_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_4 as u8) },
+    #[cfg(feature = "tim5")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM5_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) },
+    #[cfg(feature = "tim8")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM8_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
+    #[cfg(feature = "tim9")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM9_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_9 as u8) },
+    #[cfg(feature = "tim10")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM10_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_10 as u8) },
+    #[cfg(feature = "tim11")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM11_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_11 as u8) },
+    #[cfg(feature = "tim12")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM12_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_12 as u8) },
+    #[cfg(feature = "tim13")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM13_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_13 as u8) },
+    #[cfg(feature = "tim14")]
+    hal_ll_tim_hw_specifics_map_t{ base: TIM14_BASE_ADDR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_14 as u8) },
     hal_ll_tim_hw_specifics_map_t{ base: HAL_LL_MODULE_ERROR, config: [hal_ll_tim_t{ pin: HAL_LL_PIN_NC, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_NONE, af: 0 }; 8], max_period: 0xFFFF, freq_hz: 1, module_index: HAL_LL_MODULE_ERROR as u8},
 ];
 
@@ -450,7 +474,7 @@ fn hal_ll_tim_check_pins(pin: hal_ll_pin_name_t, index: &mut u8, config_index: &
 
 #[allow(unused_variables, unused_assignments)]
 fn hal_ll_get_specifics<'a>(handle: hal_ll_tim_handle_register_t) -> &'a mut hal_ll_tim_hw_specifics_map_t {
-    let mut hal_ll_module_count: usize = SPI_MODULE_COUNT as usize;
+    let mut hal_ll_module_count: usize = TIM_MODULE_COUNT as usize;
     let mut hal_ll_module_error : usize = 0;
     hal_ll_module_error = hal_ll_module_count;
     
@@ -498,17 +522,29 @@ fn hal_ll_tim_clock_source(selector : u8) -> u32 {
 
 fn hal_ll_tim_get_clock_speed(base : hal_ll_base_addr_t) -> u32 {
     match base {
+        #[cfg(feature = "tim1")]
         TIM1_BASE_ADDR => hal_ll_tim_clock_source(TIM1_BUS),
+        #[cfg(feature = "tim2")]
         TIM2_BASE_ADDR => hal_ll_tim_clock_source(TIM2_BUS),
+        #[cfg(feature = "tim3")]
         TIM3_BASE_ADDR => hal_ll_tim_clock_source(TIM3_BUS),
+        #[cfg(feature = "tim4")]
         TIM4_BASE_ADDR => hal_ll_tim_clock_source(TIM4_BUS),
+        #[cfg(feature = "tim5")]
         TIM5_BASE_ADDR => hal_ll_tim_clock_source(TIM5_BUS),
+        #[cfg(feature = "tim8")]
         TIM8_BASE_ADDR => hal_ll_tim_clock_source(TIM8_BUS),
+        #[cfg(feature = "tim9")]
         TIM9_BASE_ADDR => hal_ll_tim_clock_source(TIM9_BUS),
+        #[cfg(feature = "tim10")]
         TIM10_BASE_ADDR => hal_ll_tim_clock_source(TIM10_BUS),
+        #[cfg(feature = "tim11")]
         TIM11_BASE_ADDR => hal_ll_tim_clock_source(TIM11_BUS),
+        #[cfg(feature = "tim12")]
         TIM12_BASE_ADDR => hal_ll_tim_clock_source(TIM12_BUS),
+        #[cfg(feature = "tim13")]
         TIM13_BASE_ADDR => hal_ll_tim_clock_source(TIM13_BUS),
+        #[cfg(feature = "tim14")]
         TIM14_BASE_ADDR => hal_ll_tim_clock_source(TIM14_BUS),
         _ => 0,
     }
@@ -524,7 +560,8 @@ fn hal_ll_tim_map_pins(module_index: usize, config_index: usize, index: u8) {
 }
 
 fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: bool) {
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_1) {
+    #[cfg(feature = "tim1")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_1 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_1 as u32);
         } else {
@@ -532,7 +569,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_2) {
+    #[cfg(feature = "tim2")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_2 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_2 as u32);
         } else {
@@ -540,7 +578,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_3) {
+    #[cfg(feature = "tim3")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_3 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_3 as u32);
         } else {
@@ -548,7 +587,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_4) {
+    #[cfg(feature = "tim4")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_4 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_4 as u32);
         } else {
@@ -556,7 +596,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_5) {
+    #[cfg(feature = "tim5")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_5 as u32);
         } else {
@@ -564,7 +605,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_8) {
+    #[cfg(feature = "tim8")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_8 as u32);
         } else {
@@ -572,7 +614,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_9) {
+    #[cfg(feature = "tim9")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_9 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_9 as u32);
         } else {
@@ -580,7 +623,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_10) {
+    #[cfg(feature = "tim10")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_10 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_10 as u32);
         } else {
@@ -588,7 +632,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_11) {
+    #[cfg(feature = "tim11")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_11 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_11 as u32);
         } else {
@@ -596,7 +641,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_12) {
+    #[cfg(feature = "tim12")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_12 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_12 as u32);
         } else {
@@ -604,7 +650,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_13) {
+    #[cfg(feature = "tim13")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_13 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_13 as u32);
         } else {
@@ -612,7 +659,8 @@ fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: b
         }
     }
 
-    if map.module_index == hal_ll_tim_module_num(TIM_MODULE_14) {
+    #[cfg(feature = "tim14")]
+    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_14 as u8) {
         if hal_ll_state  {
             set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_14 as u32);
         } else {

@@ -43,7 +43,7 @@
 #![allow(non_snake_case)]
 
 use hal_ll_target::*;
-use hal_ll_uart_pin_map::*;
+pub use mcu_definition::uart::*;
 use hal_ll_gpio::*;
 use hal_ll_gpio::gpio_constants::*;
 use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
@@ -52,13 +52,21 @@ use core::fmt;
 
 const HAL_LL_UART_ACCEPTABLE_ERROR : f32 = 1.0;
 
+#[cfg(feature = "uart1")]
 const HAL_LL_USART1EN : u32 =  4;
+#[cfg(feature = "uart2")]
 const HAL_LL_USART2EN : u32 = 17;
+#[cfg(feature = "uart3")]
 const HAL_LL_USART3EN : u32 = 18;
+#[cfg(feature = "uart4")]
 const HAL_LL_UART4EN  : u32 = 19;
+#[cfg(feature = "uart5")]
 const HAL_LL_UART5EN  : u32 = 20;
+#[cfg(feature = "uart6")]
 const HAL_LL_USART6EN : u32 =  5;
+#[cfg(feature = "uart7")]
 const HAL_LL_UART7EN  : u32 = 30;
+#[cfg(feature = "uart8")]
 const HAL_LL_UART8EN  : u32 = 31;
 // const HAL_LL_UART9EN  : u32 =  6;
 // const HAL_LL_UART10EN : u32 =  7;
@@ -228,14 +236,22 @@ static mut hal_ll_module_state: [hal_ll_uart_handle_register_t; UART_MODULE_COUN
         UART_MODULE_COUNT as usize];
 
 static mut hal_ll_uart_hw_specifics_map:[hal_ll_uart_hw_specifics_map_t; (UART_MODULE_COUNT+1) as usize] = [
-    hal_ll_uart_hw_specifics_map_t{ base: UART1_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_1), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART2_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_2), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART3_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_3), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART4_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_4), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART5_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_5), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART6_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_6), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART7_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_7), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
-    hal_ll_uart_hw_specifics_map_t{ base: UART8_BASE_ADDR, module_index: hal_ll_uart_module_num(UART_MODULE_8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart1")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART1_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart2")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART2_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart3")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART3_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart4")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART4_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart5")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART5_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart6")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART6_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart7")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART7_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
+    #[cfg(feature = "uart8")]
+    hal_ll_uart_hw_specifics_map_t{ base: UART8_BASE_ADDR, module_index: hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8), pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
     hal_ll_uart_hw_specifics_map_t{ base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_PIN_NC, pins: hal_ll_uart_pins_t{ pin_tx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_rx: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } } , baud_rate: hal_ll_uart_baud_t{ baud: 115200, real_baud: 0 }, parity: HAL_LL_UART_PARITY_DEFAULT, stop_bit: HAL_LL_UART_STOP_BITS_DEFAULT, data_bit: HAL_LL_UART_DATA_BITS_DEFAULT },
 ];
 
@@ -306,36 +322,51 @@ pub fn hal_ll_uart_irq_enable(handle: &mut hal_ll_uart_handle_register_t, irq : 
             },
         }
     }
-
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_1)
+    
+    #[cfg(feature = "uart1")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
     {
         hal_ll_core_enable_irq( UART1_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_2)
+    
+    #[cfg(feature = "uart2")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
     {
          hal_ll_core_enable_irq( UART2_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_3)
+    
+    #[cfg(feature = "uart3")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
     {
         hal_ll_core_enable_irq( UART3_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_4)
+    
+    #[cfg(feature = "uart4")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
     {
         hal_ll_core_enable_irq( UART4_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_5)
+    
+    #[cfg(feature = "uart5")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
     {
         hal_ll_core_enable_irq( UART5_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_6)
+    
+    #[cfg(feature = "uart6")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
     {
         hal_ll_core_enable_irq( UART6_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_7)
+    
+    #[cfg(feature = "uart7")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
     {
         hal_ll_core_enable_irq( UART7_NVIC );
     }
-    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(UART_MODULE_8)
+    
+    #[cfg(feature = "uart8")]
+    if hal_ll_uart_hw_specifics_map_local.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
     {
         hal_ll_core_enable_irq( UART8_NVIC );
     } 
@@ -492,7 +523,7 @@ fn hal_ll_uart_check_pins(tx_pin: hal_ll_pin_name_t , rx_pin: hal_ll_pin_name_t 
                             return hal_ll_module_id;
                         } else {
                             index_counter = index_counter + 1;
-                            if I2C_MODULE_COUNT == index_counter {
+                            if UART_MODULE_COUNT == index_counter {
                                 return index_counter - 1;
                             }
                         }
@@ -558,7 +589,8 @@ fn hal_ll_uart_alternate_functions_set_state(map: &mut hal_ll_uart_hw_specifics_
 }
 
 fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state : bool) {
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_1)
+    #[cfg(feature = "uart1")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
@@ -566,7 +598,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_2)
+    #[cfg(feature = "uart2")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
@@ -574,7 +607,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_3)
+    #[cfg(feature = "uart3")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
@@ -582,7 +616,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_4)
+    #[cfg(feature = "uart4")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
@@ -590,7 +625,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_5)
+    #[cfg(feature = "uart5")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
@@ -598,7 +634,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_6)
+    #[cfg(feature = "uart6")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
@@ -606,7 +643,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_7)
+    #[cfg(feature = "uart7")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
@@ -614,7 +652,8 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
             clear_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
         }
     }
-    if map.module_index == hal_ll_uart_module_num(UART_MODULE_8)
+    #[cfg(feature = "uart8")]
+    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
     {
         if hal_ll_state {
             set_reg_bit( RCC_APB1ENR, HAL_LL_UART8EN );
@@ -634,35 +673,43 @@ fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
 
-    if module_index == hal_ll_uart_module_num(UART_MODULE_1)
+    #[cfg(feature = "uart1")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
     {
         return rcc_clocks.PCLK2_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_2)
+    #[cfg(feature = "uart2")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_3)
+    #[cfg(feature = "uart3")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_4)
+    #[cfg(feature = "uart4")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_5)
+    #[cfg(feature = "uart5")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_6)
+    #[cfg(feature = "uart6")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
     {
         return rcc_clocks.PCLK2_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_7)
+    #[cfg(feature = "uart7")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
-    if module_index == hal_ll_uart_module_num(UART_MODULE_8)
+    #[cfg(feature = "uart8")]
+    if module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
     {
         return rcc_clocks.PCLK1_Frequency;
     }
@@ -831,6 +878,7 @@ fn empty_handler(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uar
 
 ///// INTERRUPT HANDLERS
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart1")]
 pub extern "Rust" fn UART1_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART1_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -855,6 +903,7 @@ pub extern "Rust" fn UART1_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart2")]
 pub extern "Rust" fn UART2_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART2_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -879,6 +928,7 @@ pub extern "Rust" fn UART2_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart3")]
 pub extern "Rust" fn UART3_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART3_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -903,6 +953,7 @@ pub extern "Rust" fn UART3_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart4")]
 pub extern "Rust" fn UART4_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART4_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -926,6 +977,7 @@ pub extern "Rust" fn UART4_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart5")]
 pub extern "Rust" fn UART5_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART5_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -950,6 +1002,7 @@ pub extern "Rust" fn UART5_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart6")]
 pub extern "Rust" fn UART6_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART6_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -974,6 +1027,7 @@ pub extern "Rust" fn UART6_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart7")]
 pub extern "Rust" fn UART7_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART7_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
@@ -998,6 +1052,7 @@ pub extern "Rust" fn UART7_IRQHandler() {
 }
 
 #[unsafe(no_mangle)]
+#[cfg(feature = "uart8")]
 pub extern "Rust" fn UART8_IRQHandler() {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART8_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
