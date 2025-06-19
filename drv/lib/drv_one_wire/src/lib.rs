@@ -40,7 +40,6 @@
 #![no_std]
 
 use hal_one_wire::*;
-use drv_name::*;
 
 pub use hal_one_wire::hal_one_wire_t as one_wire_t;
 pub use hal_one_wire::HAL_ONE_WIRE_ERROR as ONE_WIRE_ERROR;

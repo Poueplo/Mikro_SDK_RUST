@@ -38,9 +38,9 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_upper_case_globals)]
 
 use hal_ll::one_wire::*;
-use hal_target::*;
 use hal_target::pin_names::*;
 
 pub use hal_ll::one_wire::hal_ll_one_wire_t as hal_one_wire_t;

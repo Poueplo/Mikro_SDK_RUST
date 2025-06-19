@@ -38,6 +38,9 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
+
 
 
 use hal_ll_gpio::*;
@@ -52,7 +55,7 @@ const ONE_WIRE_CMD_ROM_READ : u8 = 0x33;
 const ONE_WIRE_CMD_ROM_SKIP : u8 = 0xCC;
 const ONE_WIRE_CMD_ROM_MATCH : u8 = 0x55;
 const ONE_WIRE_CMD_ROM_SEARCH : u8 = 0xF0;
-const ONE_WIRE_CMD_ROM_READ_LEGACY : u8 = 0x0F;
+// const ONE_WIRE_CMD_ROM_READ_LEGACY : u8 = 0x0F;
 
 #[derive(Debug)]
 pub enum HAL_LL_ONE_WIRE_ERROR {
@@ -138,6 +141,7 @@ pub fn hal_ll_one_wire_open( obj : &mut hal_ll_one_wire_t ) {
     hal_ll_one_wire_reconfigure( obj );
 }
 
+#[allow(unused_assignments)]
 pub fn hal_ll_one_wire_reset() -> u8 {
     let mut device_response: u8 = 1;
 
@@ -223,6 +227,8 @@ pub fn hal_ll_one_wire_search_next_device(obj : &mut hal_ll_one_wire_t, one_wire
     Ok(())
 }
 
+#[allow(unused_variables)]
+#[allow(unused_assignments)]
 fn hal_ll_one_wire_search(obj : &mut hal_ll_one_wire_t, one_wire_device_list : &mut hal_ll_one_wire_rom_address_t) -> Result<u8> {
     let mut search_result: u8 = 0;
     
