@@ -25,9 +25,6 @@ system = {path = "../../../core/system"}
 interrupt = {path = "../../../core/interrupt"}
 
 [features]
-
-default = ["uart1","uart2","uart3","uart4","uart5","uart6", "uart"]
-
 uart = ["mcu_definition/uart"]
 
 uart1 = ["mcu_definition/uart1"]

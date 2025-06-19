@@ -26,7 +26,6 @@ system = {path = "../../../core/system"}
 
 
 [features]
-default = ["adc1", "adc2", "adc3"]
 adc = ["mcu_definition/adc"]
 adc1 = ["mcu_definition/adc1"]
 adc2 = ["mcu_definition/adc2"]

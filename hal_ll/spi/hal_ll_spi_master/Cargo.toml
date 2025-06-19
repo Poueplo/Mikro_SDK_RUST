@@ -24,8 +24,6 @@ mcu_definition = {path = "../../../family_definitions/f4"}
 system = {path = "../../../core/system"}
 
 [features]
-default = ["spi1", "spi2", "spi3", "spi4", "spi5", "spi6", "spi"]
-
 spi = ["mcu_definition/spi"]
 
 spi1 = ["mcu_definition/spi1"]

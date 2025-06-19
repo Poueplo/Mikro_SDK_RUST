@@ -24,8 +24,6 @@ mcu_definition = {path = "../../../family_definitions/f4"}
 system = {path = "../../../core/system"}
 
 [features]
-default = ["tim1","tim2","tim3","tim4","tim5","tim8","tim9","tim10","tim11","tim12","tim13","tim14", "tim"]
-
 tim = ["mcu_definition/tim"]
 
 tim1 = ["mcu_definition/tim1"]

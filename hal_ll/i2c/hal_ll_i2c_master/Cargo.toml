@@ -25,8 +25,6 @@ mcu_definition = {path = "../../../family_definitions/f4"}
 system = {path = "../../../core/system"}
 
 [features]
-default = ["i2c1", "i2c2", "i2c3", "i2c"]
-
 i2c = ["mcu_definition/i2c"]
 
 i2c1 = ["mcu_definition/i2c1"]
