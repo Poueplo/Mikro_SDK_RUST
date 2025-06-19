@@ -11,38 +11,6 @@ name = "common_header"
 version = "0.1.1"
 
 [[package]]
-name = "drv_analog_in"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_adc",
-]
-
-[[package]]
-name = "drv_digital_in"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_gpio",
-]
-
-[[package]]
-name = "drv_digital_out"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_gpio",
-]
-
-[[package]]
-name = "drv_i2c_master"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_i2c_master",
-]
-
-[[package]]
 name = "drv_name"
 version = "0.1.0"
 dependencies = [
@@ -59,46 +27,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "drv_port"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_gpio",
-]
-
-[[package]]
-name = "drv_pwm"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_pwm",
-]
-
-[[package]]
-name = "drv_spi_master"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_spi_master",
-]
-
-[[package]]
-name = "drv_uart"
-version = "0.1.0"
-dependencies = [
- "drv_name",
- "hal_uart",
-]
-
-[[package]]
-name = "hal_adc"
-version = "0.1.0"
-dependencies = [
- "hal_ll_adc",
- "hal_target",
-]
-
-[[package]]
 name = "hal_gpio"
 version = "0.1.0"
 dependencies = [
@@ -107,20 +35,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "hal_i2c_master"
+name = "hal_ll"
 version = "0.1.0"
 dependencies = [
- "hal_ll_i2c_master",
- "hal_target",
-]
-
-[[package]]
-name = "hal_ll_adc"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio_port",
- "hal_ll_target",
- "mcu_definition",
+ "hal_ll_one_wire",
  "system",
 ]
 
@@ -144,16 +62,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hal_ll_i2c_master"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "mcu_definition",
- "system",
-]
-
-[[package]]
 name = "hal_ll_one_wire"
 version = "0.1.0"
 dependencies = [
@@ -170,16 +78,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "hal_ll_spi_master"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "mcu_definition",
- "system",
-]
-
-[[package]]
 name = "hal_ll_target"
 version = "0.1.1"
 dependencies = [
@@ -192,50 +90,11 @@ name = "hal_ll_target_names"
 version = "0.1.1"
 
 [[package]]
-name = "hal_ll_tim"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "mcu_definition",
- "system",
-]
-
-[[package]]
-name = "hal_ll_uart"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "interrupt",
- "mcu_definition",
- "system",
-]
-
-[[package]]
 name = "hal_one_wire"
 version = "0.1.0"
 dependencies = [
- "hal_ll_one_wire",
+ "hal_ll",
  "hal_target",
-]
-
-[[package]]
-name = "hal_pwm"
-version = "0.1.0"
-dependencies = [
- "hal_ll_tim",
- "hal_target",
-]
-
-[[package]]
-name = "hal_spi_master"
-version = "0.1.0"
-dependencies = [
- "hal_gpio",
- "hal_ll_spi_master",
- "hal_target",
- "system",
 ]
 
 [[package]]
@@ -246,54 +105,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "hal_uart"
-version = "0.1.0"
-dependencies = [
- "hal_gpio",
- "hal_ll_uart",
- "hal_target",
- "interrupt",
- "ring",
- "system",
-]
-
-[[package]]
-name = "interrupt"
-version = "0.1.0"
-dependencies = [
- "bit_control",
-]
-
-[[package]]
 name = "mcu"
 version = "0.1.1"
-
-[[package]]
-name = "mcu_definition"
-version = "0.1.1"
-dependencies = [
- "hal_ll_pin_names",
-]
 
 [[package]]
 name = "mikrosdk"
 version = "0.1.1"
 dependencies = [
- "drv_analog_in",
- "drv_digital_in",
- "drv_digital_out",
- "drv_i2c_master",
  "drv_name",
  "drv_one_wire",
- "drv_port",
- "drv_pwm",
- "drv_spi_master",
- "drv_uart",
- "hal_ll_one_wire",
- "hal_one_wire",
- "interrupt",
  "panic-halt",
- "ring",
  "system",
 ]
 
@@ -302,10 +123,6 @@ name = "panic-halt"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a513e167849a384b7f9b746e517604398518590a9142f4846a32e3c2a4de7b11"
-
-[[package]]
-name = "ring"
-version = "0.1.0"
 
 [[package]]
 name = "system"

@@ -16,5 +16,9 @@ lto = false
 
 
 [dependencies]
-hal_ll_tim = { path = "../../../hal_ll/tim/hal_ll_tim" }
+hal_ll = { path = "../../../hal_ll" }
 hal_target = { path = "../../interface"}
+
+[features]
+default = ["pwm"]
+pwm = ["hal_ll/tim"]

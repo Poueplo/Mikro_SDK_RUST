@@ -39,13 +39,13 @@
 
 #![no_std]
 
-use hal_ll_one_wire::*;
+use hal_ll::one_wire::*;
 use hal_target::*;
 use hal_target::pin_names::*;
 
-pub use hal_ll_one_wire::hal_ll_one_wire_t as hal_one_wire_t;
-pub use hal_ll_one_wire::HAL_LL_ONE_WIRE_ERROR as HAL_ONE_WIRE_ERROR;
-pub use hal_ll_one_wire::hal_ll_one_wire_rom_address_t as hal_one_wire_rom_address_t;
+pub use hal_ll::one_wire::hal_ll_one_wire_t as hal_one_wire_t;
+pub use hal_ll::one_wire::HAL_LL_ONE_WIRE_ERROR as HAL_ONE_WIRE_ERROR;
+pub use hal_ll::one_wire::hal_ll_one_wire_rom_address_t as hal_one_wire_rom_address_t;
 
 
 type Result<T> = core::result::Result<T, HAL_ONE_WIRE_ERROR>;

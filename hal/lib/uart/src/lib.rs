@@ -43,21 +43,21 @@ mod constant_setting;
 use constant_setting::*;
 
 
-use hal_ll_uart::*;
+use hal_ll::uart::*;
 use hal_target::*;
 use hal_target::pin_names::*;
 use hal_gpio::*;
 use interrupt::interrupt_helper::*;
 
-use hal_ll_uart::hal_ll_uart_irq_t as hal_uart_irq_t;
-pub use hal_ll_uart::hal_ll_uart_handle_register_t as hal_uart_handle_register_t;
-pub use hal_ll_uart::HAL_LL_UART_ERROR as HAL_UART_ERROR;
-pub use hal_ll_uart::hal_ll_uart_stop_bits_t as hal_uart_stop_bits_t;
-pub use hal_ll_uart::HAL_LL_UART_STOP_BITS_DEFAULT as HAL_UART_STOP_BITS_DEFAULT;
-pub use hal_ll_uart::hal_ll_uart_parity_t as hal_uart_parity_t;
-pub use hal_ll_uart::HAL_LL_UART_PARITY_DEFAULT as HAL_UART_PARITY_DEFAULT;
-pub use hal_ll_uart::hal_ll_uart_data_bits_t as hal_uart_data_bits_t;
-pub use hal_ll_uart::HAL_LL_UART_DATA_BITS_DEFAULT as HAL_UART_DATA_BITS_DEFAULT;
+use hal_ll::uart::hal_ll_uart_irq_t as hal_uart_irq_t;
+pub use hal_ll::uart::hal_ll_uart_handle_register_t as hal_uart_handle_register_t;
+pub use hal_ll::uart::HAL_LL_UART_ERROR as HAL_UART_ERROR;
+pub use hal_ll::uart::hal_ll_uart_stop_bits_t as hal_uart_stop_bits_t;
+pub use hal_ll::uart::HAL_LL_UART_STOP_BITS_DEFAULT as HAL_UART_STOP_BITS_DEFAULT;
+pub use hal_ll::uart::hal_ll_uart_parity_t as hal_uart_parity_t;
+pub use hal_ll::uart::HAL_LL_UART_PARITY_DEFAULT as HAL_UART_PARITY_DEFAULT;
+pub use hal_ll::uart::hal_ll_uart_data_bits_t as hal_uart_data_bits_t;
+pub use hal_ll::uart::HAL_LL_UART_DATA_BITS_DEFAULT as HAL_UART_DATA_BITS_DEFAULT;
 use ring::ring_buf8_t;
 use system::Delay_ms;
 

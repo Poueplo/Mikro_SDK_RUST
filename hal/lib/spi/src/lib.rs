@@ -41,16 +41,16 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-use hal_ll_spi_master::*;
+use hal_ll::spi_master::*;
 use hal_target::*;
 use hal_target::pin_names::*;
 use hal_gpio::*;
 
-pub use hal_ll_spi_master::hal_ll_spi_master_handle_register_t as hal_spi_master_handle_register_t;
-pub use hal_ll_spi_master::hal_ll_spi_master_mode_t as hal_spi_master_mode_t;
-pub use hal_ll_spi_master::HAL_LL_SPI_MASTER_ERROR as HAL_SPI_MASTER_ERROR;
-pub use hal_ll_spi_master::HAL_LL_SPI_MASTER_SPEED_100K as HAL_SPI_MASTER_SPEED_100K;
-pub use hal_ll_spi_master::SPI_MASTER_MODE_DEFAULT;
+pub use hal_ll::spi_master::hal_ll_spi_master_handle_register_t as hal_spi_master_handle_register_t;
+pub use hal_ll::spi_master::hal_ll_spi_master_mode_t as hal_spi_master_mode_t;
+pub use hal_ll::spi_master::HAL_LL_SPI_MASTER_ERROR as HAL_SPI_MASTER_ERROR;
+pub use hal_ll::spi_master::HAL_LL_SPI_MASTER_SPEED_100K as HAL_SPI_MASTER_SPEED_100K;
+pub use hal_ll::spi_master::SPI_MASTER_MODE_DEFAULT;
 
 type Result<T> = core::result::Result<T, HAL_SPI_MASTER_ERROR>;
 
