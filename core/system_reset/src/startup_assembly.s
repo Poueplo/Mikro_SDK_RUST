@@ -1,8 +1,8 @@
 /**
   ******************************************************************************
-  * @file      startup_stm32f429xx.s
+  * @file      startup_stm32f479xx.s
   * @author    MCD Application Team
-  * @brief     STM32F429xx Devices vector table for GCC based toolchains. 
+  * @brief     STM32F479xx Devices vector table for GCC based toolchains. 
   *            This module performs:
   *                - Set the initial SP
   *                - Set the initial PC == Reset_Handler,
@@ -57,9 +57,9 @@ defined in linker script */
     .section  .text.Reset_Handler
   .weak  Reset_Handler
   .type  Reset_Handler, %function
-Reset_Handler: 
-  ldr   sp, =_estack       /* set stack pointer */
- 
+Reset_Handler:  
+  ldr   sp, =_estack     /* set stack pointer */
+
 /* Copy the data segment initializers from flash to SRAM */  
   ldr r0, =_sdata
   ldr r1, =_edata
@@ -121,9 +121,9 @@ Infinite_Loop:
 *******************************************************************************/
    .section  .isr_vector,"a",%progbits
   .type  g_pfnVectors, %object
-  .size  g_pfnVectors, .-g_pfnVectors
-   
-g_pfnVectors:
+  .size  g_pfnVectors, .-g_pfnVectors 
+  
+  g_pfnVectors:
   .word  _estack
   .word  Reset_Handler
 
@@ -191,7 +191,7 @@ g_pfnVectors:
   .word     TIM8_TRG_COM_TIM14_IRQHandler     /* TIM8 Trigger and Commutation and TIM14 */
   .word     TIM8_CC_IRQHandler                /* TIM8 Capture Compare         */                          
   .word     DMA1_Stream7_IRQHandler           /* DMA1 Stream7                 */                          
-  .word     FMC_IRQHandler                    /* FMC                         */                   
+  .word     FMC_IRQHandler                    /* FMC                          */                   
   .word     SDIO_IRQHandler                   /* SDIO                         */                   
   .word     TIM5_IRQHandler                   /* TIM5                         */                   
   .word     SPI3_IRQHandler                   /* SPI3                         */                   
@@ -222,7 +222,7 @@ g_pfnVectors:
   .word     OTG_HS_WKUP_IRQHandler            /* USB OTG HS Wakeup through EXTI */                         
   .word     OTG_HS_IRQHandler                 /* USB OTG HS                   */                   
   .word     DCMI_IRQHandler                   /* DCMI                         */                   
-  .word     0                                 /* Reserved                     */                   
+  .word     CRYP_IRQHandler                   /* CRYP crypto                  */                   
   .word     HASH_RNG_IRQHandler               /* Hash and Rng                 */
   .word     FPU_IRQHandler                    /* FPU                          */
   .word     UART7_IRQHandler                  /* UART7                        */      
@@ -231,10 +231,13 @@ g_pfnVectors:
   .word     SPI5_IRQHandler                   /* SPI5 						  */
   .word     SPI6_IRQHandler                   /* SPI6						  */
   .word     SAI1_IRQHandler                   /* SAI1						  */
-  .word     LTDC_IRQHandler                   /* LTDC_IRQHandler			  */
-  .word     LTDC_ER_IRQHandler                /* LTDC_ER_IRQHandler			  */
+  .word     LTDC_IRQHandler                   /* LTDC           		      */
+  .word     LTDC_ER_IRQHandler                /* LTDC error          	      */
   .word     DMA2D_IRQHandler                  /* DMA2D                        */
+  .word     QUADSPI_IRQHandler                /* QUADSPI             	      */
+  .word     DSI_IRQHandler                    /* DSI                          */  
   
+ 
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the Default_Handler. 
@@ -505,7 +508,10 @@ g_pfnVectors:
                   
    .weak      DCMI_IRQHandler            
    .thumb_set DCMI_IRQHandler,Default_Handler
-                                   
+   
+   .weak      CRYP_IRQHandler            
+   .thumb_set CRYP_IRQHandler,Default_Handler
+                                
    .weak      HASH_RNG_IRQHandler                  
    .thumb_set HASH_RNG_IRQHandler,Default_Handler   
 
@@ -538,3 +544,9 @@ g_pfnVectors:
 
    .weak      DMA2D_IRQHandler            
    .thumb_set DMA2D_IRQHandler,Default_Handler
+   
+   .weak      QUADSPI_IRQHandler            
+   .thumb_set QUADSPI_IRQHandler,Default_Handler
+
+   .weak      DSI_IRQHandler            
+   .thumb_set DSI_IRQHandler,Default_Handler

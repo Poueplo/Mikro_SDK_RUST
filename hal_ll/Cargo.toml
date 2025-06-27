@@ -24,7 +24,7 @@ mcu_definition = {path = "../family_definitions/stm/f4"}
 interrupt = {path = "../core/interrupt", optional = true}
 
 [features]
-default = ["gpioa","gpiob","gpioc","gpiod","gpioe","gpiof","gpiog","gpioh"]
+default = ["gpioa","gpiob","gpioc","gpiod","gpioe","gpiof","gpiog","gpioh","gpioi"]
 
 gpioa = ["hal_ll_target/gpioa"]
 gpiob = ["hal_ll_target/gpiob"]
