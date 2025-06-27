@@ -38,6 +38,8 @@
 ****************************************************************************/
 
 #![no_std]
+#![allow(non_upper_case_globals)]
+#![allow(non_camel_case_types)]
 
 mod constant_setting;
 use constant_setting::*;
@@ -45,8 +47,6 @@ use constant_setting::*;
 
 use hal_ll::uart::*;
 use hal_target::*;
-use hal_target::pin_names::*;
-use hal_gpio::*;
 use interrupt::interrupt_helper::*;
 
 use hal_ll::uart::hal_ll_uart_irq_t as hal_uart_irq_t;
@@ -59,7 +59,6 @@ pub use hal_ll::uart::HAL_LL_UART_PARITY_DEFAULT as HAL_UART_PARITY_DEFAULT;
 pub use hal_ll::uart::hal_ll_uart_data_bits_t as hal_uart_data_bits_t;
 pub use hal_ll::uart::HAL_LL_UART_DATA_BITS_DEFAULT as HAL_UART_DATA_BITS_DEFAULT;
 use ring::ring_buf8_t;
-use system::Delay_ms;
 
 type Result<T> = core::result::Result<T, HAL_UART_ERROR>;
 type Result_ring = core::result::Result<u8, ()>;
@@ -468,6 +467,7 @@ pub fn hal_uart_print(handle: &mut hal_uart_t, print_string: &str) -> Result<usi
     Ok(size_data_written)
 }
 
+#[allow(unused_assignments)]
 pub fn hal_uart_println(handle: &mut hal_uart_t, print_string: &str) -> Result<usize> {
     let hal_obj: &mut hal_uart_t = handle;
     let mut hal_handle: &mut hal_uart_handle_register_t;
@@ -831,6 +831,7 @@ fn is_buffer_empty(handle : &mut hal_uart_handle_register_t, event : hal_uart_ir
     
 }
 
+#[allow(unused_must_use)]
 fn buffer_push(handle : &mut hal_uart_handle_register_t, event : hal_uart_irq_t, data : u8) {
     unsafe{
         match get_handle_index(handle) {

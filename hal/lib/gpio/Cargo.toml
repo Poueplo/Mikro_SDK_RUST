@@ -16,5 +16,5 @@ lto = false
 
 
 [dependencies]
-hal_ll_gpio = { path = "../../../hal_ll/gpio/hal_ll_gpio" }
+hal_ll = { path = "../../../hal_ll" }
 hal_target = { path = "../../interface"}
