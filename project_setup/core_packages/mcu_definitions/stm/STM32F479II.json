@@ -74,7 +74,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "01000000",
                     "key": "PLLON",
                     "label": "Main PLL (PLL) enable",
                     "mask": "01000000",
@@ -403,7 +403,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "00005A00",
                     "key": "PLLN",
                     "label": "Main PLL (PLL) multiplication factor for VCO",
                     "mask": "00007FC0",
@@ -2502,7 +2502,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "04000000",
+                    "init": "09000000",
                     "key": "PLLQ",
                     "label": "Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks",
                     "mask": "0F000000",
@@ -2616,7 +2616,7 @@
             "fields": [
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "00000002",
                     "key": "SW",
                     "label": "System clock switch",
                     "mask": "00000003",
@@ -2686,7 +2686,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "00001400",
                     "key": "PPRE1",
                     "label": "APB low-speed prescaler (APB1)",
                     "mask": "00001C00",
@@ -2715,7 +2715,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "00008000",
                     "key": "PPRE2",
                     "label": "APB high-speed prescaler (APB2)",
                     "mask": "0000E000",
@@ -2881,7 +2881,7 @@
                 },
                 {
                     "hidden": false,
-                    "init": "00000000",
+                    "init": "00600000",
                     "key": "MCO1",
                     "label": "Microcontroller clock output 1",
                     "mask": "00600000",
@@ -3188,7 +3188,7 @@
     ],
     "core": "M4EF",
     "delay_src_path": "delays/m4ef/__lib_delays.c",
-    "clock": "1",
+    "clock": "180",
     "language_list": [
         {
             "language": "RUST",
