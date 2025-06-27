@@ -76,8 +76,11 @@ class MCUConfigurator(QWidget):
         self.field_widgets.clear()
         selected_mcu = self.mcu_combo.currentText()
         self.db_cursor.execute(f"SELECT FAMILY.VENDOR FROM MCU JOIN FAMILY ON MCU.FAMILY = FAMILY.NAME WHERE MCU.NAME = '{selected_mcu}'")
-        query_result = self.db_cursor.fetchall()[0]
-        vendor = query_result[0]
+        query_result = self.db_cursor.fetchall()
+        if not query_result:
+            return
+        query_data = query_result[0]
+        vendor = query_data[0]
         
         # Clear previous content
         for i in reversed(range(self.form_layout.count())):
@@ -193,6 +196,11 @@ class MCUConfigurator(QWidget):
         with open("memory.x", "w") as f:
             f.write(memory_x_contents)
 
+        with open(f"project_setup/core_packages/mcu_headers/{vendor}/{selected_mcu}/lib.rs", "r") as f:
+            mcu_header_contents = f.read()
+        with open("core/mcu_header/src/lib.rs", "w") as f:
+            f.write(mcu_header_contents)
+
         with open(f"project_setup/core_packages/startup/{vendor}/{selected_mcu.lower()}.s", "r") as f:
             startup_contents = f.read()
         with open("core/system_reset/src/startup_assembly.s", "w") as f:
@@ -228,6 +236,15 @@ class MCUConfigurator(QWidget):
         core_header_output.append(f"pub const FOSC_KHZ_VALUE : u32 = {clock_int * 1000};")
         with open("core/system/src/core_header.rs", "w") as f:
             f.write("\n".join(core_header_output))
+
+        self.db_cursor.execute(f"SELECT SYSTEM_LIB FROM MCU WHERE NAME = '{selected_mcu}'")
+        query_result = self.db_cursor.fetchall()[0]
+        system_lib = query_result[0]
+
+        with open(f"core/system/system_implementations/{vendor}/{system_lib}.rs", "r") as f:
+            system_contents = f.read()
+        with open("core/system/src/lib.rs", "w") as f:
+            f.write(system_contents)
 
 
 
