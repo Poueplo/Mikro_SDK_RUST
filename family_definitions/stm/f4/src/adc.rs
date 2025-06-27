@@ -40,8 +40,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
-use hal_ll_pin_names::*;
-
+use crate::gpio::*;
 
 #[repr(u8)]
 #[derive(Clone, Copy)]

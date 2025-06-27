@@ -39,6 +39,8 @@
 
 #![no_std]
 
+pub mod gpio;
+
 #[cfg(feature = "adc")]
 pub mod adc;
 

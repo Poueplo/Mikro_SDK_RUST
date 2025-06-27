@@ -40,7 +40,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-pub use hal_ll_pin_names::*;
+pub use crate::gpio::*;
 
 #[cfg(feature = "uart1")]
 pub const HAL_LL_UART1_GPIO_AF7: u8 = 7;

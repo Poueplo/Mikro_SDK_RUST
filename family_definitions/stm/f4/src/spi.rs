@@ -40,7 +40,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
-use hal_ll_pin_names::*;
+use crate::gpio::*;
 
 
 #[cfg(feature = "spi1")]
@@ -249,6 +249,8 @@ pub const _spi_mosi_map: &[hal_ll_spi_master_pin_map_t] =
     hal_ll_spi_master_pin_map_t{ pin: GPIO_F11, base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8), af: HAL_LL_SPI5_MASTER_GPIO_AF5 as u32},
     #[cfg(all(feature = "spi5", feature = "spi5_mosi_a10_af6"))]
     hal_ll_spi_master_pin_map_t{ pin: GPIO_A10, base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8), af: HAL_LL_SPI5_MASTER_GPIO_AF6 as u32},
+    #[cfg(all(feature = "spi5", feature = "spi5_mosi_b8_af6"))]
+    hal_ll_spi_master_pin_map_t{ pin: GPIO_B8, base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8), af: HAL_LL_SPI5_MASTER_GPIO_AF6 as u32},
     #[cfg(all(feature = "spi5", feature = "spi5_mosi_e6_af6"))]
     hal_ll_spi_master_pin_map_t{ pin: GPIO_E6, base: SPI5_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8), af: HAL_LL_SPI5_MASTER_GPIO_AF6 as u32},
     #[cfg(all(feature = "spi5", feature = "spi5_mosi_e14_af6"))]

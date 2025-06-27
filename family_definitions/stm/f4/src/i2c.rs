@@ -41,7 +41,7 @@
 #![allow(non_upper_case_globals)]
 
 
-use hal_ll_pin_names::*;
+use crate::gpio::*;
 
 pub const HAL_LL_I2C_AFIO_MAPR_REMAP : u32 = 0x2;
 pub const HAL_LL_I2C_REMAP_DISABLE : u32 = 0;

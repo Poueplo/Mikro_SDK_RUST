@@ -41,7 +41,7 @@
 #![allow(non_upper_case_globals)]
 
 
-pub use hal_ll_pin_names::*;
+pub use crate::gpio::*;
 
 #[cfg(feature = "tim1")]
 pub const HAL_LL_TIM1_GPIO_AF1 : u8 = 1;
@@ -282,8 +282,8 @@ pub static _tim_map : &[hal_ll_tim_pin_map_t] = & [
     // hal_ll_tim_pin_map_t{ pin: GPIO_H12, base: TIM5_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_3, af: HAL_LL_TIM5_GPIO_AF2 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) },
     #[cfg(all(feature = "tim5", feature = "tim5_ch4_a3_af2"))]
     hal_ll_tim_pin_map_t{ pin: GPIO_A3, base: TIM5_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM5_GPIO_AF2 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) },
-    // #[cfg(all(feature = "tim5", feature = ""))]
-    // hal_ll_tim_pin_map_t{ pin: GPIO_I0, base: TIM5_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM5_GPIO_AF2 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) },
+    #[cfg(all(feature = "tim5", feature = "tim5_ch4_i0_af2"))]
+    hal_ll_tim_pin_map_t{ pin: GPIO_I0, base: TIM5_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM5_GPIO_AF2 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) },
 
     //TIM8
     #[cfg(all(feature = "tim8", feature = "tim8_ch1_c6_af3"))]
@@ -292,7 +292,7 @@ pub static _tim_map : &[hal_ll_tim_pin_map_t] = & [
     hal_ll_tim_pin_map_t{ pin: GPIO_I5, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_1, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
     #[cfg(all(feature = "tim8", feature = "tim8_ch2_c7_af3"))]
     hal_ll_tim_pin_map_t{ pin: GPIO_C7, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_2, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
-    #[cfg(all(feature = "tim8", feature = "tim5_ch1_a0_af2"))]
+    #[cfg(all(feature = "tim8", feature = "tim8_ch2_i6_af3"))]
     hal_ll_tim_pin_map_t{ pin: GPIO_I6, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_2, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
     #[cfg(all(feature = "tim8", feature = "tim8_ch3_c8_af3"))]
     hal_ll_tim_pin_map_t{ pin: GPIO_C8, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_3, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
@@ -300,8 +300,8 @@ pub static _tim_map : &[hal_ll_tim_pin_map_t] = & [
     hal_ll_tim_pin_map_t{ pin: GPIO_I7, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_3, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
     #[cfg(all(feature = "tim8", feature = "tim8_ch4_c9_af3"))]
     hal_ll_tim_pin_map_t{ pin: GPIO_C9, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
-    #[cfg(all(feature = "tim8", feature = "tim5_ch1_a0_af2"))]
-    hal_ll_tim_pin_map_t{ pin: GPIO_I2, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
+    // #[cfg(all(feature = "tim8", feature = ""))]
+    // hal_ll_tim_pin_map_t{ pin: GPIO_I2, base: TIM8_BASE_ADDR, channel: hal_ll_tim_channel_t::HAL_LL_TIM_CHANNEL_4, af: HAL_LL_TIM8_GPIO_AF3 as u32, module_index: hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) },
 
     //TIM9
     #[cfg(all(feature = "tim9", feature = "tim9_ch1_a2_af3"))]
