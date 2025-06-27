@@ -19,4 +19,16 @@ lto = false
 hal_ll_pin_names = {path = "../hal_ll_pin_names"}
 bit_control = {path = "../../core/bit_control"}
 
+
 [features]
+gpioa = ["hal_ll_pin_names/gpioa"]
+gpiob = ["hal_ll_pin_names/gpiob"]
+gpioc = ["hal_ll_pin_names/gpioc"]
+gpiod = ["hal_ll_pin_names/gpiod"]
+gpioe = ["hal_ll_pin_names/gpioe"]
+gpiof = ["hal_ll_pin_names/gpiof"]
+gpiog = ["hal_ll_pin_names/gpiog"]
+gpioh = ["hal_ll_pin_names/gpioh"]
+gpioi = ["hal_ll_pin_names/gpioi"]
+gpioj = ["hal_ll_pin_names/gpioj"]
+gpiok = ["hal_ll_pin_names/gpiok"]

@@ -39,32 +39,22 @@
 
 #![no_std]
 
+pub mod gpio;
+pub mod gpio_port;
+
 #[cfg(feature = "adc")]
-pub mod adc {
-    pub use hal_ll_adc::*;
-}
+pub mod adc;
 
 #[cfg(feature = "i2c")]
-pub mod i2c_master {
-    pub use hal_ll_i2c_master::*;
-}
+pub mod i2c_master;
 
 #[cfg(feature = "spi")]
-pub mod spi_master {
-    pub use hal_ll_spi_master::*;
-}
+pub mod spi_master;
 
 #[cfg(feature = "tim")]
-pub mod tim {
-    pub use hal_ll_tim::*;
-}
-
+pub mod tim;
 #[cfg(feature = "uart")]
-pub mod uart {
-    pub use hal_ll_uart::*;
-}
+pub mod uart;
 
 #[cfg(feature = "one_wire")]
-pub mod one_wire {
-    pub use hal_ll_one_wire::*;
-}
+pub mod one_wire;

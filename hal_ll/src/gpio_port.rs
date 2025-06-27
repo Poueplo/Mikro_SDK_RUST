@@ -48,6 +48,7 @@
 pub use hal_ll_target::pin_names;
 use hal_ll_target::*;
 use hal_ll_gpio_constants::*;
+use system::{RCC_TypeDef, RCC_BASE};
 pub mod gpio_constants {
     pub use hal_ll_gpio_constants::{
         GPIO_CFG_MODE_ALT_FUNCTION,
@@ -102,19 +103,52 @@ pub enum hal_ll_gpio_direction_t
 pub type hal_ll_gpio_pin_t = hal_ll_gpio_t;
 pub type hal_ll_gpio_port_t = hal_ll_gpio_t;
 
-const _hal_ll_gpio_port_base: [u32; 11 ] =
+const _hal_ll_gpio_port_base: [u32; 11] =
 [
+    #[cfg(feature = "gpioa")]
     GPIOA_BASE_ADDR,
+    #[cfg(not(feature = "gpioa"))]
+    0,
+    #[cfg(feature = "gpiob")]
     GPIOB_BASE_ADDR,
+    #[cfg(not(feature = "gpiob"))]
+    0,
+    #[cfg(feature = "gpioc")]
     GPIOC_BASE_ADDR,
+    #[cfg(not(feature = "gpioc"))]
+    0,
+    #[cfg(feature = "gpiod")]
     GPIOD_BASE_ADDR,
+    #[cfg(not(feature = "gpiod"))]
+    0,
+    #[cfg(feature = "gpioe")]
     GPIOE_BASE_ADDR,
+    #[cfg(not(feature = "gpioe"))]
+    0,
+    #[cfg(feature = "gpiof")]
     GPIOF_BASE_ADDR,
+    #[cfg(not(feature = "gpiof"))]
+    0,
+    #[cfg(feature = "gpiog")]
     GPIOG_BASE_ADDR,
+    #[cfg(not(feature = "gpiog"))]
+    0,
+    #[cfg(feature = "gpioh")]
     GPIOH_BASE_ADDR,
+    #[cfg(not(feature = "gpioh"))]
+    0,
+    #[cfg(feature = "gpioi")]
     GPIOI_BASE_ADDR,
+    #[cfg(not(feature = "gpioi"))]
+    0,
+    #[cfg(feature = "gpioj")]
     GPIOJ_BASE_ADDR,
-    GPIOK_BASE_ADDR
+    #[cfg(not(feature = "gpioj"))]
+    0,
+    #[cfg(feature = "gpiok")]
+    GPIOK_BASE_ADDR,
+    #[cfg(not(feature = "gpiok"))]
+    0
 ];
 
 #[repr(C)]
@@ -131,8 +165,6 @@ pub struct hal_ll_gpio_base_handle_t
     pub afrl:    u32,
     pub afrh:    u32,
 }
-
-const RCC_GPIOCLOCK: u32 = RCC_AHB1ENR;
 
 fn hal_ll_gpio_pin_index(name: hal_ll_pin_name_t) -> u8
 {
@@ -184,22 +216,39 @@ pub fn hal_ll_gpio_module_struct_init(module: &mut module_struct, state: bool)
 //TODO : optimize per MCU
 fn hal_ll_gpio_clock_enable(port: u32) {
     let mut pos = 0;
-
+    
     unsafe 
     {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        let RCC_GPIOCLOCK: *mut u32 = &mut (*rcc_ptr).AHB1ENR;
 
         match port & 0xFFFFFC00 {
+            #[cfg(feature = "gpioa")]
             GPIOA_BASE_ADDR => {pos = 0x1;},
+            #[cfg(feature = "gpiob")]
             GPIOB_BASE_ADDR => {pos = 0x2;},
+            #[cfg(feature = "gpioc")]
             GPIOC_BASE_ADDR => {pos = 0x4;},
+            #[cfg(feature = "gpiod")]
             GPIOD_BASE_ADDR => {pos = 0x8;},
+            #[cfg(feature = "gpioe")]
             GPIOE_BASE_ADDR => {pos = 0x10;},
+            #[cfg(feature = "gpiof")]
             GPIOF_BASE_ADDR => {pos = 0x20;},
+            #[cfg(feature = "gpiog")]
             GPIOG_BASE_ADDR => {pos = 0x40;},
+            #[cfg(feature = "gpioh")]
+            GPIOH_BASE_ADDR => {pos = 0x80;},
+            #[cfg(feature = "gpioi")]
+            GPIOI_BASE_ADDR => {pos = 0x100;},
+            #[cfg(feature = "gpioj")]
+            GPIOJ_BASE_ADDR => {pos = 0x200;},
+            #[cfg(feature = "gpiok")]
+            GPIOK_BASE_ADDR => {pos = 0x400;},
             _ => {}
         }
 
-        *(RCC_GPIOCLOCK as *mut u32) |= pos;
+        *RCC_GPIOCLOCK |= pos;
     }
 }
 

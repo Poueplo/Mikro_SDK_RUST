@@ -37,16 +37,15 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
 use hal_ll_target::*;
 pub use mcu_definition::uart::*;
-use hal_ll_gpio::*;
-use hal_ll_gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
+use crate::gpio::*;
+use crate::gpio::gpio_constants::*;
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 use interrupt::interrupt_helper::*;
 use core::fmt;
 
@@ -70,6 +69,51 @@ const HAL_LL_UART7EN  : u32 = 30;
 const HAL_LL_UART8EN  : u32 = 31;
 // const HAL_LL_UART9EN  : u32 =  6;
 // const HAL_LL_UART10EN : u32 =  7;
+
+#[cfg(feature = "uart1")]
+pub const uart_index_1: usize = 0;
+#[cfg(feature = "uart2")]
+pub const uart_index_2: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 };
+#[cfg(feature = "uart3")]
+pub const uart_index_3: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 };
+#[cfg(feature = "uart4")]
+pub const uart_index_4: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 }
+    + if cfg!(feature = "uart3") { 1 } else { 0 };
+#[cfg(feature = "uart5")]
+pub const uart_index_5: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 }
+    + if cfg!(feature = "uart3") { 1 } else { 0 }
+    + if cfg!(feature = "uart4") { 1 } else { 0 };
+#[cfg(feature = "uart6")]
+pub const uart_index_6: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 }
+    + if cfg!(feature = "uart3") { 1 } else { 0 }
+    + if cfg!(feature = "uart4") { 1 } else { 0 }
+    + if cfg!(feature = "uart5") { 1 } else { 0 };
+#[cfg(feature = "uart7")]
+pub const uart_index_7: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 }
+    + if cfg!(feature = "uart3") { 1 } else { 0 }
+    + if cfg!(feature = "uart4") { 1 } else { 0 }
+    + if cfg!(feature = "uart5") { 1 } else { 0 }
+    + if cfg!(feature = "uart6") { 1 } else { 0 };
+#[cfg(feature = "uart8")]
+pub const uart_index_8: usize = 0
+    + if cfg!(feature = "uart1") { 1 } else { 0 }
+    + if cfg!(feature = "uart2") { 1 } else { 0 }
+    + if cfg!(feature = "uart3") { 1 } else { 0 }
+    + if cfg!(feature = "uart4") { 1 } else { 0 }
+    + if cfg!(feature = "uart5") { 1 } else { 0 }
+    + if cfg!(feature = "uart6") { 1 } else { 0 }
+    + if cfg!(feature = "uart7") { 1 } else { 0 };
 
 // const HAL_LL_UART_IT_CLEAR_MASK : u32 = 0x360;
 const HAL_LL_UART_IT_CR1_MASK : u32 = 0x1F0;
@@ -589,78 +633,82 @@ fn hal_ll_uart_alternate_functions_set_state(map: &mut hal_ll_uart_hw_specifics_
 }
 
 fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state : bool) {
-    #[cfg(feature = "uart1")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        #[cfg(feature = "uart1")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART1EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART1EN );
+            }
+        }
+        #[cfg(feature = "uart2")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART2EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART2EN );
+            }
+        }
+        #[cfg(feature = "uart3")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART3EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART3EN );
+            }
+        }
+        #[cfg(feature = "uart4")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART4EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART4EN );
+            }
+        }
+        #[cfg(feature = "uart5")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART5EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART5EN );
+            }
+        }
+        #[cfg(feature = "uart6")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART6EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART6EN );
+            }
+        }
+        #[cfg(feature = "uart7")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART7EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART7EN );
+            }
+        }
+        #[cfg(feature = "uart8")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART8EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART8EN );
+            }
         }
     }
-    #[cfg(feature = "uart2")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
-        }
-    }
-    #[cfg(feature = "uart3")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
-        }
-    }
-    #[cfg(feature = "uart4")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
-        }
-    }
-    #[cfg(feature = "uart5")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
-        }
-    }
-    #[cfg(feature = "uart6")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
-        }
-    }
-    #[cfg(feature = "uart7")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
-        }
-    }
-    #[cfg(feature = "uart8")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART8EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART8EN );
-        }
-    }
+    
 }
 
 fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {
@@ -887,7 +935,7 @@ pub extern "Rust" fn UART1_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[0], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -895,7 +943,7 @@ pub extern "Rust" fn UART1_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[0], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -912,7 +960,7 @@ pub extern "Rust" fn UART2_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -920,7 +968,7 @@ pub extern "Rust" fn UART2_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -937,7 +985,7 @@ pub extern "Rust" fn UART3_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -945,7 +993,7 @@ pub extern "Rust" fn UART3_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -962,7 +1010,7 @@ pub extern "Rust" fn UART4_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -970,7 +1018,7 @@ pub extern "Rust" fn UART4_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -986,7 +1034,7 @@ pub extern "Rust" fn UART5_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -994,7 +1042,7 @@ pub extern "Rust" fn UART5_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -1011,7 +1059,7 @@ pub extern "Rust" fn UART6_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -1019,7 +1067,7 @@ pub extern "Rust" fn UART6_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -1036,7 +1084,7 @@ pub extern "Rust" fn UART7_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -1044,7 +1092,7 @@ pub extern "Rust" fn UART7_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }
@@ -1061,7 +1109,7 @@ pub extern "Rust" fn UART8_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+                irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
             }
         }
 
@@ -1069,7 +1117,7 @@ pub extern "Rust" fn UART8_IRQHandler() {
             
             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+                irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
             }
         }
     }

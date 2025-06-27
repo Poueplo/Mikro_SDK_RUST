@@ -16,63 +16,73 @@ lto = false
 
 
 [dependencies]
-
-hal_ll_adc = {path = "{adc_path}", optional = true}
-hal_ll_i2c_master = {path = "{i2c_path}", optional = true}
-hal_ll_spi_master = {path = "{spi_path}", optional = true}
-hal_ll_tim = {path = "{tim_path}", optional = true}
-hal_ll_uart = {path = "{uart_path}", optional = true}
-hal_ll_one_wire = {path = "{one_wire_path}", optional = true}
-
-
+hal_ll_target = {path = "hal_ll_target"}
+hal_ll_gpio_constants = {path = "gpio/hal_ll_gpio_constants"}
 system = {path = "../core/system"}
+mcu_definition = {path = "../family_definitions/stm/f4"}
+
+interrupt = {path = "../core/interrupt", optional = true}
 
 [features]
-adc = ["hal_ll_adc/adc", "dep:hal_ll_adc", {adc}]
+default = [{gpio}]
 
-adc1 = ["hal_ll_adc/adc1"]
-adc2 = ["hal_ll_adc/adc2"]
-adc3 = ["hal_ll_adc/adc3"]
+gpioa = ["hal_ll_target/gpioa"]
+gpiob = ["hal_ll_target/gpiob"]
+gpioc = ["hal_ll_target/gpioc"]
+gpiod = ["hal_ll_target/gpiod"]
+gpioe = ["hal_ll_target/gpioe"]
+gpiof = ["hal_ll_target/gpiof"]
+gpiog = ["hal_ll_target/gpiog"]
+gpioh = ["hal_ll_target/gpioh"]
+gpioi = ["hal_ll_target/gpioi"]
+gpioj = ["hal_ll_target/gpioj"]
+gpiok = ["hal_ll_target/gpiok"]
 
-i2c = ["hal_ll_i2c_master/i2c", "dep:hal_ll_i2c_master",{i2c}]
+adc = ["mcu_definition/adc", {adc}]
 
-i2c1 = ["hal_ll_i2c_master/i2c1"]
-i2c2 = ["hal_ll_i2c_master/i2c2"]
-i2c3 = ["hal_ll_i2c_master/i2c3"]
+adc1 = ["mcu_definition/adc1"]
+adc2 = ["mcu_definition/adc2"]
+adc3 = ["mcu_definition/adc3"]
 
-spi = ["hal_ll_spi_master/spi", "dep:hal_ll_spi_master",{spi}]
+i2c = ["mcu_definition/i2c",{i2c}]
 
-spi1 = ["hal_ll_spi_master/spi1"]
-spi2 = ["hal_ll_spi_master/spi2"]
-spi3 = ["hal_ll_spi_master/spi3"]
-spi4 = ["hal_ll_spi_master/spi4"]
-spi5 = ["hal_ll_spi_master/spi5"]
-spi6 = ["hal_ll_spi_master/spi6"]
+i2c1 = ["mcu_definition/i2c1"]
+i2c2 = ["mcu_definition/i2c2"]
+i2c3 = ["mcu_definition/i2c3"]
 
-tim = ["hal_ll_tim/tim", "dep:hal_ll_tim",{tim}]
+spi = ["mcu_definition/spi",{spi}]
 
-tim1 = ["hal_ll_tim/tim1"]
-tim2 = ["hal_ll_tim/tim2"]
-tim3 = ["hal_ll_tim/tim3"]
-tim4 = ["hal_ll_tim/tim4"]
-tim5 = ["hal_ll_tim/tim5"]
-tim8 = ["hal_ll_tim/tim8"]
-tim9 = ["hal_ll_tim/tim9"]
-tim10 = ["hal_ll_tim/tim10"]
-tim11 = ["hal_ll_tim/tim11"]
-tim12 = ["hal_ll_tim/tim12"]
-tim13 = ["hal_ll_tim/tim13"]
-tim14 = ["hal_ll_tim/tim14"]
+spi1 = ["mcu_definition/spi1"]
+spi2 = ["mcu_definition/spi2"]
+spi3 = ["mcu_definition/spi3"]
+spi4 = ["mcu_definition/spi4"]
+spi5 = ["mcu_definition/spi5"]
+spi6 = ["mcu_definition/spi6"]
 
-uart = ["hal_ll_uart/uart", "dep:hal_ll_uart",{uart}]
+tim = ["mcu_definition/tim",{tim}]
 
-uart1 = ["hal_ll_uart/uart1"]
-uart2 = ["hal_ll_uart/uart2"]
-uart3 = ["hal_ll_uart/uart3"]
-uart4 = ["hal_ll_uart/uart4"]
-uart5 = ["hal_ll_uart/uart5"]
-uart6 = ["hal_ll_uart/uart6"]
-uart7 = ["hal_ll_uart/uart7"]
-uart8 = ["hal_ll_uart/uart8"]
+tim1 = ["mcu_definition/tim1"]
+tim2 = ["mcu_definition/tim2"]
+tim3 = ["mcu_definition/tim3"]
+tim4 = ["mcu_definition/tim4"]
+tim5 = ["mcu_definition/tim5"]
+tim8 = ["mcu_definition/tim8"]
+tim9 = ["mcu_definition/tim9"]
+tim10 = ["mcu_definition/tim10"]
+tim11 = ["mcu_definition/tim11"]
+tim12 = ["mcu_definition/tim12"]
+tim13 = ["mcu_definition/tim13"]
+tim14 = ["mcu_definition/tim14"]
 
-one_wire = ["hal_ll_one_wire/one_wire", "dep:hal_ll_one_wire"]
+uart = ["mcu_definition/uart", "dep:interrupt",{uart}]
+
+uart1 = ["mcu_definition/uart1"]
+uart2 = ["mcu_definition/uart2"]
+uart3 = ["mcu_definition/uart3"]
+uart4 = ["mcu_definition/uart4"]
+uart5 = ["mcu_definition/uart5"]
+uart6 = ["mcu_definition/uart6"]
+uart7 = ["mcu_definition/uart7"]
+uart8 = ["mcu_definition/uart8"]
+
+one_wire = []

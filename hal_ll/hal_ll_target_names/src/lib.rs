@@ -47,3 +47,8 @@ pub type hal_ll_pin_name_t = u8;
 pub type hal_ll_port_name_t = u8;
 pub type hal_ll_port_size_t = u16;
 // pub type hal_ll_channel_t = u8;
+
+
+pub const HAL_LL_PIN_NC : hal_ll_pin_name_t = 0xFF;
+pub const HAL_LL_PORT_NC : hal_ll_pin_name_t = 0xFF;
+pub const HAL_LL_MODULE_ERROR: u32 = 0xFFFF_FFFF;
