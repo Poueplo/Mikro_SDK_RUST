@@ -45,7 +45,7 @@ use hal_ll_target::*;
 pub use mcu_definition::uart::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 use interrupt::interrupt_helper::*;
 use core::fmt;
 
@@ -91,14 +91,14 @@ pub const uart_index_5: usize = 0
     + if cfg!(feature = "uart3") { 1 } else { 0 }
     + if cfg!(feature = "uart4") { 1 } else { 0 };
 #[cfg(feature = "uart6")]
-pub const uart_index_5: usize = 0
+pub const uart_index_6: usize = 0
     + if cfg!(feature = "uart1") { 1 } else { 0 }
     + if cfg!(feature = "uart2") { 1 } else { 0 }
     + if cfg!(feature = "uart3") { 1 } else { 0 }
     + if cfg!(feature = "uart4") { 1 } else { 0 }
     + if cfg!(feature = "uart5") { 1 } else { 0 };
 #[cfg(feature = "uart7")]
-pub const uart_index_5: usize = 0
+pub const uart_index_7: usize = 0
     + if cfg!(feature = "uart1") { 1 } else { 0 }
     + if cfg!(feature = "uart2") { 1 } else { 0 }
     + if cfg!(feature = "uart3") { 1 } else { 0 }
@@ -106,7 +106,7 @@ pub const uart_index_5: usize = 0
     + if cfg!(feature = "uart5") { 1 } else { 0 }
     + if cfg!(feature = "uart6") { 1 } else { 0 };
 #[cfg(feature = "uart8")]
-pub const uart_index_5: usize = 0
+pub const uart_index_8: usize = 0
     + if cfg!(feature = "uart1") { 1 } else { 0 }
     + if cfg!(feature = "uart2") { 1 } else { 0 }
     + if cfg!(feature = "uart3") { 1 } else { 0 }
@@ -633,78 +633,82 @@ fn hal_ll_uart_alternate_functions_set_state(map: &mut hal_ll_uart_hw_specifics_
 }
 
 fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state : bool) {
-    #[cfg(feature = "uart1")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_USART1EN );
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        #[cfg(feature = "uart1")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_1 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART1EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART1EN );
+            }
+        }
+        #[cfg(feature = "uart2")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART2EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART2EN );
+            }
+        }
+        #[cfg(feature = "uart3")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART3EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_USART3EN );
+            }
+        }
+        #[cfg(feature = "uart4")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART4EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART4EN );
+            }
+        }
+        #[cfg(feature = "uart5")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART5EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART5EN );
+            }
+        }
+        #[cfg(feature = "uart6")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART6EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_USART6EN );
+            }
+        }
+        #[cfg(feature = "uart7")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART7EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART7EN );
+            }
+        }
+        #[cfg(feature = "uart8")]
+        if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART8EN );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_UART8EN );
+            }
         }
     }
-    #[cfg(feature = "uart2")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_2 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_USART2EN );
-        }
-    }
-    #[cfg(feature = "uart3")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_3 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_USART3EN );
-        }
-    }
-    #[cfg(feature = "uart4")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_4 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART4EN );
-        }
-    }
-    #[cfg(feature = "uart5")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_5 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART5EN );
-        }
-    }
-    #[cfg(feature = "uart6")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_6 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_USART6EN );
-        }
-    }
-    #[cfg(feature = "uart7")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_7 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART7EN );
-        }
-    }
-    #[cfg(feature = "uart8")]
-    if map.module_index == hal_ll_uart_module_num(uart_modules::UART_MODULE_8 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_UART8EN );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_UART8EN );
-        }
-    }
+    
 }
 
 fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {

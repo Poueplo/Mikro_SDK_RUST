@@ -37,16 +37,15 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 #![allow(unused)]
 
 use hal_ll_target::*;
 pub use mcu_definition::spi::*;
-use hal_ll_gpio::*;
-use hal_ll_gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
+use crate::gpio::*;
+use crate::gpio::gpio_constants::*;
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 use core::fmt;
 
 pub const HAL_LL_SPI_MASTER_SPEED_100K : u32 = 100_000;
@@ -455,68 +454,68 @@ fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_s
         };
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
-
-    #[cfg(feature = "spi1")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_1 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_SPI1EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_SPI1EN_BIT );
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        #[cfg(feature = "spi1")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_1 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI1EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI1EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK2_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK2_Frequency;
-    }
 
-    #[cfg(feature = "spi2")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_SPI2EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_SPI2EN_BIT );
+        #[cfg(feature = "spi2")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_SPI2EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_SPI2EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK1_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK1_Frequency;
-    }
 
-    #[cfg(feature = "spi3")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_3 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_SPI3EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_SPI3EN_BIT );
+        #[cfg(feature = "spi3")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_3 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_SPI3EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_SPI3EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK1_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK1_Frequency;
-    }
 
-    #[cfg(feature = "spi4")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_4 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_SPI4EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_SPI4EN_BIT );
+        #[cfg(feature = "spi4")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_4 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI4EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI4EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK2_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK2_Frequency;
-    }
 
-    #[cfg(feature = "spi5")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_SPI5EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_SPI5EN_BIT );
+        #[cfg(feature = "spi5")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_5 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI5EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI5EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK2_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK2_Frequency;
-    }
 
-    #[cfg(feature = "spi6")]
-    if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_6 as u8){
-        if hal_ll_state {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_SPI6EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_SPI6EN_BIT );
+        #[cfg(feature = "spi6")]
+        if map.module_index == hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_6 as u8){
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI6EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_SPI6EN_BIT );
+            }
+            *clock_value = rcc_clocks.PCLK2_Frequency;
         }
-        *clock_value = rcc_clocks.PCLK2_Frequency;
     }
-    
-
 }
 
 fn hal_ll_spi_master_alternate_functions_set_state(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_state: bool) {

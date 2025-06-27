@@ -37,11 +37,9 @@
 **
 ****************************************************************************/
 
-#![no_std]
-
-use hal_ll_gpio_port::*;
-use hal_ll_gpio_port::pin_names::{hal_ll_port_name_t,hal_ll_port_size_t,hal_ll_gpio_mask_t, hal_ll_pin_name_t};
-pub use hal_ll_gpio_port::{
+use crate::gpio_port::*;
+use crate::gpio_port::pin_names::{hal_ll_port_name_t,hal_ll_port_size_t,hal_ll_gpio_mask_t, hal_ll_pin_name_t};
+pub use crate::gpio_port::{
     hal_ll_gpio_direction_t,
     hal_ll_gpio_port_t,
     hal_ll_gpio_pin_t,

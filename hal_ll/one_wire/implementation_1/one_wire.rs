@@ -37,14 +37,13 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
 
 
-use hal_ll_gpio::*;
-use hal_ll_gpio::pin_names::*;
+use crate::gpio::*;
+use crate::gpio::pin_names::*;
 use system::Delay_us;
 use core::fmt;
 

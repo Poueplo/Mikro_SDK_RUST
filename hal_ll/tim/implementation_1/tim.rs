@@ -37,15 +37,14 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
 use hal_ll_target::*;
 pub use mcu_definition::tim::*;
-use hal_ll_gpio::*;
-use hal_ll_gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
+use crate::gpio::*;
+use crate::gpio::gpio_constants::*;
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 use core::fmt;
 
 const HAL_LL_TIM_ENABLE_COUNTER_BIT: u32 = 0;
@@ -560,115 +559,117 @@ fn hal_ll_tim_map_pins(module_index: usize, config_index: usize, index: u8) {
 }
 
 fn hal_ll_tim_set_clock(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: bool) {
-    #[cfg(feature = "tim1")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_1 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_1 as u32);
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_1 as u32);
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+
+        #[cfg(feature = "tim1")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_1 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_1 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_1 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim2")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_2 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_2 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_2 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim3")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_3 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_3 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_3 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim4")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_4 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_4 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_4 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim5")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_5 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_5 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim8")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_8 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_8 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim9")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_9 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_9 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_9 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim10")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_10 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_10 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_10 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim11")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_11 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_11 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_11 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim12")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_12 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_12 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_12 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim13")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_13 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_13 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_13 as u32);
+            }
+        }
+
+        #[cfg(feature = "tim14")]
+        if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_14 as u8) {
+            if hal_ll_state  {
+                set_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_14 as u32);
+            } else {
+                clear_reg_bit(  &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_TIM_ENABLE_14 as u32);
+            }
         }
     }
-
-    #[cfg(feature = "tim2")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_2 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_2 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_2 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim3")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_3 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_3 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_3 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim4")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_4 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_4 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_4 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim5")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_5 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_5 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_5 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim8")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_8 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_8 as u32);
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_8 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim9")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_9 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_9 as u32);
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_9 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim10")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_10 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_10 as u32);
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_10 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim11")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_11 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_11 as u32);
-        } else {
-            clear_reg_bit( RCC_APB2ENR, HAL_LL_TIM_ENABLE_11 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim12")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_12 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_12 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_12 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim13")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_13 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_13 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_13 as u32);
-        }
-    }
-
-    #[cfg(feature = "tim14")]
-    if map.module_index == hal_ll_tim_module_num(tim_modules::TIM_MODULE_14 as u8) {
-        if hal_ll_state  {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_14 as u32);
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_TIM_ENABLE_14 as u32);
-        }
-    }
-
-
 }
 
 fn hal_ll_tim_alternate_functions_set_state(map: &mut hal_ll_tim_hw_specifics_map_t, hal_ll_state: bool) {

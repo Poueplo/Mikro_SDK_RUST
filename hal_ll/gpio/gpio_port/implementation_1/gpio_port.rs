@@ -48,6 +48,7 @@
 pub use hal_ll_target::pin_names;
 use hal_ll_target::*;
 use hal_ll_gpio_constants::*;
+use system::{RCC_TypeDef, RCC_BASE};
 pub mod gpio_constants {
     pub use hal_ll_gpio_constants::{
         GPIO_CFG_MODE_ALT_FUNCTION,
@@ -165,8 +166,6 @@ pub struct hal_ll_gpio_base_handle_t
     pub afrh:    u32,
 }
 
-const RCC_GPIOCLOCK: u32 = RCC_AHB1ENR;
-
 fn hal_ll_gpio_pin_index(name: hal_ll_pin_name_t) -> u8
 {
     name % PORT_SIZE
@@ -217,9 +216,11 @@ pub fn hal_ll_gpio_module_struct_init(module: &mut module_struct, state: bool)
 //TODO : optimize per MCU
 fn hal_ll_gpio_clock_enable(port: u32) {
     let mut pos = 0;
-
+    
     unsafe 
     {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        let RCC_GPIOCLOCK: *mut u32 = &mut (*rcc_ptr).AHB1ENR;
 
         match port & 0xFFFFFC00 {
             #[cfg(feature = "gpioa")]
@@ -247,7 +248,7 @@ fn hal_ll_gpio_clock_enable(port: u32) {
             _ => {}
         }
 
-        *(RCC_GPIOCLOCK as *mut u32) |= pos;
+        *RCC_GPIOCLOCK |= pos;
     }
 }
 

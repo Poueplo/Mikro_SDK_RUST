@@ -37,14 +37,13 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 #![allow(unreachable_patterns)]
 
 use hal_ll_target::*;
-use hal_ll_gpio_port::{hal_ll_gpio_analog_input,hal_ll_gpio_port_base,hal_ll_gpio_port_index,hal_ll_gpio_pin_mask};
-use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef};
+use crate::gpio_port::{hal_ll_gpio_analog_input,hal_ll_gpio_port_base,hal_ll_gpio_port_index,hal_ll_gpio_pin_mask};
+use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 pub use mcu_definition::adc::*;
 use core::fmt;
 
@@ -450,33 +449,21 @@ fn hal_ll_get_specifics<'a>( handle: hal_ll_adc_handle_register_t ) -> &'a mut h
     }
 }
 
-#[cfg(feature = "adc1")]
-fn adc1_enable_clock(){
-    set_reg_bit( RCC_APB2ENR, HAL_LL_ADC1_ENABLE_CLOCK);
-}
-
-#[cfg(feature = "adc2")]
-fn adc2_enable_clock(){
-    set_reg_bit(RCC_APB2ENR, HAL_LL_ADC2_ENABLE_CLOCK);
-}
-
-#[cfg(feature = "adc3")]
-fn adc3_enable_clock(){
-    set_reg_bit(RCC_APB2ENR, HAL_LL_ADC3_ENABLE_CLOCK);
-}
-
 fn _hal_ll_adc_enable_clock(base :  u8) {
-    #[cfg(feature = "adc1")]
-    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_1 as u8) 
-    {adc1_enable_clock();}
-    
-    #[cfg(feature = "adc2")]
-    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_2 as u8) 
-    {adc2_enable_clock();}
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        #[cfg(feature = "adc1")]
+        if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_1 as u8) 
+        {set_reg_bit( &(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_ADC1_ENABLE_CLOCK);}
+        
+        #[cfg(feature = "adc2")]
+        if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_2 as u8) 
+        {set_reg_bit(&(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_ADC2_ENABLE_CLOCK);}
 
-    #[cfg(feature = "adc3")]
-    if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_3 as u8) 
-    {adc3_enable_clock();}    
+        #[cfg(feature = "adc3")]
+        if base == hal_ll_adc_module_num(adc_modules::ADC_MODULE_3 as u8) 
+        {set_reg_bit(&(*rcc_ptr).APB2ENR as *const u32 as u32, HAL_LL_ADC3_ENABLE_CLOCK);} 
+    }
 }
 
 fn _hal_ll_adc_hw_init(base : u32, resolution : u32,  channel : u16) {

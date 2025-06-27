@@ -37,15 +37,14 @@
 **
 ****************************************************************************/
 
-#![no_std]
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
 use hal_ll_target::*;
 pub use mcu_definition::i2c::*;
-use hal_ll_gpio::*;
-use hal_ll_gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef};
+use crate::gpio::*;
+use crate::gpio::gpio_constants::*;
+use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 use core::fmt;
 use core::arch::asm;
 
@@ -703,31 +702,34 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_i2c_master_handle_register_t) -> &'a 
 }
 
 fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_state: bool) {
-    #[cfg(feature = "i2c1")]
-    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_I2C1EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_I2C1EN_BIT );
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        #[cfg(feature = "i2c1")]
+        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
+            }
         }
-    }
-    #[cfg(feature = "i2c2")]
-    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_I2C2EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_I2C2EN_BIT );
+        #[cfg(feature = "i2c2")]
+        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
+            }
         }
-    }
-    #[cfg(feature = "i2c3")]
-    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8)
-    {
-        if hal_ll_state {
-            set_reg_bit( RCC_APB1ENR, HAL_LL_I2C3EN_BIT );
-        } else {
-            clear_reg_bit( RCC_APB1ENR, HAL_LL_I2C3EN_BIT );
+        #[cfg(feature = "i2c3")]
+        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8)
+        {
+            if hal_ll_state {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
+            } else {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
+            }
         }
     }
 }
