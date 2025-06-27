@@ -6,7 +6,7 @@
 
 use core::arch::global_asm;
 
-global_asm!(include_str!("stm32f429zi.s"));
+global_asm!(include_str!("startup_assembly.s"));
 
 #[unsafe(no_mangle)]
 pub extern "C" fn Reset() -> ! {

@@ -39,43 +39,12 @@
 
 #![no_std]
 #![allow(non_upper_case_globals)]
-//for STM32F429ZI
-pub const APB1_BASE_ADDR: u32 = 0x4000_0000;
-pub const APB2_BASE_ADDR: u32 = 0x4001_0000;
-pub const AHB1_BASE_ADDR: u32 = 0x4002_0000;
 
-//present in hal_ll_gpio_port
-pub const GPIOA_BASE_ADDR: u32 = AHB1_BASE_ADDR;
-pub const GPIOB_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x0400;
-pub const GPIOC_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x0800;
-pub const GPIOD_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x0C00;
-pub const GPIOE_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x1000;
-pub const GPIOF_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x1400;
-pub const GPIOG_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x1800;
-pub const GPIOH_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x1C00;
-pub const GPIOI_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x2000;
-pub const GPIOJ_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x2400;
-pub const GPIOK_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x2800;
+use crate::core_header::*;
 
-pub const PORT_SIZE: u8 = 16;
-
-//present in core_header.h
-pub const ADDRESS_RCC_CR         : u32 = 0x40023800;
-pub const VALUE_RCC_CR           : u32 = 0x1000081;
-pub const ADDRESS_RCC_PLLCFGR    : u32 = 0x40023804;
-pub const VALUE_RCC_PLLCFGR      : u32 = 0x29005A10;
-pub const ADDRESS_RCC_CFGR       : u32 = 0x40023808;
-pub const VALUE_RCC_CFGR         : u32 = 0x609402;
-pub const ADDRESS_SVRANGE        : u32 = 0x400FE070;
-pub const VALUE_SVRANGE          : u32 = 0x3;
-pub const ADDRESS_RCC_PLLSAICFGR : u32 = 0x40023888;
-pub const VALUE_RCC_PLLSAICFGR   : u32 = 0x24003000;
-pub const FOSC_KHZ_VALUE         : u32 = 180000;
-
-
-//prsent in mcu_header
-pub const RCC_BASE_ADDR: u32 = AHB1_BASE_ADDR + 0x3800;
-pub const PWR_BASE_ADDR: u32 = APB1_BASE_ADDR + 0x7000;
+//present in mcu_header
+pub const RCC_BASE_ADDR: u32 = ADDRESS_RCC_CR;
+pub const PWR_BASE_ADDR: u32 = 0x4000_7000;
 
 // =========== RCC REGISTERS =========== 
 

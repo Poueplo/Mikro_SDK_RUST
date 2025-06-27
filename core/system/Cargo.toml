@@ -16,6 +16,6 @@ lto = false
 
 
 [dependencies]
-mcu = { path = "../mcu"}
 common_header = { path = "../common_header"}
+mcu_header = { path = "../mcu_header"}
 system_reset = { path = "../system_reset" }

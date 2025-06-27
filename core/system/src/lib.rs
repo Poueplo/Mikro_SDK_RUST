@@ -46,12 +46,21 @@
 
 use core::arch::asm;
 
-//use crate::core_header::*;
-//use crate::mcu_headers::mcu::*;
+mod core_header;
 
-use mcu::*;
+pub use mcu_header::{RCC_TypeDef, RCC_BASE};
+use mcu_header::{ RCC_CR_HSION_Pos, RCC_CR_HSEBYP_Pos, PWR_TypeDef, PWR_BASE, 
+    FLASH_TypeDef, FLASH_R_BASE, RCC_CFGR_HPRE_Msk, RCC_CFGR_HPRE_Pos, RCC_CFGR_PPRE1_Msk, 
+    RCC_CFGR_PPRE1_Pos, RCC_CFGR_PPRE2_Msk, RCC_CFGR_PPRE2_Pos, RCC_APB1ENR_PWREN_Pos, 
+    PWR_CR_ODEN_Pos, PWR_CSR_ODRDY_Pos, PWR_CR_ODSWEN_Pos, PWR_CSR_ODSWRDY_Pos, FLASH_ACR_PRFTEN_Pos, 
+    FLASH_ACR_ICEN_Pos, FLASH_ACR_LATENCY_8WS, FLASH_ACR_LATENCY_7WS, FLASH_ACR_LATENCY_6WS, FLASH_ACR_LATENCY_5WS, 
+    FLASH_ACR_LATENCY_4WS, FLASH_ACR_LATENCY_3WS, FLASH_ACR_LATENCY_2WS, FLASH_ACR_LATENCY_1WS, FLASH_ACR_LATENCY_Msk,
+    RCC_CR_HSIRDY_Pos, RCC_CR_HSEON_Pos, RCC_CR_HSERDY_Pos, RCC_CR_PLLON_Pos, RCC_CR_PLLRDY_Pos, RCC_CFGR_SWS_Msk};
+
 use common_header::*;
+use core_header::*;
 use system_reset::*;
+
 
 const ADDRESS_SCB_AIRCR     : u32 = 0xE000ED0C;
 const SCB_AIRCR_SYSRESETREQ : u8  = 2;
@@ -121,54 +130,60 @@ pub fn system_reset()
 */
 
 pub fn system_clock_set_default() {
-    /* Set HSION bit */
-    reg_value_set_bit(RCC_CR as *mut u32, RCC_CR_HSION_Pos);
+    unsafe{
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        /* Set HSION bit */
+        reg_value_set_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_HSION_Pos);
 
-    /* Reset CFGR register */
-    reg_value_clear_mask(RCC_CFGR as *mut u32, 0x007F0000);
+        /* Reset CFGR register */
+        reg_value_clear_mask(&(*rcc_ptr).CFGR as *const u32 as *mut u32, 0x007F0000);
 
-    /* Reset HSEON, CSSON and PLLON bits */
-    reg_value_clear_mask(RCC_CR as *mut u32, 0xFEF6FFFF);
+        /* Reset HSEON, CSSON and PLLON bits */
+        reg_value_clear_mask(&(*rcc_ptr).CR as *const u32 as *mut u32, 0xFEF6FFFF);
 
-    /* Reset PLLSRC, PLLXTPRE, PLLM and USBPRE bits */
-    reg_value_clear_mask(RCC_CFGR as *mut u32, 0x24003010);
+        /* Reset PLLSRC, PLLXTPRE, PLLM and USBPRE bits */
+        reg_value_clear_mask(&(*rcc_ptr).CFGR as *const u32 as *mut u32, 0x24003010);
 
-    /* Reset HSEBYP bit */
-    reg_value_clear_bit(RCC_CR as *mut u32, RCC_CR_HSEBYP_Pos);
+        /* Reset HSEBYP bit */
+        reg_value_clear_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_HSEBYP_Pos);
 
-    // Disable all interrupts and clear pending bits
-    reg_value_clear(RCC_CIR as *mut u32);
+        // Disable all interrupts and clear pending bits
+        reg_value_clear(&(*rcc_ptr).CIR as *const u32 as *mut u32);
+    }
+    
 }
 
 pub fn rcc_get_clocks_frequency(rcc_clocks: &mut RCC_ClocksTypeDef) {
     let mut tmp: u32;
     let mut presc: u8;
+    unsafe{
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        rcc_clocks.HCLK_Frequency = FOSC_KHZ_VALUE * 1000;
 
-    rcc_clocks.HCLK_Frequency = FOSC_KHZ_VALUE * 1000;
+        /*------ Compute HCLK, PCLK1, and PCLK2 clocks frequencies ------*/
 
-    /*------ Compute HCLK, PCLK1, and PCLK2 clocks frequencies ------*/
+        /* Get HCLK prescaler */
+        tmp = (reg_value_get(&(*rcc_ptr).CFGR as *const u32 as *mut u32) & RCC_CFGR_HPRE_Msk) >> RCC_CFGR_HPRE_Pos;
+        presc = APBAHBPrescTable[tmp as usize];
 
-    /* Get HCLK prescaler */
-    tmp = (reg_value_get(RCC_CFGR as *mut u32) & RCC_CFGR_HPRE_Msk) >> RCC_CFGR_HPRE_Pos;
-    presc = APBAHBPrescTable[tmp as usize];
+        /* HCLK clock frequency */
+        rcc_clocks.SYSCLK_Frequency = rcc_clocks.HCLK_Frequency << presc;
 
-    /* HCLK clock frequency */
-    rcc_clocks.SYSCLK_Frequency = rcc_clocks.HCLK_Frequency << presc;
+        /* Get PCLK1 prescaler */
+        tmp = (reg_value_get(&(*rcc_ptr).CFGR as *const u32 as *mut u32) & RCC_CFGR_PPRE1_Msk) >> RCC_CFGR_PPRE1_Pos;
+        presc = APBAHBPrescTable[tmp as usize];
 
-    /* Get PCLK1 prescaler */
-    tmp = (reg_value_get(RCC_CFGR as *mut u32) & RCC_CFGR_PPRE1_Msk) >> RCC_CFGR_PPRE1_Pos;
-    presc = APBAHBPrescTable[tmp as usize];
+        /* PCLK1 clock frequency */
+        rcc_clocks.PCLK1_Frequency = rcc_clocks.HCLK_Frequency >> presc;
 
-    /* PCLK1 clock frequency */
-    rcc_clocks.PCLK1_Frequency = rcc_clocks.HCLK_Frequency >> presc;
+        // Get PCLK2 prescaler
+        tmp = reg_value_get(&(*rcc_ptr).CFGR as *const u32 as *mut u32) & RCC_CFGR_PPRE2_Msk;
+        tmp = tmp >> RCC_CFGR_PPRE2_Pos;
+        presc = APBAHBPrescTable[tmp as usize];
 
-    // Get PCLK2 prescaler
-    tmp = reg_value_get(RCC_CFGR as *mut u32) & RCC_CFGR_PPRE2_Msk;
-    tmp = tmp >> RCC_CFGR_PPRE2_Pos;
-    presc = APBAHBPrescTable[tmp as usize];
-
-    // PCLK2 clock frequency
-    rcc_clocks.PCLK2_Frequency = rcc_clocks.HCLK_Frequency >> presc;
+        // PCLK2 clock frequency
+        rcc_clocks.PCLK2_Frequency = rcc_clocks.HCLK_Frequency >> presc;
+    }
 }
 
 /**
@@ -179,135 +194,146 @@ pub fn rcc_get_clocks_frequency(rcc_clocks: &mut RCC_ClocksTypeDef) {
   */
 
 pub fn enable_overdrive_mode() {
-    // Enable power clock
-    reg_value_set_bit(RCC_APB1ENR as *mut u32, RCC_APB1ENR_PWREN_Pos);
+     unsafe{
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        let pwr_ptr : *mut PWR_TypeDef = PWR_BASE as *mut PWR_TypeDef;
+        // Enable power clock
+        reg_value_set_bit(&(*rcc_ptr).APB1ENR as *const u32 as *mut u32, RCC_APB1ENR_PWREN_Pos);
 
-    // Set overdrive bit
-    reg_value_set_bit(PWR_CR as *mut u32, PWR_CR_ODEN_Pos); // ODEN
+        // Set overdrive bit
+        reg_value_set_bit(&(*pwr_ptr).CR as *const u32 as *mut u32, PWR_CR_ODEN_Pos); // ODEN
 
-    // Wait for overdrive ready flag to be set
-    while(reg_value_get_bit(PWR_CSR as *mut u32, PWR_CSR_ODRDY_Pos) == 0) // ODRDY
-    {   }
+        // Wait for overdrive ready flag to be set
+        while(reg_value_get_bit(&(*pwr_ptr).CSR as *const u32 as *mut u32, PWR_CSR_ODRDY_Pos) == 0) // ODRDY
+        {   }
 
-    // Enable overdrive switching
-    reg_value_set_bit(PWR_CR as *mut u32, PWR_CR_ODSWEN_Pos); //ODSWEN
-    
-    // Wait for overdrive switch ready flag to be set
-    while(reg_value_get_bit(PWR_CSR as *mut u32, PWR_CSR_ODSWRDY_Pos) == 0) //ODSWRDY
-    {   }
+        // Enable overdrive switching
+        reg_value_set_bit(&(*pwr_ptr).CR as *const u32 as *mut u32, PWR_CR_ODSWEN_Pos); //ODSWEN
+        
+        // Wait for overdrive switch ready flag to be set
+        while(reg_value_get_bit(&(*pwr_ptr).CSR as *const u32 as *mut u32, PWR_CSR_ODSWRDY_Pos) == 0) //ODSWRDY
+        {   }
+    }
 }
 
 #[unsafe(no_mangle)]
 pub fn system_init() {
     system_clock_set_default();
 
-    reg_value_set_bit(FLASH_ACR as *mut u32, FLASH_ACR_PRFTEN_Pos);    // PRFTEN Prefetch enable
-    reg_value_set_bit(FLASH_ACR as *mut u32, FLASH_ACR_ICEN_Pos);      // ICEN Instruction cache enable
+    unsafe{
+        
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        let flash_ptr : *mut FLASH_TypeDef = FLASH_R_BASE as *mut FLASH_TypeDef;
+  
+
+    reg_value_set_bit(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_PRFTEN_Pos);    // PRFTEN Prefetch enable
+    reg_value_set_bit(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_ICEN_Pos);      // ICEN Instruction cache enable
 
     if VALUE_SVRANGE == VR_2700_3600 {
         if FOSC_KHZ_VALUE > 150000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_5WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_5WS);
         } else if FOSC_KHZ_VALUE > 120000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_4WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_4WS);
         } else if FOSC_KHZ_VALUE > 90000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_3WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_3WS);
         } else if FOSC_KHZ_VALUE > 60000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_2WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_2WS);
         } else if FOSC_KHZ_VALUE > 30000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_1WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_1WS);
         } else {
-            reg_value_clear_mask(&mut FLASH_ACR as *mut u32, !FLASH_ACR_LATENCY_Msk);
+            reg_value_clear_mask(&(*flash_ptr).ACR as *const u32 as *mut u32, !FLASH_ACR_LATENCY_Msk);
         }
     } else if VALUE_SVRANGE == VR_2400_2700 {
         if FOSC_KHZ_VALUE > 168000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_7WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_7WS);
         } else if FOSC_KHZ_VALUE > 144000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_6WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_6WS);
         } else if FOSC_KHZ_VALUE > 120000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_5WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_5WS);
         } else if FOSC_KHZ_VALUE > 96000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_4WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_4WS);
         } else if FOSC_KHZ_VALUE > 72000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_3WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_3WS);
         } else if FOSC_KHZ_VALUE > 48000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_2WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_2WS);
         } else if FOSC_KHZ_VALUE > 24000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_1WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_1WS);
         } else {
-            reg_value_clear_mask(&mut FLASH_ACR as *mut u32, !FLASH_ACR_LATENCY_Msk);
+            reg_value_clear_mask(&(*flash_ptr).ACR as *const u32 as *mut u32, !FLASH_ACR_LATENCY_Msk);
         }
     } else if VALUE_SVRANGE == VR_2100_2400 {
         if FOSC_KHZ_VALUE > 176000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_8WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_8WS);
         } else if FOSC_KHZ_VALUE > 154000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_7WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_7WS);
         } else if FOSC_KHZ_VALUE > 132000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_6WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_6WS);
         } else if FOSC_KHZ_VALUE > 110000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_5WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_5WS);
         } else if FOSC_KHZ_VALUE > 88000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_4WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_4WS);
         } else if FOSC_KHZ_VALUE > 66000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_3WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_3WS);
         } else if FOSC_KHZ_VALUE > 44000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_2WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_2WS);
         } else if FOSC_KHZ_VALUE > 22000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_1WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_1WS);
         } else {
-            reg_value_clear_mask(&mut FLASH_ACR as *mut u32, !FLASH_ACR_LATENCY_Msk);
+            reg_value_clear_mask(&(*flash_ptr).ACR as *const u32 as *mut u32, !FLASH_ACR_LATENCY_Msk);
         }
     } else if VALUE_SVRANGE == VR_1800_2100 {
         if FOSC_KHZ_VALUE > 160000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_8WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_8WS);
         } else if FOSC_KHZ_VALUE > 140000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_7WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_7WS);
         } else if FOSC_KHZ_VALUE > 120000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_6WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_6WS);
         } else if FOSC_KHZ_VALUE > 100000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_5WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_5WS);
         } else if FOSC_KHZ_VALUE > 80000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_4WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_4WS);
         } else if FOSC_KHZ_VALUE > 60000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_3WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_3WS);
         } else if FOSC_KHZ_VALUE > 40000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_2WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_2WS);
         } else if FOSC_KHZ_VALUE > 20000 {
-            reg_value_set(FLASH_ACR as *mut u32, FLASH_ACR_LATENCY_1WS);
+            reg_value_set(&(*flash_ptr).ACR as *const u32 as *mut u32, FLASH_ACR_LATENCY_1WS);
         } else {
-            reg_value_clear_mask(&mut FLASH_ACR as *mut u32, !FLASH_ACR_LATENCY_Msk);
+            reg_value_clear_mask(&(*flash_ptr).ACR as *const u32 as *mut u32, !FLASH_ACR_LATENCY_Msk);
         }
     }
 
     enable_overdrive_mode();
 
-    reg_value_clear_set(RCC_PLLCFGR as *mut u32, VALUE_RCC_PLLCFGR);         /* set clock configuration register */
-    reg_value_clear_set(RCC_CFGR as *mut u32, VALUE_RCC_CFGR);               /* set clock configuration register 2 */
-    reg_value_clear_set(RCC_CR as *mut u32, VALUE_RCC_CR & 0x000FFFFF);      /* do not start PLLs yet */
+    reg_value_clear_set(&(*rcc_ptr).PLLCFGR as *const u32 as *mut u32, VALUE_RCC_PLLCFGR);         /* set clock configuration register */
+    reg_value_clear_set(&(*rcc_ptr).CFGR as *const u32 as *mut u32, VALUE_RCC_CFGR);               /* set clock configuration register 2 */
+    reg_value_clear_set(&(*rcc_ptr).CR as *const u32 as *mut u32, VALUE_RCC_CR & 0x000FFFFF);      /* do not start PLLs yet */
 
     if VALUE_RCC_CR & (1 << RCC_CR_HSION_Pos) != 0 { /* if HSI enabled */
-        while reg_value_get_bit(RCC_CR as *mut u32, RCC_CR_HSIRDY_Pos) == 0 {
+        while reg_value_get_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_HSIRDY_Pos) == 0 {
             /* Wait for HSIRDY = 1 (HSI is ready) */
         }
     }      
 
     if VALUE_RCC_CR & (1 << RCC_CR_HSEON_Pos) != 0 { /* if HSE enabled */
-        while reg_value_get_bit(RCC_CR as *mut u32, RCC_CR_HSERDY_Pos) == 0 {
+        while reg_value_get_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_HSERDY_Pos) == 0 {
             /* Wait for HSERDY = 1 (HSE is ready) */
         }
     }
 
     if VALUE_RCC_CR & (1 << RCC_CR_PLLON_Pos) != 0 { /* if PLL enabled */
-        reg_value_set_bit(RCC_CR as *mut u32, RCC_CR_PLLON_Pos); /* PLL On */
-        while reg_value_get_bit(RCC_CR as *mut u32, RCC_CR_PLLRDY_Pos) == 0 {
+        reg_value_set_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_PLLON_Pos); /* PLL On */
+        while reg_value_get_bit(&(*rcc_ptr).CR as *const u32 as *mut u32, RCC_CR_PLLRDY_Pos) == 0 {
             /* Wait for PLL1RDY = 1 (PLL is ready) */
         }
     }
 
     /* Wait till SYSCLK is stabilized (depending on selected clock) */    
-    while (reg_value_get(RCC_CFGR as *mut u32) & RCC_CFGR_SWS_Msk) != ((VALUE_RCC_CFGR << 2) & RCC_CFGR_SWS_Msk) {
+    while (reg_value_get(&(*rcc_ptr).CFGR as *const u32 as *mut u32) & RCC_CFGR_SWS_Msk) != ((VALUE_RCC_CFGR << 2) & RCC_CFGR_SWS_Msk) {
     }
 
     // FPU enabled by default by cortex_m_rt crate
+    }
 }
 
 // ==================== DELAYS ======================
