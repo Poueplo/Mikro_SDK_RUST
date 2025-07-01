@@ -120,7 +120,7 @@ class MCUConfigurator(QWidget):
                 if "settings" in field:
                     for i, setting in enumerate(field["settings"]):
                         combo.addItem(setting["label"], setting["value"])
-                        if init_value == setting["value"]:
+                        if init_value.lower() == setting["value"].lower():
                             selected_index = i
                 
                 elif "settings_array" in field:
@@ -150,6 +150,7 @@ class MCUConfigurator(QWidget):
         query_result = self.db_cursor.fetchall()[0]
         family_path = query_result[1]
         vendor = query_result[2]
+        target = query_result[3]
         query_result_path_index = 3
         current_data = None
         family_template = None
@@ -186,6 +187,8 @@ class MCUConfigurator(QWidget):
             hal_ll_template = hal_ll_template.replace(f"{{{module_name}}}", sub_module_list)
             query_result_path_index += 1
         
+        hal_ll_template = hal_ll_template.replace(f"{{family}}", family_path)
+
         with open(f"family_definitions/{vendor}/{family_path}/Cargo.toml", "w") as f:
             f.write(family_template)
         with open("hal_ll/Cargo.toml", "w") as f:
@@ -205,6 +208,12 @@ class MCUConfigurator(QWidget):
             startup_contents = f.read()
         with open("core/system_reset/src/startup_assembly.s", "w") as f:
             f.write(startup_contents)
+
+        with open(f".cargo/template_config.toml", "r") as f:
+            config_contents = f.read()
+        config_contents = config_contents.replace(f"{{compiling_target}}", target)
+        with open(".cargo/config.toml", "w") as f:
+            f.write(config_contents)
 
         core_header_output = []
         clock = self.clock_input.text()
