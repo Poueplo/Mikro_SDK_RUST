@@ -640,7 +640,6 @@ pub const __MPU_PRESENT: u32 = 1;
 pub const __NVIC_PRIO_BITS: u32 = 4;
 pub const __Vendor_SysTickConfig: u32 = 0;
 pub const __FPU_PRESENT: u32 = 1;
-pub const HASH_RNG_IRQn: u32 = RNG_IRQn;
 pub const FLASH_BASE: u32 = 0x08000000;
 pub const CCMDATARAM_BASE: u32 = 0x10000000;
 pub const SRAM1_BASE: u32 = 0x20000000;
