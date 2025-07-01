@@ -38,12 +38,11 @@
 ****************************************************************************/
 
 use crate::gpio_port::*;
-use crate::gpio_port::pin_names::{hal_ll_port_name_t,hal_ll_port_size_t,hal_ll_gpio_mask_t, hal_ll_pin_name_t};
+use crate::pin_names::{hal_ll_port_name_t,hal_ll_port_size_t,hal_ll_gpio_mask_t, hal_ll_pin_name_t};
 pub use crate::gpio_port::{
     hal_ll_gpio_direction_t,
     hal_ll_gpio_port_t,
     hal_ll_gpio_pin_t,
-    pin_names,
     module_struct,
     hal_ll_gpio_module_struct_init,
     VALUE,
@@ -54,6 +53,7 @@ pub use crate::gpio_port::{
     hal_ll_gpio_pin_mask,
     hal_ll_gpio_base_handle_t
 };
+pub use crate::pin_names;
 
 pub fn hal_ll_gpio_configure_pin(pin: *mut hal_ll_gpio_pin_t, name: hal_ll_pin_name_t , direction: hal_ll_gpio_direction_t)
 {

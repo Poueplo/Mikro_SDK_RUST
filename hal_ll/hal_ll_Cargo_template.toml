@@ -16,27 +16,28 @@ lto = false
 
 
 [dependencies]
-hal_ll_target = {path = "hal_ll_target"}
 hal_ll_gpio_constants = {path = "gpio/hal_ll_gpio_constants"}
+hal_ll_target_names = {path = "hal_ll_target_names"}
 system = {path = "../core/system"}
-mcu_definition = {path = "../family_definitions/stm/f4"}
+bit_control = {path = "../core/bit_control"}
+mcu_definition = {path = "../family_definitions/stm/{family}"}
 
 interrupt = {path = "../core/interrupt", optional = true}
 
 [features]
 default = [{gpio}]
 
-gpioa = ["hal_ll_target/gpioa"]
-gpiob = ["hal_ll_target/gpiob"]
-gpioc = ["hal_ll_target/gpioc"]
-gpiod = ["hal_ll_target/gpiod"]
-gpioe = ["hal_ll_target/gpioe"]
-gpiof = ["hal_ll_target/gpiof"]
-gpiog = ["hal_ll_target/gpiog"]
-gpioh = ["hal_ll_target/gpioh"]
-gpioi = ["hal_ll_target/gpioi"]
-gpioj = ["hal_ll_target/gpioj"]
-gpiok = ["hal_ll_target/gpiok"]
+gpioa = ["mcu_definition/gpioa"]
+gpiob = ["mcu_definition/gpiob"]
+gpioc = ["mcu_definition/gpioc"]
+gpiod = ["mcu_definition/gpiod"]
+gpioe = ["mcu_definition/gpioe"]
+gpiof = ["mcu_definition/gpiof"]
+gpiog = ["mcu_definition/gpiog"]
+gpioh = ["mcu_definition/gpioh"]
+gpioi = ["mcu_definition/gpioi"]
+gpioj = ["mcu_definition/gpioj"]
+gpiok = ["mcu_definition/gpiok"]
 
 adc = ["mcu_definition/adc", {adc}]
 

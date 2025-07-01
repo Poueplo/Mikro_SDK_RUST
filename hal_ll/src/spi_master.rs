@@ -41,7 +41,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::spi::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;

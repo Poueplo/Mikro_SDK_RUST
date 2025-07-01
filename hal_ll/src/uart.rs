@@ -41,7 +41,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::uart::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;

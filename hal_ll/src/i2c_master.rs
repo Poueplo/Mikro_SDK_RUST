@@ -40,7 +40,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::i2c::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;

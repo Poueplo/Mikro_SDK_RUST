@@ -41,7 +41,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(unreachable_patterns)]
 
-use hal_ll_target::*;
+use crate::target::*;
 use crate::gpio_port::{hal_ll_gpio_analog_input,hal_ll_gpio_port_base,hal_ll_gpio_port_index,hal_ll_gpio_pin_mask};
 use system::{rcc_get_clocks_frequency, delay_1us, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
 pub use mcu_definition::adc::*;

@@ -38,6 +38,30 @@
 ****************************************************************************/
 
 #![no_std]
+pub mod pin_names {
+    pub use hal_ll_target_names::*;
+    pub use mcu_definition::gpio::*;
+}
+
+pub mod target {
+    pub mod pin_names {
+        pub use crate::pin_names::*;
+    }
+
+    pub mod bit_control {
+        pub use bit_control::*;
+    }
+
+    pub use pin_names::*;
+    pub use bit_control::*;
+    pub struct hal_ll_pin_af_t
+    {
+        pub pin_name : hal_ll_pin_name_t,
+        pub pin_af : u32,
+    }
+
+}
+
 
 pub mod gpio;
 pub mod gpio_port;

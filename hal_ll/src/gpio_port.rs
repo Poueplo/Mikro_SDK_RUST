@@ -45,8 +45,8 @@
 
 //to change place at some point
 //==========================================================//
-pub use hal_ll_target::pin_names;
-use hal_ll_target::*;
+pub use crate::pin_names;
+use crate::target::*;
 use hal_ll_gpio_constants::*;
 use system::{RCC_TypeDef, RCC_BASE};
 pub mod gpio_constants {
