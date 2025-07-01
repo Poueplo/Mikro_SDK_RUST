@@ -1,0 +1,491 @@
+[package]
+name = "mcu_definition"
+version = "0.1.1"
+edition = "2024"
+author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
+
+
+[profile.release]
+opt-level = 'z' 
+lto = true
+
+
+[profile.dev]
+opt-level = 0 
+lto = false  
+
+
+[dependencies]
+hal_ll_target_names = {path = "../../../hal_ll/hal_ll_target_names"}
+
+[features]
+
+adc = []
+i2c = []
+spi = []
+tim = []
+uart = []
+
+gpioa = [{gpioa_features}]
+
+gpioa_0 = []
+gpioa_1 = []
+gpioa_2 = []
+gpioa_3 = []
+gpioa_4 = []
+gpioa_5 = []
+gpioa_6 = []
+gpioa_7 = []
+gpioa_8 = []
+gpioa_9 = []
+gpioa_10 = []
+gpioa_11 = []
+gpioa_12 = []
+gpioa_13 = []
+gpioa_14 = []
+gpioa_15 = []
+
+gpiob = [{gpiob_features}]
+
+gpiob_0 = []
+gpiob_1 = []
+gpiob_2 = []
+gpiob_3 = []
+gpiob_4 = []
+gpiob_5 = []
+gpiob_6 = []
+gpiob_7 = []
+gpiob_8 = []
+gpiob_9 = []
+gpiob_10 = []
+gpiob_11 = []
+gpiob_12 = []
+gpiob_13 = []
+gpiob_14 = []
+gpiob_15 = []
+
+gpioc = [{gpioc_features}]
+
+gpioc_0 = []
+gpioc_1 = []
+gpioc_2 = []
+gpioc_3 = []
+gpioc_4 = []
+gpioc_5 = []
+gpioc_6 = []
+gpioc_7 = []
+gpioc_8 = []
+gpioc_9 = []
+gpioc_10 = []
+gpioc_11 = []
+gpioc_12 = []
+gpioc_13 = []
+gpioc_14 = []
+gpioc_15 = []
+
+gpiod = [{gpiod_features}]
+
+gpiod_0 = []
+gpiod_1 = []
+gpiod_2 = []
+gpiod_3 = []
+gpiod_4 = []
+gpiod_5 = []
+gpiod_6 = []
+gpiod_7 = []
+gpiod_8 = []
+gpiod_9 = []
+gpiod_10 = []
+gpiod_11 = []
+gpiod_12 = []
+gpiod_13 = []
+gpiod_14 = []
+gpiod_15 = []
+
+gpioe = [{gpioe_features}]
+
+gpioe_0 = []
+gpioe_1 = []
+gpioe_2 = []
+gpioe_3 = []
+gpioe_4 = []
+gpioe_5 = []
+gpioe_6 = []
+gpioe_7 = []
+gpioe_8 = []
+gpioe_9 = []
+gpioe_10 = []
+gpioe_11 = []
+gpioe_12 = []
+gpioe_13 = []
+gpioe_14 = []
+gpioe_15 = []
+
+gpiof = [{gpiof_features}]
+
+gpiof_0 = []
+gpiof_1 = []
+gpiof_2 = []
+gpiof_3 = []
+gpiof_4 = []
+gpiof_5 = []
+gpiof_6 = []
+gpiof_7 = []
+gpiof_8 = []
+gpiof_9 = []
+gpiof_10 = []
+gpiof_11 = []
+gpiof_12 = []
+gpiof_13 = []
+gpiof_14 = []
+gpiof_15 = []
+
+gpiog = [{gpiog_features}]
+
+gpiog_0 = []
+gpiog_1 = []
+gpiog_2 = []
+gpiog_3 = []
+gpiog_4 = []
+gpiog_5 = []
+gpiog_6 = []
+gpiog_7 = []
+gpiog_8 = []
+gpiog_9 = []
+gpiog_10 = []
+gpiog_11 = []
+gpiog_12 = []
+gpiog_13 = []
+gpiog_14 = []
+gpiog_15 = []
+
+gpioh = [{gpioh_features}]
+
+gpioh_0 = []
+gpioh_1 = []
+gpioh_2 = []
+gpioh_3 = []
+gpioh_4 = []
+gpioh_5 = []
+gpioh_6 = []
+gpioh_7 = []
+gpioh_8 = []
+gpioh_9 = []
+gpioh_10 = []
+gpioh_11 = []
+gpioh_12 = []
+gpioh_13 = []
+gpioh_14 = []
+gpioh_15 = []
+
+gpioi = [{gpioi_features}]
+
+gpioi_0 = []
+gpioi_1 = []
+gpioi_2 = []
+gpioi_3 = []
+gpioi_4 = []
+gpioi_5 = []
+gpioi_6 = []
+gpioi_7 = []
+gpioi_8 = []
+gpioi_9 = []
+gpioi_10 = []
+gpioi_11 = []
+gpioi_12 = []
+gpioi_13 = []
+gpioi_14 = []
+gpioi_15 = []
+
+adc1 = [{adc1_features}]
+
+adc1_a0_c0 = []
+adc1_a1_c1 = []
+adc1_a2_c2 = []
+adc1_a3_c3 = []
+adc1_a4_c4 = []
+adc1_a5_c5 = []
+adc1_a6_c6 = []
+adc1_a7_c7 = []
+adc1_b0_c8 = []
+adc1_b1_c9 = []
+adc1_c0_c10 = []
+adc1_c1_c11 = []
+adc1_c2_c12 = []
+adc1_c3_c13 = []
+adc1_c4_c14 = []
+adc1_c5_c15 = []
+
+adc2 = [{adc2_features}]
+
+adc2_a0_c0 = []
+adc2_a1_c1 = []
+adc2_a2_c2 = []
+adc2_a3_c3 = []
+adc2_a4_c4 = []
+adc2_a5_c5 = []
+adc2_a6_c6 = []
+adc2_a7_c7 = []
+adc2_b0_c8 = []
+adc2_b1_c9 = []
+adc2_c0_c10 = []
+adc2_c1_c11 = []
+adc2_c2_c12 = []
+adc2_c3_c13 = []
+adc2_c4_c14 = []
+adc2_c5_c15 = []
+
+
+adc3 = [{adc3_features}]
+
+adc3_a0_c0 = []
+adc3_a1_c1 = []
+adc3_a2_c2 = []
+adc3_a3_c3 = []
+adc3_f6_c4 = []
+adc3_f7_c5 = []
+adc3_f8_c6 = []
+adc3_f9_c7 = []
+adc3_f10_c8 = []
+adc3_f3_c9 = []
+adc3_c0_c10 = []
+adc3_c1_c11 = []
+adc3_c2_c12 = []
+adc3_c3_c13 = []
+adc3_f4_c14 = []
+adc3_f5_c15 = []
+
+
+i2c1 = [{i2c1_features}]
+
+i2c1_scl_b6_af4 = []
+i2c1_scl_b8_af4 = []
+
+i2c1_sda_b7_af4 = []
+i2c1_sda_b9_af4 = []
+
+
+i2c2 = [{i2c2_features}]
+
+i2c2_scl_b10_af4 = []
+i2c2_scl_f1_af4 = []
+i2c2_scl_h4_af4 = []
+
+i2c2_sda_b11_af4 = []
+i2c2_sda_f0_af4 = []
+i2c2_sda_h5_af4 = []
+
+
+i2c3 = [{i2c3_features}]
+
+i2c3_scl_a8_af4 = []
+i2c3_scl_h7_af4 = []
+
+i2c3_sda_c9_af4 = []
+i2c3_sda_h8_af4 = []
+
+
+spi1 = [{spi1_features}]
+
+spi1_sck_a5_af5 = []
+spi1_sck_b3_af5 = []
+
+spi1_miso_a6_af5 = []
+spi1_miso_b4_af5 = []
+
+spi1_mosi_a7_af5 = []
+spi1_mosi_b5_af5 = []
+
+
+spi2 = [{spi2_features}]
+
+spi2_sck_b10_af5 = []
+spi2_sck_b13_af5 = []
+spi2_sck_i1_af5 = []
+
+spi2_miso_b14_af5 = []
+spi2_miso_c2_af5 = []
+spi2_miso_i2_af5 = []
+
+spi2_mosi_b15_af5 = []
+spi2_mosi_c3_af5 = []
+spi2_mosi_i3_af5 = []
+
+
+spi3 = [{spi3_features}]
+
+spi3_sck_b3_af6 = []
+spi3_sck_c10_af6 = []
+
+spi3_miso_b4_af6 = []
+spi3_miso_c11_af6 = []
+
+spi3_mosi_b5_af6 = []
+spi3_mosi_c12_af6 = []
+
+
+tim1 = [{tim1_features}]
+
+tim1_ch1_a8_af1 = []
+tim1_ch1_e9_af1 = []
+tim1_ch1n_a7_af1 = []
+tim1_ch1n_b13_af1 = []
+tim1_ch1n_e8_af1 = []
+tim1_ch2_a9_af1 = []
+tim1_ch2_e11_af1 = []
+tim1_ch2n_b0_af1 = []
+tim1_ch2n_b14_af1 = []
+tim1_ch2n_e10_af1 = []
+tim1_ch3_a10_af1 = []
+tim1_ch3_e13_af1 = []
+tim1_ch3n_b1_af1 = []
+tim1_ch3n_b15_af1 = []
+tim1_ch3n_e12_af1 = []
+tim1_ch4_a11_af1 = []
+tim1_ch4_e14_af1 = []
+
+
+tim2 = [{tim2_features}]
+
+tim2_ch1_a0_af1 = []
+tim2_ch1_a5_af1 = []
+tim2_ch1_a15_af1 = []
+tim2_ch2_a1_af1 = []
+tim2_ch2_b3_af1 = []
+tim2_ch3_a2_af1 = []
+tim2_ch3_b10_af1 = []
+tim2_ch4_a3_af1 = []
+tim2_ch4_b11_af1 = []
+
+tim3 = [{tim3_features}]
+
+tim3_ch1_a6_af2 = []
+tim3_ch1_b4_af2 = []
+tim3_ch1_c6_af2 = []
+tim3_ch2_a7_af2 = []
+tim3_ch2_b5_af2 = []
+tim3_ch2_c7_af2 = []
+tim3_ch3_b0_af2 = []
+tim3_ch3_c8_af2 = []
+tim3_ch4_b1_af2 = []
+tim3_ch4_c9_af2 = []
+
+tim4 = [{tim4_features}]
+
+tim4_ch1_b6_af2 = []
+tim4_ch1_d12_af2 = []
+tim4_ch2_b7_af2 = []
+tim4_ch2_d13_af2 = []
+tim4_ch3_b8_af2 = []
+tim4_ch3_d14_af2 = []
+tim4_ch4_b9_af2 = []
+tim4_ch4_d15_af2 = []
+
+tim5 = [{tim5_features}]
+
+tim5_ch1_a0_af2 = []
+tim5_ch1_h10_af2 = []
+tim5_ch2_a1_af2 = []
+tim5_ch2_h11_af2 = []
+tim5_ch3_a2_af2 = []
+tim5_ch3_h12_af2 = []
+tim5_ch4_a3_af2 = []
+tim5_ch4_i0_af2 = []
+
+tim8 = [{tim8_features}]
+
+tim8_ch1_c6_af3 = []
+tim8_ch1_i5_af3 = []
+tim8_ch1n_a5_af3 = []
+tim8_ch1n_a7_af3 = []
+tim8_ch1n_h13_af3 = []
+tim8_ch2_c7_af3 = []
+tim8_ch2_i6_af3 = []
+tim8_ch2n_b0_af3 = []
+tim8_ch2n_b14_af3 = []
+tim8_ch2n_h14_af3 = []
+tim8_ch3_c8_af3 = []
+tim8_ch3_i7_af3 = []
+tim8_ch3n_b1_af3 = []
+tim8_ch3n_b15_af3 = []
+tim8_ch3n_h15_af3 = []
+tim8_ch4_c9_af3 = []
+tim8_ch4_i2_af3 = []
+
+tim9 = [{tim9_features}]
+
+tim9_ch1_a2_af3 = []
+tim9_ch1_e5_af3 = []
+tim9_ch2_a3_af3 = []
+tim9_ch2_e6_af3 = []
+
+tim10 = [{tim10_features}]
+
+tim10_ch1_b8_af3 = []
+tim10_ch1_f6_af3 = []
+
+tim11 = [{tim11_features}]
+
+tim11_ch1_b9_af3 = []
+tim11_ch1_f7_af3 = []
+
+tim12 = [{tim12_features}]
+
+tim12_ch1_b14_af9 = []
+tim12_ch1_h6_af9 = []
+tim12_ch2_b15_af9 = []
+tim12_ch2_h9_af9 = []
+
+tim13 = [{tim13_features}]
+
+tim13_ch1_a6_af9 = []
+tim13_ch1_f8_af9 = []
+
+tim14 = [{tim14_features}]
+
+tim14_ch1_a7_af9 = []
+tim14_ch1_f9_af9 = []
+
+
+uart1 = [{uart1_features}]
+
+uart1_rx_a10_af7 = []
+uart1_rx_b7_af7 = []
+uart1_tx_a9_af7 = []
+uart1_tx_b6_af7 = []
+
+uart2 = [{uart2_features}]
+
+uart2_rx_a3_af7 = []
+uart2_rx_d6_af7 = []
+uart2_tx_a2_af7 = []
+uart2_tx_d5_af7 = []
+
+uart3 = [{uart3_features}]
+
+uart3_rx_b11_af7 = []
+uart3_rx_c11_af7 = []
+uart3_rx_d9_af7 = []
+uart3_tx_b10_af7 = []
+uart3_tx_c10_af7 = []
+uart3_tx_d8_af7 = []
+
+uart4 = [{uart4_features}]
+
+uart4_rx_a1_af8 = []
+uart4_rx_c11_af8 = []
+uart4_tx_a0_af8 = []
+uart4_tx_c10_af8 = []
+
+uart5 = [{uart5_features}]
+
+uart5_rx_d2_af8 = []
+uart5_tx_c12_af8 = []
+
+uart6 = [{uart6_features}]
+
+uart6_rx_c7_af8 = []
+uart6_rx_g9_af8 = []
+uart6_tx_c6_af8 = []
+uart6_tx_g14_af8 = []
+
