@@ -46,16 +46,14 @@
 use panic_halt;
 
 
-use drv_digital_out::*;
 use drv_spi_master::*;
 use drv_name::*;
 use system::*;
 
-const pin_sck: pin_name_t = GPIO_A5;
-const pin_miso: pin_name_t = GPIO_A6;
-const pin_mosi: pin_name_t = GPIO_B5;
-const pin_cs: pin_name_t = GPIO_B4;
-const pin_hld: pin_name_t = GPIO_E13;
+const pin_sck: pin_name_t = GPIO_C10;
+const pin_miso: pin_name_t = GPIO_C11;
+const pin_mosi: pin_name_t = GPIO_C12;
+const pin_cs: pin_name_t = GPIO_C13;
 
 
 #[unsafe(no_mangle)]
@@ -65,10 +63,6 @@ fn main() -> ! {
     let mut spi_write_buff: [u8; 14] = [0x02, 0x00, 0x00, 0x00, 0x63, 0x6F, 0x64, 0x65, 0x20, 0x6C, 0x79, 0x6F, 0x6B, 0x6F];
     let mut spi_read_order: [u8; 4] = [0x03, 0x00, 0x00, 0x00];
 
-    let mut hld: digital_out_t = digital_out_t::default();
-    digital_out_init(&mut hld , pin_hld );
-
-    digital_out_high(&mut hld);
     let mut spi : spi_master_t = spi_master_t::default(); 
     let mut spi_config : spi_master_config_t = spi_master_config_t::default();
 

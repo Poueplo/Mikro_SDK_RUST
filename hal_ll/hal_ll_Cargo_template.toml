@@ -1,0 +1,89 @@
+[package]
+name = "hal_ll"
+version = "0.1.0"
+edition = "2024"
+author =  ["Leon Besnie leon.besnie@reseau.eseo.fr"]
+
+
+[profile.release]
+opt-level = 'z' 
+lto = true
+
+
+[profile.dev]
+opt-level = 0 
+lto = false  
+
+
+[dependencies]
+hal_ll_gpio_constants = {path = "gpio/hal_ll_gpio_constants"}
+hal_ll_target_names = {path = "hal_ll_target_names"}
+system = {path = "../core/system"}
+bit_control = {path = "../core/bit_control"}
+mcu_definition = {path = "../family_definitions/stm/{family}"}
+
+interrupt = {path = "../core/interrupt", optional = true}
+
+[features]
+default = [{gpio}]
+
+gpioa = ["mcu_definition/gpioa"]
+gpiob = ["mcu_definition/gpiob"]
+gpioc = ["mcu_definition/gpioc"]
+gpiod = ["mcu_definition/gpiod"]
+gpioe = ["mcu_definition/gpioe"]
+gpiof = ["mcu_definition/gpiof"]
+gpiog = ["mcu_definition/gpiog"]
+gpioh = ["mcu_definition/gpioh"]
+gpioi = ["mcu_definition/gpioi"]
+gpioj = ["mcu_definition/gpioj"]
+gpiok = ["mcu_definition/gpiok"]
+
+adc = ["mcu_definition/adc", {adc}]
+
+adc1 = ["mcu_definition/adc1"]
+adc2 = ["mcu_definition/adc2"]
+adc3 = ["mcu_definition/adc3"]
+
+i2c = ["mcu_definition/i2c",{i2c}]
+
+i2c1 = ["mcu_definition/i2c1"]
+i2c2 = ["mcu_definition/i2c2"]
+i2c3 = ["mcu_definition/i2c3"]
+
+spi = ["mcu_definition/spi",{spi}]
+
+spi1 = ["mcu_definition/spi1"]
+spi2 = ["mcu_definition/spi2"]
+spi3 = ["mcu_definition/spi3"]
+spi4 = ["mcu_definition/spi4"]
+spi5 = ["mcu_definition/spi5"]
+spi6 = ["mcu_definition/spi6"]
+
+tim = ["mcu_definition/tim",{tim}]
+
+tim1 = ["mcu_definition/tim1"]
+tim2 = ["mcu_definition/tim2"]
+tim3 = ["mcu_definition/tim3"]
+tim4 = ["mcu_definition/tim4"]
+tim5 = ["mcu_definition/tim5"]
+tim8 = ["mcu_definition/tim8"]
+tim9 = ["mcu_definition/tim9"]
+tim10 = ["mcu_definition/tim10"]
+tim11 = ["mcu_definition/tim11"]
+tim12 = ["mcu_definition/tim12"]
+tim13 = ["mcu_definition/tim13"]
+tim14 = ["mcu_definition/tim14"]
+
+uart = ["mcu_definition/uart", "dep:interrupt",{uart}]
+
+uart1 = ["mcu_definition/uart1"]
+uart2 = ["mcu_definition/uart2"]
+uart3 = ["mcu_definition/uart3"]
+uart4 = ["mcu_definition/uart4"]
+uart5 = ["mcu_definition/uart5"]
+uart6 = ["mcu_definition/uart6"]
+uart7 = ["mcu_definition/uart7"]
+uart8 = ["mcu_definition/uart8"]
+
+one_wire = []

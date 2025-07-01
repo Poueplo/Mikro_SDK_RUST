@@ -50,7 +50,7 @@ use system::*;
 
 use drv_one_wire::*;
 
-const pin: pin_name_t = GPIO_B1;
+const pin: pin_name_t = GPIO_F4;
 
 const device_command : &[[u8;1]] = &[[0x44], [0xBE]];
 

@@ -44,6 +44,7 @@
 use bit_control::*;
 use crate::interrupt_defines::*;
 
+#[allow(unused_comparisons)]
 pub fn hal_ll_core_port_nvic_enable_irq(IRQn : u8)
 {
     match IRQn
@@ -74,7 +75,7 @@ pub fn hal_ll_core_port_nvic_enable_irq(IRQn : u8)
     }
 }
 
-
+#[allow(unused_comparisons)]
 pub fn hal_ll_core_port_nvic_disable_irq(IRQn : u8)
 {
     match IRQn

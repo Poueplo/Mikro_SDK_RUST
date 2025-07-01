@@ -41,14 +41,13 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-use hal_ll_i2c_master::*;
+use hal_ll::i2c_master::*;
 use hal_target::*;
-use hal_target::pin_names::*;
 
 
-pub use hal_ll_i2c_master::hal_ll_i2c_master_speed_t as hal_i2c_master_speed_t;
-pub use hal_ll_i2c_master::hal_ll_i2c_master_handle_register_t as hal_i2c_master_handle_register_t;
-pub use hal_ll_i2c_master::HAL_LL_I2C_MASTER_ERROR as HAL_I2C_MASTER_ERROR;
+pub use hal_ll::i2c_master::hal_ll_i2c_master_speed_t as hal_i2c_master_speed_t;
+pub use hal_ll::i2c_master::hal_ll_i2c_master_handle_register_t as hal_i2c_master_handle_register_t;
+pub use hal_ll::i2c_master::HAL_LL_I2C_MASTER_ERROR as HAL_I2C_MASTER_ERROR;
 
 type Result<T> = core::result::Result<T, HAL_I2C_MASTER_ERROR>;
 

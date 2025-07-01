@@ -32,11 +32,12 @@ drv_pwm = {path = "drv/lib/drv_pwm"}
 drv_uart = {path = "drv/lib/drv_uart"}
 drv_one_wire = {path = "drv/lib/drv_one_wire"}
 system = {path = "core/system"}
-interrupt = {path = "core/interrupt"}
-ring = {path = "platform/ring"}
+
+#interrupt = {path = "core/interrupt"}
+#ring = {path = "platform/ring"}
 
 
-hal_one_wire = {path = "hal/lib/one_wire"} 
-hal_ll_one_wire = {path = "hal_ll/one_wire/hal_ll_one_wire"}
+#hal_one_wire = {path = "hal/lib/one_wire"} 
+#hal_ll_one_wire = {path = "hal_ll/one_wire/hal_ll_one_wire"}
 
 [features]

@@ -41,15 +41,14 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-use hal_ll_adc::*;
+use hal_ll::adc::*;
 use hal_target::*;
-use hal_target::pin_names::*;
 use core::fmt;
 
-pub use hal_ll_adc::hal_ll_adc_resolution_t as hal_adc_resolution_t;
-pub use hal_ll_adc::hal_ll_adc_voltage_reference_t as hal_adc_vref_t;
-pub use hal_ll_adc::hal_ll_adc_handle_register_t as hal_adc_handle_register_t;
-pub use hal_ll_adc::{ADC_RESOLUTION_DEFAULT, ADC_VREF_DEFAULT};
+pub use  hal_ll::adc::hal_ll_adc_resolution_t as hal_adc_resolution_t;
+pub use  hal_ll::adc::hal_ll_adc_voltage_reference_t as hal_adc_vref_t;
+pub use  hal_ll::adc::hal_ll_adc_handle_register_t as hal_adc_handle_register_t;
+pub use  hal_ll::adc::{ADC_RESOLUTION_DEFAULT, ADC_VREF_DEFAULT};
 
 #[derive(Debug)]
 pub enum HAL_ADC_ERROR {

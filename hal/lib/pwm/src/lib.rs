@@ -41,12 +41,11 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
-use hal_ll_tim::*;
+use hal_ll::tim::*;
 use hal_target::*;
-use hal_target::pin_names::*;
 
-pub use hal_ll_tim::hal_ll_tim_handle_register_t as hal_pwm_handle_register_t;
-pub use hal_ll_tim::HAL_LL_TIM_ERROR as HAL_PWM_ERROR;
+pub use hal_ll::tim::hal_ll_tim_handle_register_t as hal_pwm_handle_register_t;
+pub use hal_ll::tim::HAL_LL_TIM_ERROR as HAL_PWM_ERROR;
 
 type Result<T> = core::result::Result<T, HAL_PWM_ERROR>;
 

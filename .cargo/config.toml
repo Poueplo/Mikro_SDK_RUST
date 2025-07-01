@@ -1,7 +1,4 @@
 # .cargo/config
 [build]
-# Always compile for the instruction set of the STM32F1
 target = "thumbv7m-none-eabi"
-
-[target.thumbv7m-none-eabi]
 rustflags = ["-C", "link-arg=-Tmemory.x"]

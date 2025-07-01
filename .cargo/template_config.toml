@@ -1,0 +1,4 @@
+# .cargo/config
+[build]
+target = "{compiling_target}"
+rustflags = ["-C", "link-arg=-Tmemory.x"]

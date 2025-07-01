@@ -94,7 +94,7 @@ dependencies = [
 name = "hal_adc"
 version = "0.1.0"
 dependencies = [
- "hal_ll_adc",
+ "hal_ll",
  "hal_target",
 ]
 
@@ -102,7 +102,7 @@ dependencies = [
 name = "hal_gpio"
 version = "0.1.0"
 dependencies = [
- "hal_ll_gpio",
+ "hal_ll",
  "hal_target",
 ]
 
@@ -110,32 +110,19 @@ dependencies = [
 name = "hal_i2c_master"
 version = "0.1.0"
 dependencies = [
- "hal_ll_i2c_master",
+ "hal_ll",
  "hal_target",
 ]
 
 [[package]]
-name = "hal_ll_adc"
+name = "hal_ll"
 version = "0.1.0"
 dependencies = [
- "hal_ll_adc_pin_map",
- "hal_ll_gpio_port",
+ "hal_ll_gpio_constants",
  "hal_ll_target",
+ "interrupt",
+ "mcu_definition",
  "system",
-]
-
-[[package]]
-name = "hal_ll_adc_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
-]
-
-[[package]]
-name = "hal_ll_gpio"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio_port",
 ]
 
 [[package]]
@@ -143,61 +130,11 @@ name = "hal_ll_gpio_constants"
 version = "0.1.0"
 
 [[package]]
-name = "hal_ll_gpio_port"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio_constants",
- "hal_ll_target",
-]
-
-[[package]]
-name = "hal_ll_i2c_master"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_i2c_pin_map",
- "hal_ll_target",
- "system",
-]
-
-[[package]]
-name = "hal_ll_i2c_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
-]
-
-[[package]]
-name = "hal_ll_one_wire"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "system",
-]
-
-[[package]]
 name = "hal_ll_pin_names"
 version = "0.1.1"
 dependencies = [
  "hal_ll_target_names",
- "mcu",
-]
-
-[[package]]
-name = "hal_ll_spi_master"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_spi_master_pin_map",
- "hal_ll_target",
- "system",
-]
-
-[[package]]
-name = "hal_ll_spi_master_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
+ "mcu_definition",
 ]
 
 [[package]]
@@ -213,45 +150,10 @@ name = "hal_ll_target_names"
 version = "0.1.1"
 
 [[package]]
-name = "hal_ll_tim"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "hal_ll_tim_pin_map",
- "system",
-]
-
-[[package]]
-name = "hal_ll_tim_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
-]
-
-[[package]]
-name = "hal_ll_uart"
-version = "0.1.0"
-dependencies = [
- "hal_ll_gpio",
- "hal_ll_target",
- "hal_ll_uart_pin_map",
- "interrupt",
- "system",
-]
-
-[[package]]
-name = "hal_ll_uart_pin_map"
-version = "0.1.0"
-dependencies = [
- "hal_ll_pin_names",
-]
-
-[[package]]
 name = "hal_one_wire"
 version = "0.1.0"
 dependencies = [
- "hal_ll_one_wire",
+ "hal_ll",
  "hal_target",
 ]
 
@@ -259,7 +161,7 @@ dependencies = [
 name = "hal_pwm"
 version = "0.1.0"
 dependencies = [
- "hal_ll_tim",
+ "hal_ll",
  "hal_target",
 ]
 
@@ -268,7 +170,7 @@ name = "hal_spi_master"
 version = "0.1.0"
 dependencies = [
  "hal_gpio",
- "hal_ll_spi_master",
+ "hal_ll",
  "hal_target",
  "system",
 ]
@@ -285,7 +187,7 @@ name = "hal_uart"
 version = "0.1.0"
 dependencies = [
  "hal_gpio",
- "hal_ll_uart",
+ "hal_ll",
  "hal_target",
  "interrupt",
  "ring",
@@ -300,7 +202,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "mcu"
+name = "mcu_definition"
+version = "0.1.1"
+dependencies = [
+ "hal_ll_target_names",
+]
+
+[[package]]
+name = "mcu_header"
 version = "0.1.1"
 
 [[package]]
@@ -317,11 +226,7 @@ dependencies = [
  "drv_pwm",
  "drv_spi_master",
  "drv_uart",
- "hal_ll_one_wire",
- "hal_one_wire",
- "interrupt",
  "panic-halt",
- "ring",
  "system",
 ]
 
@@ -340,7 +245,7 @@ name = "system"
 version = "0.1.0"
 dependencies = [
  "common_header",
- "mcu",
+ "mcu_header",
  "system_reset",
 ]
 

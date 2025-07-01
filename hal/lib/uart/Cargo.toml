@@ -16,9 +16,14 @@ lto = false
 
 
 [dependencies]
-hal_ll_uart = { path = "../../../hal_ll/uart/hal_ll_uart" }
+hal_ll = { path = "../../../hal_ll" }
 hal_target = { path = "../../interface"}
 hal_gpio = { path = "../gpio"}
 system = {path = "../../../core/system"}
 interrupt = {path = "../../../core/interrupt"}
 ring = {path = "../../../platform/ring"}
+
+
+[features]
+default = ["uart"]
+uart = ["hal_ll/uart"]

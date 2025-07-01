@@ -40,7 +40,7 @@
 #![no_std]
 #![allow(non_camel_case_types)]
 
-use hal_ll_gpio::*;
+use hal_ll::gpio::*;
 use hal_target::*;
 use hal_target::pin_names::*;
 

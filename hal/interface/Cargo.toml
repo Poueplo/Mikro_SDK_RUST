@@ -16,4 +16,4 @@ lto = false
 
 
 [dependencies]
-hal_ll_target = {path = "../../hal_ll/hal_ll_target"}
+hal_ll = {path = "../../hal_ll"}
