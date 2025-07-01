@@ -1,4 +1,4 @@
 # .cargo/config
 [build]
-target = "thumbv7m-none-eabi"
+target = "{compiling_target}"
 rustflags = ["-C", "link-arg=-Tmemory.x"]
