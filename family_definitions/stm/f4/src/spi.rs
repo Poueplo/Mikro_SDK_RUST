@@ -223,7 +223,7 @@ pub const _spi_mosi_map: &[hal_ll_spi_master_pin_map_t] =
     #[cfg(all(feature = "spi2", feature = "spi2_mosi_b15_af5"))]
     hal_ll_spi_master_pin_map_t{ pin: GPIO_B15, base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8), af: HAL_LL_SPI2_MASTER_GPIO_AF5 as u32},
     #[cfg(all(feature = "spi2", feature = "spi2_mosi_c1_af5"))]
-    hal_ll_spi_master_pin_map_t{ pin: GPIO_C3, base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8), af: HAL_LL_SPI2_MASTER_GPIO_AF5 as u32},
+    hal_ll_spi_master_pin_map_t{ pin: GPIO_C1, base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8), af: HAL_LL_SPI2_MASTER_GPIO_AF5 as u32},
     #[cfg(all(feature = "spi2", feature = "spi2_mosi_c3_af5"))]
     hal_ll_spi_master_pin_map_t{ pin: GPIO_C3, base: SPI2_MASTER_BASE_ADDR, module_index: hal_ll_spi_master_module_num(spi_modules::SPI_MODULE_2 as u8), af: HAL_LL_SPI2_MASTER_GPIO_AF5 as u32},
     #[cfg(all(feature = "spi2", feature = "spi2_mosi_i3_af5"))]
