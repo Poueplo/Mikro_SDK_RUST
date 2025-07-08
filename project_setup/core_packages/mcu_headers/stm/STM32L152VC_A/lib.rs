@@ -497,7 +497,6 @@ pub const DMA2_Channel3_BASE: u32 = DMA2_BASE + 0x00000030;
 pub const DMA2_Channel4_BASE: u32 = DMA2_BASE + 0x00000044;
 pub const DMA2_Channel5_BASE: u32 = DMA2_BASE + 0x00000058;
 pub const DBGMCU_BASE: u32 = 0xE0042000;
-pub const DAC: u32 = DAC1;
 pub const LSI_STARTUP_TIME: u32 = 200;
 pub const VREFINT_CAL_ADDR_CMSIS: u32 = 0x1FF800F8;
 pub const TEMPSENSOR_CAL1_ADDR_CMSIS: u32 = 0x1FF800FA;
