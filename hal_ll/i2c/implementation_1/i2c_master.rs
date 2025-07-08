@@ -40,7 +40,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(non_camel_case_types)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::i2c::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;
@@ -56,6 +56,7 @@ const HAL_LL_I2C_CCR_DUTY_BIT : u32 = 14;
 const HAL_LL_I2C_CCR_F_S_BIT : u32 = 15;
 const HAL_LL_I2C1EN_BIT : u32 = 21;
 const HAL_LL_I2C2EN_BIT : u32 = 22;
+#[cfg(feature = "i2c3")]
 const HAL_LL_I2C3EN_BIT : u32 = 23;
 
 const HAL_LL_I2C_CR1_PE_BIT : u32 = 0;
@@ -801,12 +802,7 @@ fn hal_ll_i2c_calculate_speed(clock_value: u32, speed: u32) -> u32 {
 fn hal_ll_i2c_hw_init(map: &mut hal_ll_i2c_hw_specifics_map_t) {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
     let frequency_range: u32;
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef{
-        SYSCLK_Frequency    : 0,
-        HCLK_Frequency      : 0,
-        PCLK1_Frequency     : 0,
-        PCLK2_Frequency     : 0
-        };
+    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
 

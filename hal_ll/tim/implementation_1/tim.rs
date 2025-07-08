@@ -40,7 +40,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_upper_case_globals)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::tim::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;
@@ -493,12 +493,7 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_tim_handle_register_t) -> &'a mut hal
 }
 
 fn hal_ll_tim_clock_source(selector : u8) -> u32 {
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef{
-        SYSCLK_Frequency    : 0,
-        HCLK_Frequency      : 0,
-        PCLK1_Frequency     : 0,
-        PCLK2_Frequency     : 0
-        };
+    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
 
