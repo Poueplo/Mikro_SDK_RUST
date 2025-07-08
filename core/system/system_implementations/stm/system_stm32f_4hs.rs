@@ -85,6 +85,17 @@ pub struct RCC_ClocksTypeDef
     pub PCLK2_Frequency     : u32,
 }
 
+impl Default for RCC_ClocksTypeDef {
+    fn default() -> Self {
+        Self {
+            SYSCLK_Frequency    : 0,
+            HCLK_Frequency      : 0,
+            PCLK1_Frequency     : 0,
+            PCLK2_Frequency     : 0
+        }
+    }
+}
+
 const APBAHBPrescTable : [u8; 16] = [0, 0, 0, 0, 1, 2, 3, 4, 1, 2, 3, 4, 6, 7, 8, 9];
 
 //*****************************************************************************
@@ -477,4 +488,11 @@ pub fn delay_100ms() {
 
 pub fn delay_1sec() {
     Delay_ms(1000);
+}
+
+pub fn get_gpio_clock<'a>() -> &'a mut u32 {
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        &mut (*rcc_ptr).AHB1ENR
+    }
 }

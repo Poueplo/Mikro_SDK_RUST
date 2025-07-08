@@ -712,12 +712,7 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
 }
 
 fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef{
-        SYSCLK_Frequency    : 0,
-        HCLK_Frequency      : 0,
-        PCLK1_Frequency     : 0,
-        PCLK2_Frequency     : 0
-        };
+    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
 
     rcc_get_clocks_frequency( &mut rcc_clocks );
 
