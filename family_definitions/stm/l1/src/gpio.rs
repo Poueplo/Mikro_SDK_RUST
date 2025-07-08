@@ -49,12 +49,12 @@ pub const GPIOC_BASE_ADDR: u32 = 0x4002_0800;
 pub const GPIOD_BASE_ADDR: u32 = 0x4002_0C00;
 #[cfg(feature = "gpioe")]
 pub const GPIOE_BASE_ADDR: u32 = 0x4002_1000;
-#[cfg(feature = "gpioh")]
-pub const GPIOH_BASE_ADDR: u32 = 0x4002_1400;
 #[cfg(feature = "gpiof")]
 pub const GPIOF_BASE_ADDR: u32 = 0x4002_1800;
 #[cfg(feature = "gpiog")]
 pub const GPIOG_BASE_ADDR: u32 = 0x4002_1C00;
+#[cfg(feature = "gpioh")]
+pub const GPIOH_BASE_ADDR: u32 = 0x4002_1400;
 
 #[cfg(feature = "gpioa")]
 pub const GPIO_PORT_A: hal_ll_port_name_t = 0x00;

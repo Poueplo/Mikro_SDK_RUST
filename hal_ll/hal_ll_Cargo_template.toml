@@ -25,7 +25,13 @@ mcu_definition = {path = "../family_definitions/stm/{family}"}
 interrupt = {path = "../core/interrupt", optional = true}
 
 [features]
-default = [{gpio}]
+default = ["family", {gpio}]
+
+family = ["{family}"]
+
+f2 = []
+f4 = []
+l1 = []
 
 gpioa = ["mcu_definition/gpioa"]
 gpiob = ["mcu_definition/gpiob"]
