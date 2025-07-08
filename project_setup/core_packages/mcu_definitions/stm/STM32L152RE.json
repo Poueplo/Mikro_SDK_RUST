@@ -1,0 +1,777 @@
+{
+    "config_registers": [
+        {
+            "address": "40023800",
+            "default": "00000000",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "00000001",
+                    "key": "HSION",
+                    "label": "Internal high-speed clock enable",
+                    "mask": "00000001",
+                    "settings": [
+                        {
+                            "label": "Internal 16 MHz RC oscillator OFF",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "Internal 16 MHz RC oscillator ON",
+                            "value": "00000001"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "MSION",
+                    "label": "MSI clock enable",
+                    "mask": "00000100",
+                    "settings": [
+                        {
+                            "label": "MSI oscillator OFF",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "MSI oscillator ON",
+                            "value": "00000100"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "HSEON",
+                    "label": "External high-speed clock enable",
+                    "mask": "00010000",
+                    "settings": [
+                        {
+                            "label": "HSE oscillator OFF",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HSE oscillator ON",
+                            "value": "00010000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "HSEBYP",
+                    "label": "External high-speed clock bypass",
+                    "mask": "00040000",
+                    "settings": [
+                        {
+                            "label": "HSE oscillator not bypassed",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HSE oscillator bypassed with external clock",
+                            "value": "00040000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "CSSON",
+                    "label": "Clock security system enable",
+                    "mask": "10000000",
+                    "settings": [
+                        {
+                            "label": "Clock detector OFF",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "Clock detector ON (if the HSE oscillator is ready, OFF if not)",
+                            "value": "10000000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "01000000",
+                    "key": "PLLON",
+                    "label": "PLL Power Down",
+                    "mask": "01000000",
+                    "settings": [
+                        {
+                            "label": "PLL OFF",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "PLL ON",
+                            "value": "01000000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "60000000",
+                    "key": "RTCPRE",
+                    "label": "RTC/LCD prescaler",
+                    "mask": "60000000",
+                    "settings": [
+                        {
+                            "label": "HSE is divided by 2 for RTC/LCD clock",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HSE is divided by 4 for RTC/LCD clock",
+                            "value": "20000000"
+                        },
+                        {
+                            "label": "HSE is divided by 8 for RTC/LCD clock",
+                            "value": "40000000"
+                        },
+                        {
+                            "label": "HSE is divided by 16 for RTC/LCD clock",
+                            "value": "60000000"
+                        }
+                    ]
+                }
+            ],
+            "key": "RCC_CR",
+            "unused": "00000000"
+        },
+        {
+            "address": "40023808",
+            "default": "00000000",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "00000003",
+                    "key": "SW",
+                    "label": "System clock switch",
+                    "mask": "00000003",
+                    "settings": [
+                        {
+                            "label": "MSI oscillator used as system clock",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HSI oscillator used as system clock",
+                            "value": "00000001"
+                        },
+                        {
+                            "label": "HSE oscillator used as system clock",
+                            "value": "00000002"
+                        },
+                        {
+                            "label": "PLL used as system clock",
+                            "value": "00000003"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "HPRE",
+                    "label": "Set and cleared by software to control the division factor of the AHB clock",
+                    "mask": "000000F0",
+                    "settings": [
+                        {
+                            "label": "SYSCLK not divided",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "SYSCLK divided by 2",
+                            "value": "00000080"
+                        },
+                        {
+                            "label": "SYSCLK divided by 4",
+                            "value": "00000090"
+                        },
+                        {
+                            "label": "SYSCLK divided by 8",
+                            "value": "000000A0"
+                        },
+                        {
+                            "label": "SYSCLK divided by 16",
+                            "value": "000000B0"
+                        },
+                        {
+                            "label": "SYSCLK divided by 64",
+                            "value": "000000C0"
+                        },
+                        {
+                            "label": "SYSCLK divided by 128",
+                            "value": "000000D0"
+                        },
+                        {
+                            "label": "SYSCLK divided by 256",
+                            "value": "000000E0"
+                        },
+                        {
+                            "label": "SYSCLK divided by 512",
+                            "value": "000000F0"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "PPRE1",
+                    "label": "APB low-speed prescaler (APB1)",
+                    "mask": "00000700",
+                    "settings": [
+                        {
+                            "label": "HCLK not divided ",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HCLK divided by 2 ",
+                            "value": "00000400"
+                        },
+                        {
+                            "label": "HCLK divided by 4 ",
+                            "value": "00000500"
+                        },
+                        {
+                            "label": "HCLK divided by 8 ",
+                            "value": "00000600"
+                        },
+                        {
+                            "label": "HCLK divided by 16 ",
+                            "value": "00000700"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "PPRE2",
+                    "label": "APB high-speed prescaler (APB2)",
+                    "mask": "00003800",
+                    "settings": [
+                        {
+                            "label": "HCLK not divided ",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HCLK divided by 2 ",
+                            "value": "00002000"
+                        },
+                        {
+                            "label": "HCLK divided by 4 ",
+                            "value": "00002100"
+                        },
+                        {
+                            "label": "HCLK divided by 8 ",
+                            "value": "00003000"
+                        },
+                        {
+                            "label": "HCLK divided by 16 ",
+                            "value": "00003100"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "PLLSRC",
+                    "label": "PLL entry clock source",
+                    "mask": "00010000",
+                    "settings": [
+                        {
+                            "label": "HSI oscillator clock selected as PLL input clock",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "HSE oscillator clock selected as PLL input clock",
+                            "value": "00010000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00040000",
+                    "key": "PLLMUL",
+                    "label": "PLL multiplication factor",
+                    "mask": "003C0000",
+                    "settings": [
+                        {
+                            "label": "PLLVCO = PLL clock entry x 3",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 4",
+                            "value": "00040000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 6",
+                            "value": "00080000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 8",
+                            "value": "000C0000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 12",
+                            "value": "00100000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 16",
+                            "value": "00140000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 24",
+                            "value": "00180000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 32",
+                            "value": "001C0000"
+                        },
+                        {
+                            "label": "PLLVCO = PLL clock entry x 48",
+                            "value": "00200000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00400000",
+                    "key": "PLLDIV",
+                    "label": "PLL output division",
+                    "mask": "00C00000",
+                    "settings": [
+                        {
+                            "label": "not allowed",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "PLL clock output = PLLVCO / 2",
+                            "value": "00400000"
+                        },
+                        {
+                            "label": "PLL clock output = PLLVCO / 3",
+                            "value": "00800000"
+                        },
+                        {
+                            "label": "PLL clock output = PLLVCO / 4",
+                            "value": "00C00000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "00000000",
+                    "key": "MCOSEL",
+                    "label": "Microcontroller clock output",
+                    "mask": "07000000",
+                    "settings": [
+                        {
+                            "label": "No clock",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "System clock (SYSCLK) selected",
+                            "value": "01000000"
+                        },
+                        {
+                            "label": "HSI clock selected",
+                            "value": "02000000"
+                        },
+                        {
+                            "label": "MSI oscillator clock selected",
+                            "value": "03000000"
+                        },
+                        {
+                            "label": "HSE oscillator clock selected",
+                            "value": "04000000"
+                        },
+                        {
+                            "label": "PLL clock selected",
+                            "value": "05000000"
+                        },
+                        {
+                            "label": "LSI oscillator clock selected",
+                            "value": "06000000"
+                        },
+                        {
+                            "label": "LSE oscillator clock selected",
+                            "value": "07000000"
+                        }
+                    ]
+                },
+                {
+                    "hidden": false,
+                    "init": "40000000",
+                    "key": "MCOPRE",
+                    "label": "Microcontroller clock output prescaler",
+                    "mask": "70000000",
+                    "settings": [
+                        {
+                            "label": "MCO is divided by 1",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "MCO is divided by 2",
+                            "value": "10000000"
+                        },
+                        {
+                            "label": "MCO is divided by 4",
+                            "value": "20000000"
+                        },
+                        {
+                            "label": "MCO is divided by 8",
+                            "value": "30000000"
+                        },
+                        {
+                            "label": "MCO is divided by 16",
+                            "value": "40000000"
+                        }
+                    ]
+                }
+            ],
+            "key": "RCC_CFGR",
+            "unused": "00000000"
+        },
+        {
+            "address": "40007000",
+            "default": "00000000",
+            "fields": [
+                {
+                    "hidden": false,
+                    "init": "00000002",
+                    "key": "VCORE",
+                    "label": "Core Voltage",
+                    "mask": "00000003",
+                    "settings": [
+                        {
+                            "label": "VCORE = 1.2 V",
+                            "value": "00000000"
+                        },
+                        {
+                            "label": "VCORE = 1.5 V",
+                            "value": "00000001"
+                        },
+                        {
+                            "label": "VCORE = 1.8 V",
+                            "value": "00000002"
+                        }
+                    ]
+                }
+            ],
+            "key": "SVCORE",
+            "unused": "00000000"
+        }
+    ],
+    "core": "M3",
+    "delay_src_path": "delays/m3/__lib_delays.c",
+    "clock": "32",
+        "language_list": [
+        {
+            "language": "RUST",
+            "module_list": [
+                {
+                    "module_name": "gpio",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "gpioa",
+                            "pin_map_features": [
+                                "gpioa_0",
+                                "gpioa_1",
+                                "gpioa_2",
+                                "gpioa_3",
+                                "gpioa_4",
+                                "gpioa_5",
+                                "gpioa_6",
+                                "gpioa_7",
+                                "gpioa_8",
+                                "gpioa_9",
+                                "gpioa_10",
+                                "gpioa_11",
+                                "gpioa_12",
+                                "gpioa_13",
+                                "gpioa_14",
+                                "gpioa_15"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpiob",
+                            "pin_map_features": [
+                                "gpiob_0",
+                                "gpiob_1",
+                                "gpiob_2",
+                                "gpiob_3",
+                                "gpiob_4",
+                                "gpiob_5",
+                                "gpiob_6",
+                                "gpiob_7",
+                                "gpiob_8",
+                                "gpiob_9",
+                                "gpiob_10",
+                                "gpiob_11",
+                                "gpiob_12",
+                                "gpiob_13",
+                                "gpiob_14",
+                                "gpiob_15"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpioc",
+                            "pin_map_features": [
+                                "gpioc_0",
+                                "gpioc_1",
+                                "gpioc_2",
+                                "gpioc_3",
+                                "gpioc_4",
+                                "gpioc_5",
+                                "gpioc_6",
+                                "gpioc_7",
+                                "gpioc_8",
+                                "gpioc_9",
+                                "gpioc_10",
+                                "gpioc_11",
+                                "gpioc_12",
+                                "gpioc_13",
+                                "gpioc_14",
+                                "gpioc_15"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpiod",
+                            "pin_map_features": [
+                                "gpiod_2"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpioe",
+                            "pin_map_features": [
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpiof",
+                            "pin_map_features": [
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpiog",
+                            "pin_map_features": [
+                            ]
+                        },
+                        {
+                            "sub_module_name": "gpioh",
+                            "pin_map_features": [
+                                "gpioh_0",
+                                "gpioh_1"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "module_name": "adc",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "adc1",
+                            "pin_map_features": [
+                                "adc1_a0_c0",
+                                "adc1_a1_c1",
+                                "adc1_a2_c2",
+                                "adc1_a3_c3",
+                                "adc1_a4_c4",
+                                "adc1_a5_c5",
+                                "adc1_a6_c6",
+                                "adc1_a7_c7",
+                                "adc1_b0_c8",
+                                "adc1_b1_c9",
+                                "adc1_c0_c10",
+                                "adc1_c1_c11",
+                                "adc1_c2_c12",
+                                "adc1_c3_c13",
+                                "adc1_c4_c14",
+                                "adc1_c5_c15",
+                                "adc1_b12_c18",
+                                "adc1_b13_c19",
+                                "adc1_b14_c20",
+                                "adc1_b15_c21",
+                                "adc1_b2_c0b"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "module_name": "i2c",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "i2c1",
+                            "pin_map_features": [
+                                "i2c1_scl_b6_af4",
+                                "i2c1_scl_b8_af4",
+                                "i2c1_sda_b7_af4",
+                                "i2c1_sda_b9_af4"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "i2c2",
+                            "pin_map_features": [
+                                "i2c2_scl_b10_af4",
+                                "i2c2_sda_b11_af4"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "module_name": "spi",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "spi1",
+                            "pin_map_features": [
+                                "spi1_sck_a5_af5",
+                                "spi1_sck_b3_af5",
+                                "spi1_miso_a6_af5",
+                                "spi1_miso_a11_af5",
+                                "spi1_miso_b4_af5",
+                                "spi1_mosi_a7_af5",
+                                "spi1_mosi_a12_af5",
+                                "spi1_mosi_b5_af5"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "spi2",
+                            "pin_map_features": [
+                                "spi2_sck_b13_af5",
+                                "spi2_miso_b14_af5",
+                                "spi2_mosi_b15_af5"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "spi3",
+                            "pin_map_features": [
+                                "spi3_sck_b3_af6",
+                                "spi3_sck_c10_af6",
+                                "spi3_miso_b4_af6",
+                                "spi3_miso_c11_af6",
+                                "spi3_mosi_b5_af6",
+                                "spi3_mosi_c12_af6"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "module_name": "tim",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "tim2",
+                            "pin_map_features": [
+                                "tim2_ch1_a0_af1",
+                                "tim2_ch1_a5_af1",
+                                "tim2_ch1_a15_af1",
+                                "tim2_ch2_a1_af1",
+                                "tim2_ch2_b3_af1",
+                                "tim2_ch3_a2_af1",
+                                "tim2_ch3_b10_af1",
+                                "tim2_ch4_a3_af1",
+                                "tim2_ch4_b11_af1"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim3",
+                            "pin_map_features": [
+                                "tim3_ch1_a6_af2",
+                                "tim3_ch1_b4_af2",
+                                "tim3_ch1_c6_af2",
+                                "tim3_ch2_a7_af2",
+                                "tim3_ch2_b5_af2",
+                                "tim3_ch2_c7_af2",
+                                "tim3_ch3_b0_af2",
+                                "tim3_ch3_c8_af2",
+                                "tim3_ch4_b1_af2",
+                                "tim3_ch4_c9_af2"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim4",
+                            "pin_map_features": [
+                                "tim4_ch1_b6_af2",
+                                "tim4_ch2_b7_af2",
+                                "tim4_ch3_b8_af2",
+                                "tim4_ch4_b9_af2"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim5",
+                            "pin_map_features": [
+                                "tim5_ch1_a0_af2",
+                                "tim5_ch2_a1_af2",
+                                "tim5_ch3_a2_af2",
+                                "tim5_ch4_a3_af2"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim9",
+                            "pin_map_features": [
+                                "tim9_ch1_a2_af3",
+                                "tim9_ch1_b13_af3",
+                                "tim9_ch2_a3_af3",
+                                "tim9_ch2_b14_af3"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim10",
+                            "pin_map_features": [
+                                "tim10_ch1_a6_af3",
+                                "tim10_ch1_b12_af3",
+                                "tim10_ch1_b8_af3"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "tim11",
+                            "pin_map_features": [
+                                "tim11_ch1_a7_af3",
+                                "tim11_ch1_b9_af3",
+                                "tim11_ch1_b15_af3"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "module_name": "uart",
+                    "sub_modules": [
+                        {
+                            "sub_module_name": "uart1",
+                            "pin_map_features": [
+                                "uart1_rx_a10_af7",
+                                "uart1_rx_b7_af7",
+                                "uart1_tx_a9_af7",
+                                "uart1_tx_b6_af7"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "uart2",
+                            "pin_map_features": [
+                                "uart2_rx_a3_af7",
+                                "uart2_tx_a2_af7"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "uart3",
+                            "pin_map_features": [
+                                "uart3_rx_b11_af7",
+                                "uart3_rx_c11_af7",
+                                "uart3_tx_b10_af7",
+                                "uart3_tx_c10_af7"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "uart4",
+                            "pin_map_features": [
+                                "uart4_rx_c11_af8",
+                                "uart4_tx_c10_af8"
+                            ]
+                        },
+                        {
+                            "sub_module_name": "uart5",
+                            "pin_map_features": [
+                                "uart5_rx_d2_af8",
+                                "uart5_tx_c12_af8"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ] 
+}
