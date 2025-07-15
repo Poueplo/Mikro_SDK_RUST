@@ -48,7 +48,7 @@
 pub use crate::pin_names;
 use crate::target::*;
 use hal_ll_gpio_constants::*;
-use system::{RCC_TypeDef, RCC_BASE};
+use system::{RCC_TypeDef, RCC_BASE, get_gpio_clock};
 pub mod gpio_constants {
     pub use hal_ll_gpio_constants::{
         GPIO_CFG_MODE_ALT_FUNCTION,
@@ -220,7 +220,7 @@ fn hal_ll_gpio_clock_enable(port: u32) {
     unsafe 
     {
         let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
-        let RCC_GPIOCLOCK: *mut u32 = &mut (*rcc_ptr).AHB1ENR;
+        let RCC_GPIOCLOCK: *mut u32 = get_gpio_clock(); //move this to family def with a function get gpio_clock for better genericity
 
         match port & 0xFFFFFC00 {
             #[cfg(feature = "gpioa")]
@@ -233,12 +233,21 @@ fn hal_ll_gpio_clock_enable(port: u32) {
             GPIOD_BASE_ADDR => {pos = 0x8;},
             #[cfg(feature = "gpioe")]
             GPIOE_BASE_ADDR => {pos = 0x10;},
-            #[cfg(feature = "gpiof")]
+
+            #[cfg(all(feature = "gpiof", not(feature = "l1")))]
             GPIOF_BASE_ADDR => {pos = 0x20;},
-            #[cfg(feature = "gpiog")]
+            #[cfg(all(feature = "gpiog", not(feature = "l1")))]
             GPIOG_BASE_ADDR => {pos = 0x40;},
-            #[cfg(feature = "gpioh")]
+            #[cfg(all(feature = "gpioh", not(feature = "l1")))]
             GPIOH_BASE_ADDR => {pos = 0x80;},
+            
+            #[cfg(all(feature = "gpioh", feature = "l1"))]
+            GPIOH_BASE_ADDR => {pos = 0x20;},
+            #[cfg(all(feature = "gpiof", feature = "l1"))]
+            GPIOF_BASE_ADDR => {pos = 0x40;},
+            #[cfg(all(feature = "gpiog", feature = "l1"))]
+            GPIOG_BASE_ADDR => {pos = 0x80;},
+
             #[cfg(feature = "gpioi")]
             GPIOI_BASE_ADDR => {pos = 0x100;},
             #[cfg(feature = "gpioj")]

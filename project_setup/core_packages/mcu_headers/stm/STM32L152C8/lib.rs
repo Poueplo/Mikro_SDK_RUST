@@ -434,7 +434,6 @@ pub const DMA1_Channel5_BASE: u32 = DMA1_BASE + 0x00000058;
 pub const DMA1_Channel6_BASE: u32 = DMA1_BASE + 0x0000006C;
 pub const DMA1_Channel7_BASE: u32 = DMA1_BASE + 0x00000080;
 pub const DBGMCU_BASE: u32 = 0xE0042000;
-pub const DAC: u32 = DAC1;
 pub const LSI_STARTUP_TIME: u32 = 200;
 pub const VREFINT_CAL_ADDR_CMSIS: u32 = 0x1FF80078;
 pub const TEMPSENSOR_CAL1_ADDR_CMSIS: u32 = 0x1FF8007A;

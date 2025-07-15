@@ -2,25 +2,41 @@ outdated WIP
 
 # Mikro SDK in Rust
 
-**Supported MCU:** STM32F429x  
+**Supported MCU:** 
+- STM32F207ZG
+- STM32F217ZG
+- STM32F405ZG
+- STM32F412RE
+- STM32F429ZI
+- STM32F479II
+- STM32L152RE
 
 ## Overview  
-This initial version implements only GPIO functionality.  
-The `main.rs` file calls functions from the following modules:  
+This version implements every module required by Mikrobuses.  
+The folder `test` provides a set of `main.rs` files demonstrating the capabilities of the SDK using function from the libraries below:  
 
-- `drv_digital_in`  
-- `drv_digital_out`  
-- `drv_port`  
+- `drv_digital_in`
+- `drv_digital_out`
+- `drv_port`
+- `drv_analog_in`
+- `drv_i2c_master`
+- `drv_spi_master`
+- `drv_pwm`
+- `drv_uart`
+- `drv_one_wire`
 
-For some functions, it is recommended to use a debugger to check the return value, especially for the variable `value1`.  
+For some functions, it is recommended to use a debugger to check the return value, especially for the variable `value1`.
+The setting of pins and port should be adapted to the MCU being used.
 
 ## Compiling and Flashing the Project  
 
 ### Prerequisites  
 Ensure you have the following tools installed:  
 
-- **Rustup**  
-  - Installer for Windows, and installation procedure for other platform can be found here: [Rust Installation Guide](https://www.rust-lang.org/tools/install)  
+- **Rustup and python 3**
+  - Installer for Windows, and installation procedure for other platform can be found here: 
+    - [Rust Installation Guide](https://www.rust-lang.org/tools/install)
+    - [Python](https://www.python.org/downloads/)
 
 - **probe-rs**  
   - Windows PowerShell command:  
@@ -32,6 +48,13 @@ Ensure you have the following tools installed:
 
 You must have a ST-Link V2, Firmware version 2.26 or higher
 
+### Project Setup
+
+To set your project up according to your chosen MCU You must launch the python app `project_setup_application.py`.
+It will open a window in which you will have the possibility to search for your MCU. It will load a default set of settings for the clock that can be adjusted to your liking. Then all you have to do is press the button "Save System Parameters" at the bottom of the windows and you project will be set to the chosen MCU with you clock settings.
+
+You can now develope your project !
+
 ### Compiling and Flashing  
 
 Run the following command to build and flash your MCU:  
@@ -39,10 +62,9 @@ Run the following command to build and flash your MCU:
 ```sh
 cargo-flash --chip STM32F429ZI --connect-under-reset
 ```
+This command should be adapted to the MCU used for your project
 
 After executing this command, you may be prompted to select a detected programmer (if multiple are connected). Choose the appropriate ST-Link V2.
-
-This project is configured to target the thumbv7m-none-eabi architecture by default. You can find this setting in .cargo/config.toml.
 
 ## Debugging on Windows
 
@@ -64,6 +86,11 @@ source [find interface/stlink.cfg]
 transport select dapdirect_swd
 source [find target/stm32f4x.cfg]
 ```
+The target should be adapted again to the family of the MCU in use for your project. Here is a list for the family currently being supported:
+  - stm32f4x.cfg
+  - stm32f2x.cfg
+  - stm32l1.cfg
+
 
 ### Debugging  
 
@@ -74,8 +101,11 @@ source [find target/stm32f4x.cfg]
    
 2. Launch GDB:  
    ```sh
-   <Your path to>\arm-gnu-toolchain-XX.X.rel1-mingw-w64-x86_64-arm-none-eabi\bin\arm-none-eabi-gdb.exe <Your path to>\<project root folder>\target\thumbv7m-none-eabi\debug\mikrosdk
+   <Your path to>\arm-gnu-toolchain-XX.X.rel1-mingw-w64-x86_64-arm-none-eabi\bin\arm-none-eabi-gdb.exe <Your path to>\<project root folder>\target\<target of the chosen  MCU>\debug\mikrosdk
    ```
+   If you do not know the name of the target for your specific MCU, you can find it in the file `.cargo/config.toml`. It is automatically set at project setup by the python application.
+   <br>
+   
 3. In GDB:
     ```sh
     target extended-remote localhost:3333

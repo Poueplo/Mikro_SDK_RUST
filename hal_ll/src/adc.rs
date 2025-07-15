@@ -470,12 +470,7 @@ fn _hal_ll_adc_hw_init(base : u32, resolution : u32,  channel : u16) {
 
     let adc_ptr : *mut hal_ll_adc_base_handle_t = base as *mut hal_ll_adc_base_handle_t;
 
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef{
-        SYSCLK_Frequency    : 0,
-        HCLK_Frequency      : 0,
-        PCLK1_Frequency     : 0,
-        PCLK2_Frequency     : 0
-        };
+    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
     let reg : *mut u32 = (ADC1_BASE_ADDR + HAL_LL_ADC_CCR_OFFSET) as *mut u32;
 
     rcc_get_clocks_frequency( &mut rcc_clocks );

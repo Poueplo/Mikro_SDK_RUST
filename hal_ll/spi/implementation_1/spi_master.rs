@@ -41,7 +41,7 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused)]
 
-use hal_ll_target::*;
+use crate::target::*;
 pub use mcu_definition::spi::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;
@@ -446,13 +446,7 @@ fn hal_ll_spi_master_map_pins(module_index: usize, index_list: &mut hal_ll_spi_p
 }
 
 fn hal_ll_spi_master_set_clock(map: &mut hal_ll_spi_hw_specifics_map_t, hal_ll_state: bool, clock_value: &mut u32) {
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef{
-        SYSCLK_Frequency    : 0,
-        HCLK_Frequency      : 0,
-        PCLK1_Frequency     : 0,
-        PCLK2_Frequency     : 0
-        };
-
+    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
     rcc_get_clocks_frequency( &mut rcc_clocks );
     unsafe {
         let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
