@@ -93,8 +93,6 @@ pub enum hal_ll_adc_channel_t
     HAL_LL_ADC_CHANNEL_29,
     HAL_LL_ADC_CHANNEL_30,
     HAL_LL_ADC_CHANNEL_31,
-
-    HAL_LL_ADC_CHANNEL_B,
     
     HAL_LL_ADC_CHANNEL_0B,
     HAL_LL_ADC_CHANNEL_1B,
@@ -131,6 +129,8 @@ pub enum hal_ll_adc_channel_t
 
     HAL_LL_ADC_CHANNEL_NC = 0xFFFF
 }
+
+pub const HAL_LL_ADC_CHANNEL_B : u16 = hal_ll_adc_channel_t::HAL_LL_ADC_CHANNEL_0B as u16;
 
 pub struct hal_ll_adc_pin_map_t
 {

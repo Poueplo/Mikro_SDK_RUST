@@ -151,10 +151,19 @@ class MCUConfigurator(QWidget):
         family_path = query_result[1]
         vendor = query_result[2]
         target = query_result[3]
+        gpio = query_result[4] 
+        adc = query_result[5]
+        i2c = query_result[6]
+        spi = query_result[7]
+        tim = query_result[8]
+        uart = query_result[9]
+
         query_result_path_index = 3
         current_data = None
         family_template = None
         hal_ll_template = None
+        implementation = None
+
         with open(f"project_setup/core_packages/mcu_definitions/{vendor}/{selected_mcu}.json", "r") as f:
             current_data = json.load(f)
         with open(f"family_definitions/{vendor}/{family_path}/Cargo_family_template.toml", "r") as f:
@@ -188,6 +197,41 @@ class MCUConfigurator(QWidget):
             query_result_path_index += 1
         
         hal_ll_template = hal_ll_template.replace(f"{{family}}", family_path)
+
+
+        #loading modules implementation
+        with open(f"hal_ll/gpio/gpio_port/{gpio}/gpio_port.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/gpio_port.rs", "w") as f:
+            f.write(implementation)
+        
+        with open(f"hal_ll/adc/{adc}/adc.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/adc.rs", "w") as f:
+            f.write(implementation)
+
+        with open(f"hal_ll/i2c/{i2c}/i2c_master.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/i2c_master.rs", "w") as f:
+            f.write(implementation)
+
+        with open(f"hal_ll/spi/{spi}/spi_master.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/spi_master.rs", "w") as f:
+            f.write(implementation)
+
+        with open(f"hal_ll/tim/{tim}/tim.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/tim.rs", "w") as f:
+            f.write(implementation)
+
+        with open(f"hal_ll/uart/{uart}/uart.rs", "r") as f:
+            implementation = f.read()
+        with open("hal_ll/src/uart.rs", "w") as f:
+            f.write(implementation)
+
+
+        
 
         with open(f"family_definitions/{vendor}/{family_path}/Cargo.toml", "w") as f:
             f.write(family_template)
