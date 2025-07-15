@@ -1,5 +1,3 @@
-outdated WIP
-
 # Mikro SDK in Rust
 
 **Supported MCU:** 
