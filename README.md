@@ -23,7 +23,7 @@ The folder `test` provides a set of `main.rs` files demonstrating the capabiliti
 - `drv_uart`
 - `drv_one_wire`
 
-For some functions, it is recommended to use a debugger to check the return value, especially for the variable `value1`.
+For some functions, it is recommended to use a debugger to check their contents.
 The setting of pins and port should be adapted to the MCU being used.
 
 ## Compiling and Flashing the Project  
