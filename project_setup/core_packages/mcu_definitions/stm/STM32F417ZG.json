@@ -3342,10 +3342,10 @@
                             "pin_map_features": [
                                 "tim2_ch1_a0_af1",
                                 "tim2_ch1_a5_af1",
-                                "tim2_ch1_a15_af1",
                                 "tim2_ch2_a1_af1",
                                 "tim2_ch3_a2_af1",
                                 "tim2_ch4_a3_af1",
+                                "tim2_ch1_a15_af1",
                                 "tim2_ch2_b3_af1",
                                 "tim2_ch3_b10_af1",
                                 "tim2_ch4_b11_af1"

@@ -478,8 +478,11 @@ tim4_ch4_d15_af2 = []
 tim5 = [{tim5_features}]
 
 tim5_ch1_a0_af2 = []
+tim5_ch1_h10_af2 = []
 tim5_ch2_a1_af2 = []
+tim5_ch2_h11_af2 = []
 tim5_ch3_a2_af2 = []
+tim5_ch3_h12_af2 = []
 tim5_ch4_a3_af2 = []
 tim5_ch4_i0_af2 = []
 
@@ -520,8 +523,9 @@ tim11_ch1_f7_af3 = []
 tim12 = [{tim12_features}]
 
 tim12_ch1_b14_af9 = []
-tim12_ch2_b15_af9 = []
 tim12_ch1_h6_af9 = []
+tim12_ch2_b15_af9 = []
+tim12_ch2_h9_af9 = []
 
 tim13 = [{tim13_features}]
 
