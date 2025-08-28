@@ -148,21 +148,26 @@ const HAL_LL_UART_AF_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_
 
 pub type hal_ll_uart_isr_t = fn(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uart_irq_t );
 
-#[derive(Debug)]
+
+// TODO : remove the UART_NOT_CURRENTLY_SUPPORTED error
+#[derive(Debug, PartialEq)]
 pub enum HAL_LL_UART_ERROR {
     UART_WRONG_PINS,
     MODULE_ERROR,
     ACQUIRE_FAIL,
     UART_ERROR,
+    UART_NOT_CURRENTLY_SUPPORTED,
 }
 
+// TODO : remove the UART_NOT_CURRENTLY_SUPPORTED message
 impl fmt::Display for HAL_LL_UART_ERROR {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             Self::UART_WRONG_PINS => write!(f, "UART_WRONG_PINS occurred"),
-            Self::MODULE_ERROR => write!(f, "MODULE_ERROR occurred"),             
-            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),                  
-            Self::UART_ERROR => write!(f, "UART_ERROR occurred"),                  
+            Self::MODULE_ERROR => write!(f, "MODULE_ERROR occurred"),
+            Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),
+            Self::UART_ERROR => write!(f, "UART_ERROR occurred"),
+            Self::UART_NOT_CURRENTLY_SUPPORTED => write!(f, "UART is a work in progress and is currently not supported for this family"),
         }
     }
 }
@@ -304,7 +309,11 @@ static mut hal_ll_uart_hw_specifics_map:[hal_ll_uart_hw_specifics_map_t; (UART_M
 static mut irq_handler : hal_ll_uart_isr_t = empty_handler;
 
 ///////// public functions
+//TODO : check if change required most likely nothing to be change
+//TODO : remove the early error return
 pub fn hal_ll_uart_register_handle(tx_pin: hal_ll_pin_name_t, rx_pin: hal_ll_pin_name_t, hal_module_id: &mut u8) -> Result<hal_ll_uart_handle_register_t> {
+    return Err(HAL_LL_UART_ERROR::UART_NOT_CURRENTLY_SUPPORTED);
+    
     let pin_check_result: u8;
     let mut index_list: hal_ll_uart_pin_id = 
         hal_ll_uart_pin_id {
@@ -335,11 +344,13 @@ pub fn hal_ll_uart_register_handle(tx_pin: hal_ll_pin_name_t, rx_pin: hal_ll_pin
     }
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_register_irq_handler(handler : hal_ll_uart_isr_t)
 {
     unsafe {irq_handler = handler;}
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_module_configure_uart(handle: &mut hal_ll_uart_handle_register_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -353,6 +364,7 @@ pub fn hal_ll_module_configure_uart(handle: &mut hal_ll_uart_handle_register_t) 
     hal_handle.init_ll_state = true;
 }
 
+//TODO : check if change required
 pub fn hal_ll_uart_irq_enable(handle: &mut hal_ll_uart_handle_register_t, irq : hal_ll_uart_irq_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -419,6 +431,7 @@ pub fn hal_ll_uart_irq_enable(handle: &mut hal_ll_uart_handle_register_t, irq : 
     
 }
 
+//TODO : check if change required
 pub fn hal_ll_uart_irq_disable(handle: &mut hal_ll_uart_handle_register_t, irq : hal_ll_uart_irq_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -436,6 +449,7 @@ pub fn hal_ll_uart_irq_disable(handle: &mut hal_ll_uart_handle_register_t, irq :
     }
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_set_baud(handle: &mut hal_ll_uart_handle_register_t, baud: u32) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -449,6 +463,7 @@ pub fn hal_ll_uart_set_baud(handle: &mut hal_ll_uart_handle_register_t, baud: u3
     hal_handle.init_ll_state = true;
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_set_parity(handle: &mut hal_ll_uart_handle_register_t, parity: hal_ll_uart_parity_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -462,6 +477,7 @@ pub fn hal_ll_uart_set_parity(handle: &mut hal_ll_uart_handle_register_t, parity
     hal_handle.init_ll_state = true;
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_set_stop_bits(handle: &mut hal_ll_uart_handle_register_t, stop_bit: hal_ll_uart_stop_bits_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -475,6 +491,7 @@ pub fn hal_ll_uart_set_stop_bits(handle: &mut hal_ll_uart_handle_register_t, sto
     hal_handle.init_ll_state = true;
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_set_data_bits(handle: &mut hal_ll_uart_handle_register_t, data_bit: hal_ll_uart_data_bits_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -488,22 +505,26 @@ pub fn hal_ll_uart_set_data_bits(handle: &mut hal_ll_uart_handle_register_t, dat
     hal_handle.init_ll_state = true;
 }
 
+//TODO : check if change required
 pub fn hal_ll_uart_write(handle: &mut hal_ll_uart_handle_register_t, wr_data: u8) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let uart_ptr : *mut hal_ll_uart_base_handle_t = hal_ll_uart_hw_specifics_map_local.base as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {(*uart_ptr).dr = wr_data as u32 & 0xFF;}
+
+    unsafe {(*uart_ptr).tdr = wr_data as u32 & 0xFF;}
 }
 
+//TODO : check if change required
 pub fn hal_ll_uart_read(handle: &mut hal_ll_uart_handle_register_t) -> u8 {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let uart_ptr : *mut hal_ll_uart_base_handle_t = hal_ll_uart_hw_specifics_map_local.base as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {((*uart_ptr).dr & 0xFF) as u8}
+    unsafe {((*uart_ptr).rdr & 0xFF) as u8}
 }
 
+//TODO : check if change required most likely nothing to be change
 pub fn hal_ll_uart_close(handle: &mut hal_ll_uart_handle_register_t) {
     let hal_handle : &mut hal_ll_uart_handle_register_t = handle;
     let hal_ll_uart_hw_specifics_map_local: &mut hal_ll_uart_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
@@ -539,6 +560,7 @@ pub fn hal_ll_uart_close(handle: &mut hal_ll_uart_handle_register_t) {
 
 ///////// private functions
 
+//TODO : check if change required most likely nothing to be change
 fn hal_ll_uart_check_pins(tx_pin: hal_ll_pin_name_t , rx_pin: hal_ll_pin_name_t , index_list: &mut hal_ll_uart_pin_id) -> u8 {
     let tx_map_size: u8 = hal_ll_uart_tx_map.len() as u8 ;
     let rx_map_size: u8 = hal_ll_uart_rx_map.len() as u8 ;
@@ -586,6 +608,7 @@ fn hal_ll_uart_check_pins(tx_pin: hal_ll_pin_name_t , rx_pin: hal_ll_pin_name_t 
     }
 }
 
+//TODO : check if change required most likely nothing to be change
 #[allow(unused_variables, unused_assignments)]
 fn hal_ll_get_specifics<'a>(handle: hal_ll_uart_handle_register_t) -> &'a mut hal_ll_uart_hw_specifics_map_t {
     let mut hal_ll_module_count: usize = UART_MODULE_COUNT as usize;
@@ -607,6 +630,7 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_uart_handle_register_t) -> &'a mut ha
     }
 }
 
+//TODO : check if change required most likely nothing to be change
 fn hal_ll_uart_map_pins(module_index: usize, index_list: &mut hal_ll_uart_pin_id) {
     unsafe{
         // Map new pins
@@ -618,6 +642,7 @@ fn hal_ll_uart_map_pins(module_index: usize, index_list: &mut hal_ll_uart_pin_id
     }
 }
 
+//TODO : check if change required most likely nothing to be change
 fn hal_ll_uart_alternate_functions_set_state(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state: bool) {
     let mut module: module_struct = module_struct::default();
 
@@ -634,6 +659,7 @@ fn hal_ll_uart_alternate_functions_set_state(map: &mut hal_ll_uart_hw_specifics_
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state : bool) {
     unsafe {
         let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
@@ -713,6 +739,7 @@ fn hal_ll_uart_set_clock(map: &mut hal_ll_uart_hw_specifics_map_t, hal_ll_state 
     
 }
 
+//TODO : check if change required
 fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {
     let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
 
@@ -762,6 +789,7 @@ fn hal_ll_uart_get_clock_speed(module_index : hal_ll_pin_name_t) -> u32 {
     return 0;
 }
 
+//TODO : check if change required
 fn hal_ll_uart_clear_regs(uart_ptr : *mut hal_ll_uart_base_handle_t) {
     unsafe{
         (*uart_ptr).cr1 &= HAL_LL_UART_IT_CR1_MASK;
@@ -770,6 +798,7 @@ fn hal_ll_uart_clear_regs(uart_ptr : *mut hal_ll_uart_base_handle_t) {
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_data_bits_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
     unsafe {
@@ -786,6 +815,7 @@ fn hal_ll_uart_set_data_bits_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_parity_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
 
@@ -805,6 +835,7 @@ fn hal_ll_uart_set_parity_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_stop_bits_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
 
@@ -827,6 +858,7 @@ fn hal_ll_uart_set_stop_bits_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t
     }
 }
 
+//TODO : check if change required
 #[allow(unused_assignments)]
 fn hal_ll_uart_set_baud_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
@@ -855,6 +887,7 @@ fn hal_ll_uart_set_baud_bare_metal(map: &mut hal_ll_uart_hw_specifics_map_t) {
 
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_transmitter(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_state : hal_ll_uart_state_t) {
     unsafe {
         match pin_state
@@ -870,6 +903,7 @@ fn hal_ll_uart_set_transmitter(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_st
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_receiver(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_state : hal_ll_uart_state_t) {
     unsafe {
         match pin_state
@@ -885,6 +919,7 @@ fn hal_ll_uart_set_receiver(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_state
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_set_module(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_state : hal_ll_uart_state_t) {
     unsafe {
         match pin_state
@@ -900,6 +935,7 @@ fn hal_ll_uart_set_module(uart_ptr : *mut hal_ll_uart_base_handle_t, pin_state :
     }
 }
 
+//TODO : check if change required
 fn hal_ll_uart_hw_init(map: &mut hal_ll_uart_hw_specifics_map_t) {
     let uart_ptr : *mut hal_ll_uart_base_handle_t = map.base as *mut hal_ll_uart_base_handle_t;
     hal_ll_uart_clear_regs(uart_ptr);
@@ -918,205 +954,211 @@ fn hal_ll_uart_init(map: &mut hal_ll_uart_hw_specifics_map_t) {
     hal_ll_uart_hw_init(map);
 }
 
+//TODO : check if change required most likely nothing to be change
+//empty function required for initialisation of the UART module (Rust specific: no static can be uninitialised)
 #[allow(unused_variables)]
 fn empty_handler(handle : &mut hal_ll_uart_handle_register_t, event : hal_ll_uart_irq_t ){}
 
 ///// INTERRUPT HANDLERS
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart1")]
-pub extern "Rust" fn UART1_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART1_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// 
+// TODO
+// 
+//
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart1")]
+// pub extern "Rust" fn UART1_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART1_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_1], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart2")]
-pub extern "Rust" fn UART2_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART2_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart2")]
+// pub extern "Rust" fn UART2_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART2_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_2], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart3")]
-pub extern "Rust" fn UART3_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART3_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart3")]
+// pub extern "Rust" fn UART3_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART3_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_3], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart4")]
-pub extern "Rust" fn UART4_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART4_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart4")]
+// pub extern "Rust" fn UART4_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART4_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
-}
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_4], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart5")]
-pub extern "Rust" fn UART5_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART5_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart5")]
+// pub extern "Rust" fn UART5_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART5_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_5], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart6")]
-pub extern "Rust" fn UART6_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART6_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart6")]
+// pub extern "Rust" fn UART6_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART6_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_6], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart7")]
-pub extern "Rust" fn UART7_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART7_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart7")]
+// pub extern "Rust" fn UART7_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART7_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_7], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
 
-#[unsafe(no_mangle)]
-#[cfg(feature = "uart8")]
-pub extern "Rust" fn UART8_IRQHandler() {
-    let uart_ptr : *mut hal_ll_uart_base_handle_t = UART8_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
+// #[unsafe(no_mangle)]
+// #[cfg(feature = "uart8")]
+// pub extern "Rust" fn UART8_IRQHandler() {
+//     let uart_ptr : *mut hal_ll_uart_base_handle_t = UART8_BASE_ADDR as *mut hal_ll_uart_base_handle_t;
 
-    unsafe {
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
+//     unsafe {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_RXNE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
-                clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
-                irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
-            }
-        }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32,HAL_LL_UART_IT_RXNE) != 0 {
+//                 clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_RXNE); //software clear
+//                 irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_RX);
+//             }
+//         }
 
-        if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
+//         if (*uart_ptr).sr & HAL_LL_UART_STATUS_TXE_FLAG > 0 {
             
-            if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
-                //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
-                irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
-            }
-        }
-    }
+//             if check_reg_bit(&(*uart_ptr).cr1 as *const u32 as u32, HAL_LL_UART_IT_TXE) != 0 {
+//                 //clear_reg_bit(&(*uart_ptr).sr as *const u32 as u32, HAL_LL_UART_IT_TXE); //hardware clear by setting data to reg_dr
+//                 irq_handler(&mut hal_ll_module_state[uart_index_8], hal_ll_uart_irq_t::HAL_LL_UART_IRQ_TX);
+//             }
+//         }
+//     }
     
-}
+// }
