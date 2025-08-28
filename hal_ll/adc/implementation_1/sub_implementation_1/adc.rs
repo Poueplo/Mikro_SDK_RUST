@@ -67,7 +67,9 @@ pub const HAL_LL_ADC_ALIGN: u32 = 0x800;
 pub const HAL_LL_ADC_JEXTSEL: u32 = 0xE0000;
 
 pub const HAL_LL_ADC_60MHZ: u32 = 6000_0000;
+pub const HAL_LL_ADC_72MHZ: u32 = 7500_0000;
 pub const HAL_LL_ADC_120MHZ: u32 = 12000_0000;
+pub const HAL_LL_ADC_144MHZ: u32 = 14400_0000;
 pub const HAL_LL_ADC_180MHZ: u32 = 18000_0000;
 
 pub const HAL_LL_ADC_PRESCALER_2: u32 = 0x0000_0000;
@@ -476,22 +478,42 @@ fn _hal_ll_adc_hw_init(base : u32, resolution : u32,  channel : u16) {
     rcc_get_clocks_frequency( &mut rcc_clocks );
     unsafe{
         *reg &= !HAL_LL_ADC_PRESCALER_MASK;
-        if rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_180MHZ 
+        #[cfg(not(feature = "f7"))]
         {
-            *reg |= HAL_LL_ADC_PRESCALER_8;
+            if rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_180MHZ 
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_8;
+            }
+            else if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_120MHZ 
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_6;
+            }
+            else if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_60MHZ 
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_4;
+            }
+            else
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_2;
+            }
         }
-        else if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_120MHZ 
+
+        #[cfg(feature = "f7")]
         {
-            *reg |= HAL_LL_ADC_PRESCALER_6;
+            if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_144MHZ 
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_6;
+            }
+            else if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_72MHZ 
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_4;
+            }
+            else
+            {
+                *reg |= HAL_LL_ADC_PRESCALER_2;
+            }
         }
-        else if  rcc_clocks.PCLK2_Frequency > HAL_LL_ADC_60MHZ 
-        {
-            *reg |= HAL_LL_ADC_PRESCALER_4;
-        }
-        else
-        {
-            *reg |= HAL_LL_ADC_PRESCALER_2;
-        }
+        
 
         (*adc_ptr).cr1 &= 0xFFF0FEFF;
         (*adc_ptr).cr2 &= !(HAL_LL_ADC_CONT | HAL_LL_ADC_ALIGN | HAL_LL_ADC_JEXTSEL);

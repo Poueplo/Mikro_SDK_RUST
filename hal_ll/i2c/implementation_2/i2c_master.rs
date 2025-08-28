@@ -44,44 +44,56 @@ use crate::target::*;
 pub use mcu_definition::i2c::*;
 use crate::gpio::*;
 use crate::gpio::gpio_constants::*;
-use system::{rcc_get_clocks_frequency, RCC_ClocksTypeDef, RCC_TypeDef, RCC_BASE};
+use system::{RCC_TypeDef, RCC_BASE};
 use core::fmt;
-use core::arch::asm;
 
-const HAL_LL_I2C_CCR_MINIMUM_ALLOWED_VALUE : u32 = 0x04;
 
-pub const HAL_LL_I2C_DEFAULT_PASS_COUNT : u16 = 10000;
+pub const HAL_LL_I2C_DEFAULT_PASS_COUNT : u16 = 0xFFFF;
 
-const HAL_LL_I2C_CCR_DUTY_BIT : u32 = 14;
-const HAL_LL_I2C_CCR_F_S_BIT : u32 = 15;
 const HAL_LL_I2C1EN_BIT : u32 = 21;
 const HAL_LL_I2C2EN_BIT : u32 = 22;
-#[cfg(feature = "i2c3")]
+#[cfg(all(feature = "i2c3", feature = "f7"))]
 const HAL_LL_I2C3EN_BIT : u32 = 23;
+#[cfg(all(feature = "i2c4", feature = "f7"))]
+const HAL_LL_I2C4EN_BIT : u32 = 24;
+#[cfg(feature = "f7")]
+const HAL_LL_I2C1SEL1_BIT : u32 = 17;
+#[cfg(feature = "f7")]
+const HAL_LL_I2C2SEL1_BIT : u32 = 19;
+#[cfg(feature = "f7")]
+const HAL_LL_I2C3SEL1_BIT : u32 = 21;
+#[cfg(feature = "f7")]
+const HAL_LL_I2C4SEL1_BIT : u32 = 23;
 
 const HAL_LL_I2C_CR1_PE_BIT : u32 = 0;
-const HAL_LL_I2C_CR1_START_BIT : u32 = 8;
-const HAL_LL_I2C_CR1_STOP_BIT : u32 = 9;
-const HAL_LL_I2C_CR1_ACK_BIT : u32 = 10;
-const HAL_LL_I2C_CR1_POS_BIT : u32 = 11;
 
-const HAL_LL_I2C_SR1_ADDR_BIT : u32 = 1;
-const HAL_LL_I2C_SR1_BTF_BIT : u32 = 2;
-const HAL_LL_I2C_SR1_ARLO_BIT : u32 = 9;
+const HAL_LL_I2C_CR1_FILTERS_OFF_MASK : u32 = 0xFFFFE0FF;
+const HAL_LL_I2C_CR1_RXTX_INT_MASK : u32 = 0x6;
 
-const HAL_LL_I2C_SR2_BUSY_BIT : u32 = 1;
 
-const HAL_LL_I2C_CR2_FREQ_MASK : u32 = 0x3F;
+//const HAL_LL_I2C_CR2_START_BIT : u32 = 13;
+const HAL_LL_I2C_CR2_STOP_BIT : u32 = 14;
+
+const HAL_LL_I2C_CR2_SADD_MASK : u32 = 0x3FF;
+const HAL_LL_I2C_CR2_NBYTES_MASK : u32 = 0xFF0000;
+const HAL_LL_I2C_CR2_RD_WRN_MASK : u32 = 1 << 10;
+const HAL_LL_I2C_CR2_HEAD10R_MASK : u32 = 1 << 12;
+const HAL_LL_I2C_CR2_START_MASK : u32 = 1 << 13;
+const HAL_LL_I2C_CR2_STOP_MASK : u32 = 1 << 14;
+const HAL_LL_I2C_CR2_RELOAD_MASK : u32 = 1 << 24;
+const HAL_LL_I2C_CR2_AUTOEND_MASK : u32 = 1 << 25;
+
+const HAL_LL_I2C_ISR_TXE_BIT : u32 = 0;
+const HAL_LL_I2C_ISR_TXIS_BIT : u32 = 1;
+const HAL_LL_I2C_ISR_RXNE_BIT : u32 = 2;
+const HAL_LL_I2C_ISR_STOPF_BIT : u32 = 5;
+//const HAL_LL_I2C_ISR_ARLO_BIT : u32 = 9;
+
+const HAL_LL_I2C_ICR_STOPCF_BIT : u32 = 5;
+
+//const HAL_LL_I2C_LOOP_INDEX : u16 = 10000;
 
 const HAL_LL_I2C_AF_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_HIGH | GPIO_CFG_OTYPE_OD;
-
-/* event 0xsr2_sr1 */
-const HAL_LL_I2C_EVENT_MASTER_MODE_SELECT : u32 = 0x0003_0001;   /* BUSY, MSL and SB flags */
-const HAL_LL_I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED : u32 = 0x0007_0082; /* BUSY, MSL, ADDR, TXE and TRA flags */
-const HAL_LL_I2C_EVENT_MASTER_BYTE_RECEIVED : u32 = 0x0003_0040; /* BUSY, MSL and RXNE flags */
-const HAL_LL_I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED : u32 = 0x0003_0002; /* BUSY, MSL and ADDR flags */
-const HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTING : u32 = 0x0007_0080; /* TRA, BUSY, MSL, TXE flags */
-const HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTED : u32 = 0x0007_0084; /* TRA, BUSY, MSL, TXE and BTF flags */
 
 #[derive(Debug)]
 pub enum HAL_LL_I2C_MASTER_ERROR {
@@ -95,6 +107,7 @@ pub enum HAL_LL_I2C_MASTER_ERROR {
     I2C_MASTER_TIMEOUT_INIT,
     I2C_MASTER_TIMEOUT_WAIT_IDLE,
     I2C_MASTER_BUFFER_ERROR,
+    I2C_MASTER_TOO_MUCH_BYTES_ERROR,
     ACQUIRE_FAIL,
     I2C_MASTER_ERROR
 }
@@ -111,7 +124,8 @@ impl fmt::Display for HAL_LL_I2C_MASTER_ERROR {
             Self::I2C_MASTER_ARBITRATION_LOST => write!(f, "I2C_MASTER_ARBITRATION_LOST occurred"),
             Self::I2C_MASTER_TIMEOUT_INIT => write!(f, "I2C_MASTER_TIMEOUT_INIT occurred"),
             Self::I2C_MASTER_TIMEOUT_WAIT_IDLE => write!(f, "I2C_MASTER_TIMEOUT_WAIT_IDLE occurred"),
-            Self::I2C_MASTER_BUFFER_ERROR => write!(f, "I2C_MASTER_BUFFER_ERROR occurred"),                    
+            Self::I2C_MASTER_BUFFER_ERROR => write!(f, "I2C_MASTER_BUFFER_ERROR occurred"),
+            Self::I2C_MASTER_TOO_MUCH_BYTES_ERROR => write!(f, "I2C_MASTER_TOO_MUCH_BYTES_ERROR occurred"),
             Self::ACQUIRE_FAIL => write!(f, "ACQUIRE_FAIL occurred"),                    
             Self::I2C_MASTER_ERROR => write!(f, "I2C_MASTER_ERROR occurred"),                    
         }
@@ -136,6 +150,17 @@ pub enum hal_ll_i2c_master_speed_t
 {
     I2C_MASTER_SPEED_100K = 100000,
     I2C_MASTER_SPEED_400K = 400000,
+    I2C_MASTER_SPEED_1M = 1000000,
+}
+
+#[cfg(feature = "f7")]
+#[repr(u32)]
+#[derive(Clone, Copy, PartialEq)]
+pub enum hal_ll_i2c_master_speed_config_reg_t
+{
+    I2C_TIMINGR_100K = 0x00303D5D,
+    I2C_TIMINGR_400K = 0x0010061A,
+    I2C_TIMINGR_1M = 0x00000107,
 }
 
 
@@ -184,11 +209,13 @@ struct hal_ll_i2c_base_handle_t
     pub cr2: hal_ll_base_addr_t,
     pub oar1: hal_ll_base_addr_t,
     pub oar2: hal_ll_base_addr_t,
-    pub dr: hal_ll_base_addr_t,
-    pub sr1: hal_ll_base_addr_t,
-    pub sr2: hal_ll_base_addr_t,
-    pub ccr: hal_ll_base_addr_t,
-    pub trise: hal_ll_base_addr_t,
+    pub timingr: hal_ll_base_addr_t,
+    pub timoutr: hal_ll_base_addr_t,
+    pub isr: hal_ll_base_addr_t,
+    pub icr: hal_ll_base_addr_t,
+    pub pecr: hal_ll_base_addr_t,
+    pub rxdr: hal_ll_base_addr_t,
+    pub txdr: hal_ll_base_addr_t,
 }
 
 
@@ -208,6 +235,8 @@ static mut hal_ll_i2c_hw_specifics_map:[hal_ll_i2c_hw_specifics_map_t; (I2C_MODU
     hal_ll_i2c_hw_specifics_map_t{base: I2C2_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
     #[cfg(feature = "i2c3")]
     hal_ll_i2c_hw_specifics_map_t{base: I2C3_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
+    #[cfg(feature = "i2c4")]
+    hal_ll_i2c_hw_specifics_map_t{base: I2C4_BASE_ADDR, module_index: hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_4 as u8), pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: HAL_LL_I2C_DEFAULT_PASS_COUNT },
     hal_ll_i2c_hw_specifics_map_t{base: HAL_LL_MODULE_ERROR, module_index: HAL_LL_MODULE_ERROR as u8, pins: hal_ll_i2c_pins_t{ pin_scl: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 }, pin_sda: hal_ll_pin_af_t{ pin_name: HAL_LL_PIN_NC, pin_af: 0 } }, speed: hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K, address: 0, timeout: 0}
 ];
 
@@ -247,7 +276,7 @@ pub fn hal_ll_module_configure_i2c(handle: &mut hal_ll_i2c_master_handle_registe
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let pin_check_result: usize = hal_ll_i2c_hw_specifics_map_local.module_index as usize;
 
-    hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local );
+    hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local )?;
     unsafe{
         hal_ll_module_state[pin_check_result].i2c_master_handle = hal_ll_i2c_hw_specifics_map[pin_check_result].base;
         hal_ll_module_state[pin_check_result].init_ll_state = true;
@@ -264,9 +293,10 @@ pub fn hal_ll_i2c_master_set_speed(handle: &mut hal_ll_i2c_master_handle_registe
 
     hal_ll_i2c_hw_specifics_map_local.speed = speed;
 
-    hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local );
+    hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local )?;
 
     hal_handle.init_ll_state = true;
+
     Ok(())
 }
 
@@ -279,34 +309,27 @@ pub fn hal_ll_i2c_master_set_timeout(handle: &mut hal_ll_i2c_master_handle_regis
     }
 }
 
-pub fn hal_ll_i2c_master_set_slave_address(handle: &mut hal_ll_i2c_master_handle_register_t, addr: u8) -> Result<()> {
+pub fn hal_ll_i2c_master_set_slave_address(handle: &mut hal_ll_i2c_master_handle_register_t, addr: u8) {
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
     if hal_ll_i2c_hw_specifics_map_local.base != HAL_LL_MODULE_ERROR {
         hal_ll_i2c_hw_specifics_map_local.address = addr;
     }
-    Ok(())
 }
 
 pub fn hal_ll_i2c_master_read( handle: &mut hal_ll_i2c_master_handle_register_t, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<()>{
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
-    match hal_ll_i2c_master_read_bare_metal( hal_ll_i2c_hw_specifics_map_local, read_data_buf, len_read_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP ) {
-        Ok(_) => Ok(()),
-        Err(e) =>  Err(e),
-    }
+    hal_ll_i2c_master_read_bare_metal( hal_ll_i2c_hw_specifics_map_local, read_data_buf, len_read_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP )
 }
 
 pub fn hal_ll_i2c_master_write(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize ) -> Result<()>{
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
-    match hal_ll_i2c_master_write_bare_metal( hal_ll_i2c_hw_specifics_map_local, write_data_buf, len_write_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP ) {
-        Ok(_) => Ok(()),
-        Err(e) =>  Err(e),
-    }
+    hal_ll_i2c_master_write_bare_metal( hal_ll_i2c_hw_specifics_map_local, write_data_buf, len_write_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP )
 }
 
 pub fn hal_ll_i2c_master_write_then_read(  handle: &mut hal_ll_i2c_master_handle_register_t, write_data_buf: &mut [u8], len_write_data: usize,  read_data_buf: &mut [u8], len_read_data: usize) -> Result<()>{
@@ -318,10 +341,9 @@ pub fn hal_ll_i2c_master_write_then_read(  handle: &mut hal_ll_i2c_master_handle
         Err(e) =>  return Err(e),
     }
 
-    match hal_ll_i2c_master_read_bare_metal( hal_ll_i2c_hw_specifics_map_local, read_data_buf, len_read_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_WRITE_THEN_READ ) {
-        Ok(_) => Ok(()),
-        Err(e) =>  Err(e),
-    }
+    hal_ll_i2c_master_read_bare_metal( hal_ll_i2c_hw_specifics_map_local, read_data_buf, len_read_data, hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_WRITE_THEN_READ )?;
+    Ok(())
+    
 
 }
 
@@ -360,281 +382,187 @@ fn hal_ll_i2c_master_read_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, re
         return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_BUFFER_ERROR);
     }
 
-    if mode != hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_WRITE_THEN_READ {
-        match hal_ll_i2c_master_start( map ) {
+    if len_read_data > 0xFF {
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TOO_MUCH_BYTES_ERROR);
+    }
+
+    
+    hal_ll_i2c_master_configure_transfer(map, 
+                                        ((map.address as u32) << 1 & HAL_LL_I2C_CR2_SADD_MASK ) |
+                                        ((len_read_data as u32) << 16 & HAL_LL_I2C_CR2_NBYTES_MASK ) |
+                                        HAL_LL_I2C_CR2_RD_WRN_MASK |
+                                        HAL_LL_I2C_CR2_START_MASK);
+    
+    unsafe {
+        while transfer_counter < len_read_data {
+            while check_reg_bit( &(*i2c_ptr).isr as *const u32 as u32, HAL_LL_I2C_ISR_RXNE_BIT ) == 0 {
+                if map.timeout > 0 {
+                    if time_counter == 0 {
+                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
+                    }
+
+                    time_counter -= 1;
+                }
+            }
+            read_data_buf[ transfer_counter ] = (*i2c_ptr).rxdr as u8;
+            transfer_counter += 1;
+        }
+    }
+
+    if mode == hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_WRITE_THEN_READ || mode == hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP {
+        match hal_ll_i2c_master_stop( map ) {
             Ok(_) => (),
             Err(e) => return Err(e),
         }
     }
-    unsafe{
-        if len_read_data <= 2 {
-            if len_read_data == 2 {
-                set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_ACK_BIT);
-                set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_POS_BIT );
-            }
+    // currently unreachable
+    // else {
+    //     match hal_ll_i2c_master_start( map ) {
+    //         Ok(_) => (),
+    //         Err(e) => return Err(e),
+    //     }
+    // }
 
-            (*i2c_ptr).dr = ( (map.address as u32) << 1 ) | 1;
+    hal_ll_i2c_master_reset_cr2( map );
 
-            while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_ADDR_BIT ) == 0 {
-                if map.timeout > 0 {
-                    if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                    }
-
-                    time_counter -= 1;
-                }
-            }
-
-            hal_ll_i2c_master_clear_status_reg(i2c_ptr);
-
-            time_counter = map.timeout;
-            if len_read_data == 1 {
-                while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_RECEIVED ) {
-                    if map.timeout > 0 {
-                        if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                        }
-
-                        time_counter -= 1;
-                    }
-                }
-            } else {
-                while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0  {
-                    if map.timeout > 0 {
-                        if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                        }
-
-                        time_counter -= 1;
-                    }
-                }
-            }
-
-            set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_STOP_BIT );
-
-            if len_read_data == 1 {
-                read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-            } else {
-                read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-                transfer_counter += 1;
-                read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-            }
-
-            if len_read_data == 2 {
-                clear_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_POS_BIT);
-            }
-
-        } else {
-            set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_ACK_BIT);
-            (*i2c_ptr).dr = ( (map.address as u32) << 1 ) | 1;
-
-            while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_RECEIVER_MODE_SELECTED ) {
-                if map.timeout > 0 {
-                    if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                    }
-
-                    time_counter -= 1;
-                }
-            }
-
-            while transfer_counter < (len_read_data - 3) {
-                time_counter = map.timeout;
-                while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_RECEIVED ) {
-                    if map.timeout > 0 {
-                        if time_counter == 0 {
-                            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                        }
-    
-                        time_counter -= 1;
-                    }
-                }
-                read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-                transfer_counter += 1;
-            }
-
-            time_counter = map.timeout;
-            while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0 {
-                if map.timeout > 0 {
-                    if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                    }    
-                    time_counter -= 1;
-                }
-            }
-            
-            clear_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_ACK_BIT );
-
-            read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-            transfer_counter += 1;
-
-            time_counter = map.timeout;
-            while check_reg_bit( &(*i2c_ptr).sr1 as *const u32 as u32, HAL_LL_I2C_SR1_BTF_BIT ) == 0 {
-                if map.timeout > 0 {
-                    if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
-                    }    
-                    time_counter -= 1;
-                }
-            }
-            
-            set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_STOP_BIT );
-
-
-            read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-            transfer_counter += 1;
-            read_data_buf[ transfer_counter ] = (*i2c_ptr).dr as u8;
-        }
-
-        Ok(())
-    }
+    Ok(())
 }
 
 fn hal_ll_i2c_master_write_bare_metal(map: &mut hal_ll_i2c_hw_specifics_map_t, write_data_buf: &mut [u8], len_write_data: usize, mode: hal_ll_i2c_master_end_mode_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
     let mut time_counter: u16 = map.timeout;
     let mut transfer_counter: usize = 0;
-    
-    match hal_ll_i2c_master_start( map ) {
-        Ok(_) => (),
-        Err(e) => return Err(e),
+
+    if write_data_buf.len() < len_write_data {
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_BUFFER_ERROR);
     }
+
+    if len_write_data > 0xFF {
+        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TOO_MUCH_BYTES_ERROR);
+    }
+
+    hal_ll_i2c_master_configure_transfer(map, 
+                                        ((map.address as u32) << 1 & HAL_LL_I2C_CR2_SADD_MASK ) |
+                                        ((len_write_data as u32) << 16 & HAL_LL_I2C_CR2_NBYTES_MASK ) |
+                                        HAL_LL_I2C_CR2_START_MASK);
     
     unsafe {
-        (*i2c_ptr).dr = (map.address as u32) << 1;
-
-        while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED ) {
-            if map.timeout > 0 {
-                if time_counter == 0 {
-                    return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
-                }
-
-                time_counter -= 1;
-            }
-        }
-
-        hal_ll_i2c_master_clear_status_reg(i2c_ptr);
-
-        while transfer_counter < (len_write_data - 1) {
-            (*i2c_ptr).dr = (write_data_buf[transfer_counter] as u32 ) & 0xFF ;
-    
-            time_counter = map.timeout;
-            while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTING ) {
+        while transfer_counter < len_write_data {
+            while check_reg_bit( &(*i2c_ptr).isr as *const u32 as u32, HAL_LL_I2C_ISR_TXIS_BIT ) == 0 {
                 if map.timeout > 0 {
                     if time_counter == 0 {
                         return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                     }
-    
+
                     time_counter -= 1;
                 }
             }
 
+            (*i2c_ptr).txdr = write_data_buf[ transfer_counter ] as u32;
             transfer_counter += 1;
         }
 
-        (*i2c_ptr).dr = (write_data_buf[transfer_counter] as u32 ) & 0xFF ;
-    
-        time_counter = map.timeout;
-        while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_BYTE_TRANSMITTED ) {
+        while check_reg_bit( &(*i2c_ptr).isr as *const u32 as u32, HAL_LL_I2C_ISR_TXE_BIT ) == 0 {
             if map.timeout > 0 {
                 if time_counter == 0 {
                     return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
                 }
-                
+
                 time_counter -= 1;
             }
         }
 
-        if mode == hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP {
-            set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_STOP_BIT);
-        } else {
-            set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_START_BIT);
-
-            time_counter = map.timeout;
-            while !hal_ll_i2c_master_check_event( i2c_ptr, HAL_LL_I2C_EVENT_MASTER_MODE_SELECT ) {
-                if map.timeout > 0 {
-                    if time_counter == 0 {
-                        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WRITE);
-                    }
-                    
-                    time_counter -= 1;
-                }
-            }
-        }
-
     }
 
+    if mode == hal_ll_i2c_master_end_mode_t::HAL_LL_I2C_MASTER_END_MODE_STOP {
+        match hal_ll_i2c_master_stop( map ) {
+            Ok(_) => (),
+            Err(e) => return Err(e),
+        }
+    }
+
+    hal_ll_i2c_master_reset_cr2( map );
 
     Ok(())
 }
 
-#[allow(unused_variables, unused_assignments)]
-fn hal_ll_i2c_master_clear_status_reg(i2c_ptr: *mut hal_ll_i2c_base_handle_t) {
-    unsafe{
-        let mut tmp: u32 = (*i2c_ptr).sr1;
-        asm!{"nop"};
-        tmp |= (*i2c_ptr).sr2 << 16;
+fn hal_ll_i2c_master_configure_transfer(map: &mut hal_ll_i2c_hw_specifics_map_t, config: u32 ) {
+    let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
+    unsafe {
+        (*i2c_ptr).cr2 &= !(HAL_LL_I2C_CR2_SADD_MASK | 
+                            HAL_LL_I2C_CR2_NBYTES_MASK | 
+                            HAL_LL_I2C_CR2_RELOAD_MASK |
+                            HAL_LL_I2C_CR2_AUTOEND_MASK |
+                            HAL_LL_I2C_CR2_RD_WRN_MASK |
+                            HAL_LL_I2C_CR2_START_MASK |
+                            HAL_LL_I2C_CR2_STOP_MASK);
+
+        (*i2c_ptr).cr2 |= config;
+    }
+
+}
+
+fn hal_ll_i2c_master_reset_cr2(map: &mut hal_ll_i2c_hw_specifics_map_t) {
+    let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
+    unsafe {
+        (*i2c_ptr).cr2 &= !(HAL_LL_I2C_CR2_SADD_MASK |
+                            HAL_LL_I2C_CR2_HEAD10R_MASK |
+                            HAL_LL_I2C_CR2_NBYTES_MASK |
+                            HAL_LL_I2C_CR2_RELOAD_MASK |
+                            HAL_LL_I2C_CR2_RD_WRN_MASK
+                            );
     }
 }
 
-fn hal_ll_i2c_master_start(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
-    let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
-    let mut time_counter: u16 = map.timeout;
+//currently dead code
+// fn hal_ll_i2c_master_start(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
+//     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
 
-    let status: bool = hal_ll_i2c_master_wait_for_idle( map ).is_ok();
-    if !status  {
-        return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_START);
-    }
-    unsafe{
-        set_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_START_BIT);
+//     unsafe{
+//         set_reg_bit( &(*i2c_ptr).cr2 as *const u32 as u32, HAL_LL_I2C_CR2_START_BIT);
     
-        if check_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_SR1_ARLO_BIT ) == 1 {
-            return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ARBITRATION_LOST);
-        }
-    }
-    while !hal_ll_i2c_master_check_event(i2c_ptr, HAL_LL_I2C_EVENT_MASTER_MODE_SELECT) {
-        if  map.timeout > 0  {
-            if time_counter == 0 {
-                return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_START);
-            }
-            time_counter -= 1;
-        }
-    }
+//         if check_reg_bit( &(*i2c_ptr).isr as *const u32 as u32, HAL_LL_I2C_ISR_ARLO_BIT ) == 1 {
+//             return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_ARBITRATION_LOST);
+//         }
+//     }
+//     #[allow(unused_variables)]
+//     for loop_index in 0 .. HAL_LL_I2C_LOOP_INDEX {
+//         ();
+//     }
 
-    Ok(())
-}
+//     Ok(())
+// }
 
-fn hal_ll_i2c_master_wait_for_idle(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
-    let mut time_counter: u16 = map.timeout;
+fn hal_ll_i2c_master_stop(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
+    let mut time_counter: u16 = map.timeout;
 
-    while  !hal_ll_i2c_master_is_idle(i2c_ptr ) {
-        if map.timeout > 0 {
-            if time_counter == 0 {
-                return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_WAIT_IDLE);
+    unsafe{
+        set_reg_bit( &(*i2c_ptr).cr2 as *const u32 as u32, HAL_LL_I2C_CR2_STOP_BIT);
+    
+        while check_reg_bit( &(*i2c_ptr).isr as *const u32 as u32, HAL_LL_I2C_ISR_STOPF_BIT ) == 0 {
+            if map.timeout > 0 {
+                if time_counter == 0 {
+                    return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_READ);
+                }
+
+                time_counter -= 1;
             }
-
-            time_counter -= 1;
         }
+
+        //present in the C implementation currently useless for the F7 family
+        //slows down the flow a lot
+        // if map.timeout < HAL_LL_I2C_LOOP_INDEX {
+        //     #[allow(unused_variables)]
+        //     for loop_index in 0 .. HAL_LL_I2C_LOOP_INDEX {
+        //         ();
+        //     }
+        // }
+
+        (*i2c_ptr).icr |= 1 << HAL_LL_I2C_ICR_STOPCF_BIT;
     }
 
     Ok(())
-}
-
-fn hal_ll_i2c_master_is_idle(i2c_ptr: *mut hal_ll_i2c_base_handle_t) -> bool {
-    unsafe{
-        check_reg_bit( &(*i2c_ptr).sr2 as *const u32 as u32, HAL_LL_I2C_SR2_BUSY_BIT ) == 0
-    }
-}
-
-fn hal_ll_i2c_master_get_status(i2c_ptr: *mut hal_ll_i2c_base_handle_t) -> u32 {
-    unsafe{
-        (*i2c_ptr).sr1 | ((*i2c_ptr).sr2 << 16)
-    }
-}
-
-fn hal_ll_i2c_master_check_event(i2c_ptr: *mut hal_ll_i2c_base_handle_t, event: u32) -> bool {
-    (hal_ll_i2c_master_get_status(i2c_ptr) & event ) == event
 }
 
 fn hal_ll_i2c_master_check_pins(scl: hal_ll_pin_name_t, sda: hal_ll_pin_name_t, index_list: &mut hal_ll_i2c_pin_id) -> u8 {
@@ -706,35 +634,30 @@ fn hal_ll_get_specifics<'a>(handle: hal_ll_i2c_master_handle_register_t) -> &'a 
 }
 
 fn hal_ll_i2c_master_set_clock(map: &mut hal_ll_i2c_hw_specifics_map_t, hal_ll_state: bool) {
-    unsafe {
-        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
-        #[cfg(feature = "i2c1")]
-        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8)
-        {
-            if hal_ll_state {
-                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
-            } else {
-                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
-            }
-        }
-        #[cfg(feature = "i2c2")]
-        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8)
-        {
-            if hal_ll_state {
-                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
-            } else {
-                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
-            }
-        }
-        #[cfg(feature = "i2c3")]
-        if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8)
-        {
-            if hal_ll_state {
-                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
-            } else {
-                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
-            }
-        }
+    
+    #[cfg(feature = "i2c1")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_1 as u8)
+    {
+        hal_ll_i2c1_set_clock(hal_ll_state);
+        return;
+    }
+    #[cfg(feature = "i2c2")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_2 as u8)
+    {
+        hal_ll_i2c2_set_clock(hal_ll_state);
+        return;
+    }
+    #[cfg(feature = "i2c3")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_3 as u8)
+    {
+        hal_ll_i2c3_set_clock(hal_ll_state);
+        return;
+    }
+    #[cfg(feature = "i2c4")]
+    if map.module_index == hal_ll_i2c_module_num(i2c_modules::I2C_MODULE_4 as u8)
+    {
+        hal_ll_i2c4_set_clock(hal_ll_state);
+        return;
     }
 }
 
@@ -760,79 +683,129 @@ fn hal_ll_i2c_master_alternate_functions_set_state(map: &mut hal_ll_i2c_hw_speci
         module.configs[0] = HAL_LL_I2C_AF_CONFIG;
         module.configs[1] = HAL_LL_I2C_AF_CONFIG;
 
-        // /* STM32F1xx specific */
-        // module.gpio_remap = map->pins.pin_scl.pin_af;
-
         hal_ll_gpio_module_struct_init( &mut module, hal_ll_state );
     }
 }
 
-#[allow(unused_variables, unused_assignments)]
-fn hal_ll_i2c_calculate_speed(clock_value: u32, speed: u32) -> u32 {
-    let mut tmp_one: u32 = 0;
-    let mut tmp_two: u32 = 0;
+fn hal_ll_i2c_get_speed(speed: hal_ll_i2c_master_speed_t) -> u32 {
+    
+    if speed == hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_400K {
+        return hal_ll_i2c_master_speed_config_reg_t::I2C_TIMINGR_400K as u32;
+    } else if speed == hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_1M {
+        return hal_ll_i2c_master_speed_config_reg_t::I2C_TIMINGR_1M as u32;
+    }
 
-    if speed <= hal_ll_i2c_master_speed_t::I2C_MASTER_SPEED_100K as u32 {
-        tmp_one = clock_value / ( speed << 1 );
-        if tmp_one < HAL_LL_I2C_CCR_MINIMUM_ALLOWED_VALUE {
-            return HAL_LL_I2C_CCR_MINIMUM_ALLOWED_VALUE & 0xCFFF;
-        }
+    hal_ll_i2c_master_speed_config_reg_t::I2C_TIMINGR_100K as u32
+}
 
-        return tmp_one & 0xCFFF;
-    } else {
-        tmp_one = (clock_value / ( speed * 3 )) & 0xFF;
-        tmp_two = (clock_value / ( speed * 25 )) & 0xFF;
-
-        tmp_one = tmp_one * ( speed * 3 );
-        tmp_two = tmp_two * ( speed * 25 );
-
-        if ( clock_value - tmp_one ) < ( clock_value - tmp_two )
-        {
-            tmp_one = clock_value / ( speed * 3 );
+fn hal_ll_i2c1_set_clock(hal_ll_state : bool) {
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        if hal_ll_state {
+            #[cfg(feature = "f7")]
+            {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
+                set_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C1SEL1_BIT );
+            }
         } else {
-            tmp_one = clock_value / ( speed * 25 );
-            tmp_one |= 1 << HAL_LL_I2C_CCR_DUTY_BIT;
+            #[cfg(feature = "f7")]
+            {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C1EN_BIT );
+                clear_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C1SEL1_BIT );
+            }
         }
-
-        if ( tmp_one & 0xFFF ) == 0 {
-            tmp_one |= 1;
-        }
-
-        return (tmp_one | ( 1 << HAL_LL_I2C_CCR_F_S_BIT )) & 0xCFFF;
     }
 }
 
-fn hal_ll_i2c_hw_init(map: &mut hal_ll_i2c_hw_specifics_map_t) {
+fn hal_ll_i2c2_set_clock(hal_ll_state : bool) {
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        if hal_ll_state {
+            #[cfg(feature = "f7")]
+            {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
+                set_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C2SEL1_BIT );
+            }
+        } else {
+            #[cfg(feature = "f7")]
+            {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C2EN_BIT );
+                clear_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C2SEL1_BIT );
+            }
+        }
+    }
+}
+
+#[cfg(feature = "i2c3")]
+fn hal_ll_i2c3_set_clock(hal_ll_state : bool) {
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        if hal_ll_state {
+            #[cfg(feature = "f7")]
+            {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
+                set_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C3SEL1_BIT );
+            }
+        } else {
+            #[cfg(feature = "f7")]
+            {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C3EN_BIT );
+                clear_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C3SEL1_BIT );
+            }
+        }
+    }
+}
+
+#[cfg(feature = "i2c4")]
+fn hal_ll_i2c4_set_clock(hal_ll_state : bool) {
+    unsafe {
+        let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
+        if hal_ll_state {
+            #[cfg(feature = "f7")]
+            {
+                set_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C4EN_BIT );
+                set_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C4SEL1_BIT );
+            }
+        } else {
+            #[cfg(feature = "f7")]
+            {
+                clear_reg_bit( &(*rcc_ptr).APB1ENR as *const u32 as u32, HAL_LL_I2C4EN_BIT );
+                clear_reg_bit( &(*rcc_ptr).DCKCFGR2 as *const u32 as u32, HAL_LL_I2C4SEL1_BIT );
+            }
+        }
+    }
+}
+
+fn hal_ll_i2c_hw_init(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
     let i2c_ptr : *mut hal_ll_i2c_base_handle_t = map.base as *mut hal_ll_i2c_base_handle_t;
-    let frequency_range: u32;
-    let mut rcc_clocks : RCC_ClocksTypeDef = RCC_ClocksTypeDef::default();
-
-    rcc_get_clocks_frequency( &mut rcc_clocks );
-
-    frequency_range = (rcc_clocks.PCLK1_Frequency / 1000000) & 0xFFFF;
+    let mut time_counter: u16 = map.timeout;
 
     unsafe{
-        (*i2c_ptr).cr2 &= !HAL_LL_I2C_CR2_FREQ_MASK;
-
-        (*i2c_ptr).cr2 = frequency_range;
-
         clear_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_PE_BIT );
 
-        if map.speed as u32 <= 100000 {
-            (*i2c_ptr).trise = frequency_range + 1;
-        } else {
-            (*i2c_ptr).trise = ((frequency_range*300)/1000)+1;
+        while check_reg_bit( &(*i2c_ptr).cr1 as *const u32 as u32, HAL_LL_I2C_CR1_PE_BIT ) == 1 {
+            if map.timeout > 0 {
+                if time_counter == 0 {
+                    return Err(HAL_LL_I2C_MASTER_ERROR::I2C_MASTER_TIMEOUT_INIT);
+                }
+
+                time_counter -= 1;
+            }
         }
 
-        (*i2c_ptr).ccr = hal_ll_i2c_calculate_speed( rcc_clocks.PCLK1_Frequency, map.speed as u32);
+        (*i2c_ptr).cr1 &= HAL_LL_I2C_CR1_FILTERS_OFF_MASK;
 
-        (*i2c_ptr).cr1 = 0;
+        (*i2c_ptr).timingr = hal_ll_i2c_get_speed(map.speed);
+
+
+        (*i2c_ptr).cr1 |= HAL_LL_I2C_CR1_RXTX_INT_MASK;
 
         set_reg_bit( &(*i2c_ptr).cr1  as *const u32 as u32, HAL_LL_I2C_CR1_PE_BIT );
     }
+    Ok(())
 }
 
-fn hal_ll_i2c_init(map: &mut hal_ll_i2c_hw_specifics_map_t) {
+fn hal_ll_i2c_init(map: &mut hal_ll_i2c_hw_specifics_map_t) -> Result<()> {
     hal_ll_i2c_master_set_clock(map, true);
-    hal_ll_i2c_hw_init(map);
+    hal_ll_i2c_hw_init(map)
 }

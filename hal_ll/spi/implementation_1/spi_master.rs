@@ -72,11 +72,14 @@ const HAL_LL_SPI_MASTER_SSI_1 : u32        = 8;
 const HAL_LL_SPI_MASTER_SSM_ENABLE : u32   = 9;
 
 const HAL_LL_SPI_MASTER_RXNE : u32 = 0;
-const HAL_LL_SPI_MASTER_TXE : u32 = 1;
 
 const HAL_LL_SPI_MASTER_SSOE_BIT : u32 = 2;
 
+#[cfg(feature = "f7")]
+const HAL_LL_SPI_MASTER_FRXTH : u32 = 1<<12;
+#[cfg(not(feature = "f7"))]
 const HAL_LL_SPI_MASTER_FRXTH : u32 = 0;
+
 
 
 const HAL_LL_SPI_CONFIG : u32 = GPIO_CFG_MODE_ALT_FUNCTION | GPIO_CFG_SPEED_HIGH | GPIO_CFG_OTYPE_PP;
@@ -155,11 +158,17 @@ impl Default for hal_ll_spi_master_handle_register_t {
 }
 
 #[repr(C)]
+union dr_register {
+    dr: hal_ll_base_addr_t,
+    data_byte: u8,
+}
+
+#[repr(C)]
 struct hal_ll_spi_master_base_handle_t {
     pub cr1: hal_ll_base_addr_t,          /* Address offset 0x00 */
     pub cr2: hal_ll_base_addr_t,          /* Address offset 0x04 */
     pub sr: hal_ll_base_addr_t,           /* Address offset 0x08 */
-    pub dr: hal_ll_base_addr_t,           /* Address offset 0x0C */
+    pub dr: dr_register,                  /* Address offset 0x0C */
     pub crcpr: hal_ll_base_addr_t,        /* Address offset 0x10 */
     pub rxcrcr: hal_ll_base_addr_t,       /* Address offset 0x14 */
     pub txcrcr: hal_ll_base_addr_t,       /* Address offset 0x18 */
@@ -329,13 +338,14 @@ pub fn hal_ll_spi_master_close(  handle: &mut hal_ll_spi_master_handle_register_
 }
 
 ///////// private functions
+
 fn hal_ll_spi_master_transfer_bare_metal(spi_ptr: *mut hal_ll_spi_master_base_handle_t, data: u8) -> u8 {
     unsafe{
-        (*spi_ptr).dr = data as u32 & 0xFF;
-
+        (*spi_ptr).dr.data_byte = data;
+    
         while check_reg_bit(&(*spi_ptr).sr as *const u32 as u32, HAL_LL_SPI_MASTER_RXNE) == 0 {()}
 
-        ((*spi_ptr).dr & 0xFF) as u8
+        (*spi_ptr).dr.data_byte
     }
 }
 

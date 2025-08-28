@@ -152,7 +152,7 @@ pub fn hal_i2c_master_set_slave_address(handle: &mut hal_i2c_master_t, config: h
         None => return Err(HAL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
-    hal_ll_i2c_master_set_slave_address(hal_handle , config.addr);
+    hal_ll_i2c_master_set_slave_address(hal_handle , config.addr)?;
     hal_obj.handle = *hal_handle;
     Ok(())
 }
@@ -165,7 +165,7 @@ pub fn hal_i2c_master_set_speed(handle: &mut hal_i2c_master_t, config: hal_i2c_m
         None => return Err(HAL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
-    hal_ll_i2c_master_set_speed(hal_handle , config.speed);
+    hal_ll_i2c_master_set_speed(hal_handle , config.speed)?;
     hal_obj.handle = *hal_handle;
     Ok(())
 }
@@ -195,7 +195,7 @@ pub fn hal_i2c_master_read(handle: &mut hal_i2c_master_t,  read_data_buf: &mut [
     }
 
     if !hal_handle.init_ll_state {
-        hal_ll_module_configure_i2c(hal_handle);
+        hal_ll_module_configure_i2c(hal_handle)?;
         hal_obj.handle = *hal_handle;
     }
     
@@ -218,7 +218,7 @@ pub fn hal_i2c_master_write(handle: &mut hal_i2c_master_t,  write_data_buf: &mut
     }
 
     if !hal_handle.init_ll_state {
-        hal_ll_module_configure_i2c(hal_handle);
+        hal_ll_module_configure_i2c(hal_handle)?;
         hal_obj.handle = *hal_handle;
     }
     
@@ -242,7 +242,7 @@ pub fn hal_i2c_master_write_then_read(handle: &mut hal_i2c_master_t,  write_data
     }
 
     if !hal_handle.init_ll_state {
-        hal_ll_module_configure_i2c(hal_handle);
+        hal_ll_module_configure_i2c(hal_handle)?;
         hal_obj.handle = *hal_handle;
     }
     
