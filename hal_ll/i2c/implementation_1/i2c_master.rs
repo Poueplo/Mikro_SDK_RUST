@@ -279,14 +279,13 @@ pub fn hal_ll_i2c_master_set_timeout(handle: &mut hal_ll_i2c_master_handle_regis
     }
 }
 
-pub fn hal_ll_i2c_master_set_slave_address(handle: &mut hal_ll_i2c_master_handle_register_t, addr: u8) -> Result<()> {
+pub fn hal_ll_i2c_master_set_slave_address(handle: &mut hal_ll_i2c_master_handle_register_t, addr: u8) {
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
     if hal_ll_i2c_hw_specifics_map_local.base != HAL_LL_MODULE_ERROR {
         hal_ll_i2c_hw_specifics_map_local.address = addr;
     }
-    Ok(())
 }
 
 pub fn hal_ll_i2c_master_read( handle: &mut hal_ll_i2c_master_handle_register_t, read_data_buf: &mut [u8], len_read_data: usize ) -> Result<()>{

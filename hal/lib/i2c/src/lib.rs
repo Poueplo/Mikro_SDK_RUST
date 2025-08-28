@@ -152,7 +152,7 @@ pub fn hal_i2c_master_set_slave_address(handle: &mut hal_i2c_master_t, config: h
         None => return Err(HAL_I2C_MASTER_ERROR::I2C_MASTER_ERROR),
     }
 
-    hal_ll_i2c_master_set_slave_address(hal_handle , config.addr)?;
+    hal_ll_i2c_master_set_slave_address(hal_handle , config.addr);
     hal_obj.handle = *hal_handle;
     Ok(())
 }
