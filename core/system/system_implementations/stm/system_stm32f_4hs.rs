@@ -205,7 +205,7 @@ pub fn rcc_get_clocks_frequency(rcc_clocks: &mut RCC_ClocksTypeDef) {
   */
 
 pub fn enable_overdrive_mode() {
-     unsafe{
+    unsafe{
         let rcc_ptr : *mut RCC_TypeDef = RCC_BASE as *mut RCC_TypeDef;
         let pwr_ptr : *mut PWR_TypeDef = PWR_BASE as *mut PWR_TypeDef;
         // Enable power clock

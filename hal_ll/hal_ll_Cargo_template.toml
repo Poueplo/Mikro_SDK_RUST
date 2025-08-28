@@ -31,6 +31,7 @@ family = ["{family}"]
 
 f2 = []
 f4 = []
+f7 = []
 l1 = []
 
 gpioa = ["mcu_definition/gpioa"]
@@ -56,6 +57,7 @@ i2c = ["mcu_definition/i2c",{i2c}]
 i2c1 = ["mcu_definition/i2c1"]
 i2c2 = ["mcu_definition/i2c2"]
 i2c3 = ["mcu_definition/i2c3"]
+i2c4 = ["mcu_definition/i2c4"]
 
 spi = ["mcu_definition/spi",{spi}]
 
