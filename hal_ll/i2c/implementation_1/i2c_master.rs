@@ -242,7 +242,7 @@ pub fn hal_ll_i2c_master_register_handle(scl: hal_ll_pin_name_t, sda: hal_ll_pin
     }
 }
 
-pub fn hal_ll_module_configure_i2c(handle: &mut hal_ll_i2c_master_handle_register_t) {
+pub fn hal_ll_module_configure_i2c(handle: &mut hal_ll_i2c_master_handle_register_t) -> Result<()> {
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
     let pin_check_result: usize = hal_ll_i2c_hw_specifics_map_local.module_index as usize;
@@ -253,9 +253,10 @@ pub fn hal_ll_module_configure_i2c(handle: &mut hal_ll_i2c_master_handle_registe
         hal_ll_module_state[pin_check_result].init_ll_state = true;
     }
     hal_handle.init_ll_state = true;
+    Ok(())
 }
 
-pub fn hal_ll_i2c_master_set_speed(handle: &mut hal_ll_i2c_master_handle_register_t, speed: hal_ll_i2c_master_speed_t) {
+pub fn hal_ll_i2c_master_set_speed(handle: &mut hal_ll_i2c_master_handle_register_t, speed: hal_ll_i2c_master_speed_t) -> Result<()> {
     let hal_handle : &mut hal_ll_i2c_master_handle_register_t = handle;
     let hal_ll_i2c_hw_specifics_map_local: &mut hal_ll_i2c_hw_specifics_map_t = hal_ll_get_specifics(*hal_handle);
 
@@ -266,6 +267,7 @@ pub fn hal_ll_i2c_master_set_speed(handle: &mut hal_ll_i2c_master_handle_registe
     hal_ll_i2c_init( hal_ll_i2c_hw_specifics_map_local );
 
     hal_handle.init_ll_state = true;
+    Ok(())
 }
 
 pub fn hal_ll_i2c_master_set_timeout(handle: &mut hal_ll_i2c_master_handle_register_t, timeout: u16) {
