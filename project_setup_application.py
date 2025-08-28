@@ -131,11 +131,15 @@ class MCUConfigurator(QWidget):
                     values = list(range(min_val, max_val + 1))
                     if inverted:
                         values = list(reversed(values))
+                    
+                    init_value_array = "0x" + init_value.lstrip('0')
 
                     for i, val in enumerate(values):
-                        val_hex = hex(val)[2:].zfill(8).upper()
+                        mask_hex = int(f"0x{field["mask"]}", 16)
+                        val_bin = bin(mask_hex)
+                        val_hex = hex(int(f"0x{hex(val)[2:].zfill(8).upper()}", 16) << (len(val_bin) - len(val_bin.rstrip('0'))))
                         combo.addItem(f"{field_key} = {val}", val_hex)
-                        if init_value == val_hex:
+                        if init_value_array == val_hex:
                             selected_index = i
                 
                 if selected_index != -1:
