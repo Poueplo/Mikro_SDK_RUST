@@ -3,11 +3,14 @@
 **Supported MCU:** 
 - STM32F207ZG
 - STM32F217ZG
-- STM32F405ZG
+- STM32F405xx, STM32F407xx, STM32F415xx and STM32F417xx tested with STM32F405ZG
 - STM32F412RE
 - STM32F429ZI
 - STM32F479II
 - STM32L152RE
+- STM32F723IE and STM32F723ZE tested with STM32F723ZE
+- STM32F756NG and STM32F756ZG tested with STM32F756ZG
+- STM32F777NI
 
 ## Overview  
 This version implements every module required by Mikrobuses.  
@@ -88,6 +91,7 @@ The target should be adapted again to the family of the MCU in use for your proj
   - stm32f4x.cfg
   - stm32f2x.cfg
   - stm32l1.cfg
+  - stm32f7x.cfg
 
 
 ### Debugging  
