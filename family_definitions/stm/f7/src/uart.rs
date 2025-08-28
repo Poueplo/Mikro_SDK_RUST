@@ -89,21 +89,21 @@ pub const UART8_BASE_ADDR : u32 = 0x4000_7C00;
 
 
 #[cfg(feature = "uart1")]
-pub const UART1_NVIC: u8 = 37;
+pub const UART1_NVIC: u8 = 53;
 #[cfg(feature = "uart2")]
-pub const UART2_NVIC: u8 = 38;
+pub const UART2_NVIC: u8 = 54;
 #[cfg(feature = "uart3")]
-pub const UART3_NVIC: u8 = 39;
+pub const UART3_NVIC: u8 = 55;
 #[cfg(feature = "uart4")]
-pub const UART4_NVIC: u8 = 52;
+pub const UART4_NVIC: u8 = 68;
 #[cfg(feature = "uart5")]
-pub const UART5_NVIC: u8 = 53;
+pub const UART5_NVIC: u8 = 69;
 #[cfg(feature = "uart6")]
-pub const UART6_NVIC: u8 = 71;
+pub const UART6_NVIC: u8 = 87;
 #[cfg(feature = "uart7")]
-pub const UART7_NVIC: u8 = 82;
+pub const UART7_NVIC: u8 = 98;
 #[cfg(feature = "uart8")]
-pub const UART8_NVIC: u8 = 83;
+pub const UART8_NVIC: u8 = 99;
 
 #[repr(u8)]
 #[derive(Clone, Copy)]

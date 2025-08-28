@@ -65,12 +65,12 @@ pub fn hal_ll_core_port_nvic_enable_irq(IRQn : u8)
         }
 
     // General exceptions
-    if IRQn >= 64
+    if IRQn >= 80
     {
         set_reg_bit( HAL_LL_CORE_NVIC_ISER_2, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 32 {
+    } else if IRQn >= 48 {
         set_reg_bit( HAL_LL_CORE_NVIC_ISER_1, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 0 {
+    } else if IRQn >= 16 {
         set_reg_bit( HAL_LL_CORE_NVIC_ISER_0, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
     }
 }
@@ -100,12 +100,12 @@ pub fn hal_ll_core_port_nvic_disable_irq(IRQn : u8)
     }
 
     // General exceptions
-    if IRQn >= 64 
+    if IRQn >= 80 
     {
         set_reg_bit( HAL_LL_CORE_NVIC_ICER_2, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 32 {
+    } else if IRQn >= 48 {
         set_reg_bit( HAL_LL_CORE_NVIC_ICER_1, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
-    } else if IRQn >= 0 {
+    } else if IRQn >= 16 {
         set_reg_bit( HAL_LL_CORE_NVIC_ICER_0, ( /*( hal_ll_core_irq( IRQn ) )*/ IRQn & HAL_LL_CORE_IRQ_MASK ) as u32 );
     }
 }
